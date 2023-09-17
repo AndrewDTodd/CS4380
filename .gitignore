@@ -11,3 +11,4 @@ CTestTestfile.cmake
 _deps
 /.vs
 /out
+/build/windows-clang-x64-debug
