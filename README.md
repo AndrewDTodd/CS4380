@@ -1,8 +1,8 @@
 # Project0_BinaryConversion
 
 Steps to build
-prolog: though this step isn't strictly necessary to actually build the project it helps to make sure the user is in the right directory and all necessary configuration files have been downloaded correctly
-  in the bash terminal navigate to the directory of the cloded repository. For isntance home/CS4380.
+prolog: though this step isn't strictly necessary to actually build the project it helps to make sure the user is in the right directory and all necessary configuration files have been downloaded correctly.
+  In the bash terminal navigate to the directory of the cloned repository. For isntance home/CS4380.
   in this root directory for the repo there should be a CMakePresets.json document.
   verify its contents are correct by running the following command
   
