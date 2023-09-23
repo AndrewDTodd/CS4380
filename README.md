@@ -1,47 +1,39 @@
-# Project0_BinaryConversion
+# Project0_BinaryConversion  
 
-Steps to build
-prolog: though this step isn't strictly necessary to actually build the project it helps to make sure the user is in the right directory and all necessary configuration files have been downloaded correctly.
-  In the bash terminal navigate to the directory of the cloned repository. For isntance home/CS4380.
-  in this root directory for the repo there should be a CMakePresets.json document.
-  verify its contents are correct by running the following command
+###### **NOTE: all steps assume user is on Ubuntu 22.04 or compatible Debian system**  
+#### Steps to build  
+##### Prolog: Clone the repo  
+Navigate to the directory you what the repository to be cloned into and enter the following command  
+
+If authenticating with SSH(recommended)  
   
-    cmake --list-presets=all
+    git clone git@github.com:AndrewDTodd/CS4380.git
 
-  after running this command you should see a dialog saying that the available configure presets are
-    "linux-x64-debug" and "linux-x64-release"
+If authenticating with HTTPS  
 
-Step 1:
-  This is where the actual necessary steps to build and run begin
+    git clone https://github.com/AndrewDTodd/CS4380.git
 
-  while in the root directory of the repositories clone (such as home/CS4380) run the following command to set the cmake build configuration
+##### Step 1: navigate to repo  
+Use the following command to navigate into the repositories directory  
 
-    cmake --preset linux-x64-release
+    cd CS4380
 
-  Cmake will configure for the build now. The last line of the dialog will tell you what directory the build cache files have been made in.
-  It will be ${root}/build/linux-x64-release (CS4380/build/linux-x64-release)
+##### Step 2: make Build shell script executable  
+Run the following command to make the script executable  
 
- Step 2:
-   now run the following command
+    chmod +x Build.sh
 
-     cmake --build ./build/linux-x64-release
+#### Steps to run programs/tests  
+##### Step 1: navigate to build directory  
+The previouse steps have created and built the programs in a new directory. Enter the following to navigate to this directory  
 
-   you will see a 14 step build process proceed
-   upon completion navigate to the build/linux-x64-release directory with the following command
+    cd build/linux-x64-release
 
-     cd build/linux-x64-release
+##### Step 2: run desired programs
+To run the test suite
 
- Step 3:
-   the built executables can now be run
+    ./runTests
 
-   To run the unit tests in the test suite
+To run the project program
 
-     ./runTests
-
-   you will see 5 tests execute and report
-
-   To run the B10ToB2 program
-
-     ./B10ToB2
-
-   you will be prompted for input by the program
+    ./B10ToB2
