@@ -23,6 +23,11 @@ Run the following command to make the script executable
 
     chmod +x Build.sh
 
+##### Step 3: run the build script
+Enter the following command to run the build script
+
+    ./Build.sh
+
 #### Steps to run programs/tests  
 ##### Step 1: navigate to build directory  
 The previouse steps have created and built the programs in a new directory. Enter the following to navigate to this directory  
@@ -30,10 +35,10 @@ The previouse steps have created and built the programs in a new directory. Ente
     cd build/linux-x64-release
 
 ##### Step 2: run desired programs
-To run the test suite
+To run the test suite enter the following
 
     ./runTests
 
-To run the project program
+To run the project program enter the following
 
     ./B10ToB2
