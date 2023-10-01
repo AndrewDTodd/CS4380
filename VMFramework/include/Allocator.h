@@ -10,7 +10,7 @@
 namespace VMFramework
 {
 	/// <summary>
-	/// Allocator base class is used to define specific types of memory allocators to different use cases
+	/// Allocator base class is used to define specific types of memory allocators for different use cases
 	/// </summary>
 	class Allocator
 	{
@@ -30,6 +30,20 @@ namespace VMFramework
 		/// </summary>
 		size_t m_numOfAllocations = 0;
 
+		/// <summary>
+		/// Create an allocator instance with the specified configuration
+		/// </summary>
+		/// <param name="size">The number of bytes this allocator should claim for its block</param>
+		/// <param name="start">The address where this allocators block will begin</param>
+		/// <exeption cref="invalid_argument">Thrown if start is nullptr</exeption>
+		Allocator(const size_t& size, void* start);
+
+		/// <summary>
+		/// Base class destructor, will set Allocators pointers and members to default value
+		/// </summary>
+		/// <exeption cref="runtime_error">Thrown in Debug builds if the number of allocations or the used memory size are not 0, indicating a memory leak</exeption>
+		virtual ~Allocator();
+
 	public:
 		/// <summary>
 		/// The number of bytes in this allocators block of memory (total)
@@ -37,28 +51,18 @@ namespace VMFramework
 		size_t m_size;
 
 		/// <summary>
-		/// Create an allocator instance with the specified configuration
-		/// </summary>
-		/// <param name="size">The number of bytes this allocator should claim for its block</param>
-		/// <param name="start">The address where this allocators block will begin</param>
-		Allocator(const size_t& size, void* start);
-		
-		//Specifics will need to be set by derived types
-		virtual ~Allocator();
-
-		/// <summary>
 		/// Make an allocation on this allocator's block of memory
 		/// </summary>
 		/// <param name="size">The number of bytes to claim</param>
 		/// <param name="allignment">The alignment needed for the allocation, default is 8 byte allign</param>
 		/// <returns>A pointer to first byte of the allocation</returns>
-		virtual void* Allocate(const size_t& size, const uint8_t& allignment = 8);
+		virtual void* Allocate(const size_t& size, const uint8_t& allignment = 8) = 0;
 
 		/// <summary>
 		/// Free up an allocation that was made on this allocator's block of memory
 		/// </summary>
 		/// <param name="address">The first byte in the allocation that is to be freed</param>
-		virtual void Deallocate(void* address);
+		virtual void Deallocate(void* address) = 0;
 
 		/// <summary>
 		/// Gets the address of the first byte in this allocator's block of memory

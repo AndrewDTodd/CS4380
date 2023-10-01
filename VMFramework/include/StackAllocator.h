@@ -3,11 +3,21 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <execution>
 
 #include "Allocator.h"
 
 namespace VMFramework
 {
+	class stack_overflow : public std::exception
+	{
+	public:
+		const char* what() const noexcept override
+		{
+			return "Stack Overflow detected: Not enough memory remaining for requested allocation";
+		}
+	};
+
 	/// <summary>
 	/// StackAllocator works by allocating segments of memory that are "pushed" onto the allocators block of memory when an allocation is made, and "popped" off when a deallocation is made
 	/// </summary>

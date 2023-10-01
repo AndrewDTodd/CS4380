@@ -13,4 +13,17 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(VMFramework STATIC "Machine.cpp" "Machine.h" "Process.h" "Process.cpp" "MemoryManager.h" "MemoryManager.cpp" "Allocator.h" "Allocator.cpp" "StackAllocator.h" "StackAllocator.cpp" "PointerMath.h" "PointerMath.cpp" "ISA.h" "ISA.cpp" "Instruction.h" "Instruction.cpp")
+set(SOURCE_FILES
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instruction.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/ISA.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Machine.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/PointerMath.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Process.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
+)
+
+add_library(VMFramework STATIC ${SOURCE_FILES})
+#include the header files in the include directory
+target_include_directories(VMFramework PRIVATE ${CMAKE_SOURCE_DIR}/include)

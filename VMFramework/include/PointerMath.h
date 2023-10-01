@@ -30,9 +30,9 @@ namespace VMFramework
 		PointerMath() = delete;
 		~PointerMath() = delete;
 		PointerMath(const PointerMath&) = delete;
-		void operator=(const PointerMath&) = delete;
+		PointerMath& operator=(const PointerMath&) = delete;
 		PointerMath(PointerMath&&) = delete;
-		void operator=(PointerMath&&) = delete;
+		PointerMath& operator=(PointerMath&&) = delete;
 	};
 }
 #endif //!POINTER_MATH_H

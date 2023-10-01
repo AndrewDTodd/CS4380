@@ -2,14 +2,20 @@
 #define MEMORY_MANAGER_H
 
 #include <cstdint>
+#include <thread>
+#include <shared_mutex>
 
 #include "StackAllocator.h"
+
+#define TOTAL_GIBIGYTES_FOR_SYSTEM 1
 
 namespace VMFramework
 {
 	class MemoryManager
 	{
 	private:
+		static std::shared_mutex _sharedMutex;
+
 		/// <summary>
 		/// A pool of memory that is created at initialization of this class, relied upon by other subsystems for dynamic memory allocation through this manager
 		/// </summary>
@@ -24,9 +30,10 @@ namespace VMFramework
 		/// Default constructor is private, MemoryManager is a singleton. Internal use only
 		/// </summary>
 		MemoryManager();
+		
 		/// <summary>
 		/// Default destructor is private, MemoryManager is a singleton. Internal use only
-		/// </summ
+		/// </summary>
 		~MemoryManager();
 
 	public:
