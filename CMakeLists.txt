@@ -27,9 +27,32 @@ add_subdirectory(VMFramework)
 
 #VM_4380 target section
 ################################################################################################################################################################
+
+#set source for VM_4380 executable
+set(VM_4380_SOURCE
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/ISA_4380.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Process_4380.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/VM4380.cpp
+)
+
+set(VM_4380_INSTRUCTIONS
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/ADD.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/DIV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/JMP_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/LDB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/LDR_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/MOV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/MUL.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/SUB.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/TRP.cpp
+)
+
 # Create executable for the execution of the project
-add_executable (VM_4380 main.cpp)
+add_executable (VM_4380 main.cpp ${VM_4380_SOURCE})
 target_link_libraries(VM_4380 PRIVATE VMFramework)
+
+target_include_directories(VMFramework PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
+target_include_directories(VMFramework PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions)
 
 ################################################################################################################################################################
 
@@ -51,10 +74,6 @@ enable_testing()
 
 #set source for "runTests" unit testing executable
 set(UNIT_TESTS
-	
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/InstructionTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/ISATests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MachineTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MemoryManagerTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/PointerMathTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/ProcessTests.cpp

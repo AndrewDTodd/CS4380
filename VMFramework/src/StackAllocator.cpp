@@ -70,4 +70,15 @@ namespace VMFramework
 
 		m_numOfAllocations--;
 	}
+
+	void StackAllocator::ClearAllocator()
+	{
+		Allocator::ClearAllocator();
+
+		m_current_position = m_start;
+
+#ifdef _DEBUG
+		m_prev_position = nullptr;
+#endif // _DEBUG
+	}
 }

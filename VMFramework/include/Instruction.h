@@ -7,21 +7,23 @@
 
 namespace VMFramework
 {
-	template<typename OpCodeType>
-	requires std::integral<OpCodeType>
+	template<typename GPRegisterType, typename RegisterType, typename ProcessType>
+	//requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>>
 	struct Instruction
 	{
+	private:
+		Instruction();
 	public:
 		/// <summary>
 		/// The numeric code associated with this operation
 		/// </summary>
-		OpCodeType opcode;
+		RegisterType opcode;
 
 		/// <summary>
 		/// Pure virtual abstract definition of Instruction's Op method. Deriving types implement this method to define what that Instruction does
 		/// </summary>
 		/// <param name="executingProcess">Pointer to the Process object that represents the thread of execution executing this Instruction</param>
-		virtual void Op(Process* executingProcess) = 0;
+		virtual void Op(ProcessType* executingProcess) = 0;
 
 		Instruction(const Instruction&) = delete;
 		Instruction& operator=(const Instruction&) = delete;

@@ -7,17 +7,20 @@
 #include <cstddef>
 
 #include "Instruction.h"
+//#include "Process.h"
+
+constexpr size_t cexp_setSize = 22;
 
 namespace VMFramework
 {
-	template<typename OpCodeType>
-	requires std::integral<OpCodeType>
+	template<typename GPRegisterType, typename RegisterType, typename ProcessType>
+	//requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>>
 	class ISA
 	{
 	protected:
-		constexpr size_t cexp_setSize;
+		using InstructionType = Instruction<GPRegisterType, GPRegisterType, ProcessType>;
 
-		Instruction<OpCodeType>[cexp_setSize] m_instructionSet;
+		InstructionType* m_instructionSet[cexp_setSize];
 
 	public:
 		/// <summary>
@@ -25,9 +28,17 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="instructions">Pointer to array of defined Instructions to populate ISA with</param>
 		/// <param name="numInstructions">The number of Instructions in the array</param>
-		ISA(Instruction<OpCodeType>* instructions, const size_t& numInstructions);
+		ISA(InstructionType* instructions[], const size_t& numInstructions)
+		{
+			for (size_t index = 0; index < numInstructions; index++)
+			{
+				m_instructionSet[instructions[index].opcode] = std::move(instructions[index]);
+			}
+		}
 
-		~ISA();
+		~ISA()
+		{
+		}
 
 		//Do not attempt to copy
 		ISA(const ISA&) = delete;

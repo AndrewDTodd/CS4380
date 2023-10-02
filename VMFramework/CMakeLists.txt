@@ -15,15 +15,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Instruction.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/ISA.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Machine.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PointerMath.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Process.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
 )
 
 add_library(VMFramework STATIC ${SOURCE_FILES})
 #include the header files in the include directory
-target_include_directories(VMFramework PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(VMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

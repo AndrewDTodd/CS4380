@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cassert>
+#include <new>
 
 #include "PointerMath.h"
 
@@ -42,7 +43,11 @@ namespace VMFramework
 		/// Base class destructor, will set Allocators pointers and members to default value
 		/// </summary>
 		/// <exeption cref="runtime_error">Thrown in Debug builds if the number of allocations or the used memory size are not 0, indicating a memory leak</exeption>
-		virtual ~Allocator();
+		virtual ~Allocator()
+#ifdef _DEBUG
+			noexcept(false)
+#endif // _DEBUG
+			;
 
 	public:
 		/// <summary>
@@ -63,6 +68,11 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="address">The first byte in the allocation that is to be freed</param>
 		virtual void Deallocate(void* address) = 0;
+
+		/// <summary>
+		/// Clear the Allocator and reset it to it's initial state. Effectively remove all allocations, which may invalidate existing pointers
+		/// </summary>
+		virtual void ClearAllocator();
 
 		/// <summary>
 		/// Gets the address of the first byte in this allocator's block of memory
@@ -101,7 +111,7 @@ namespace VMFramework
 	template <class T> T* AllocateNew(const size_t& size, Allocator* allocator)
 	{
 		void* p = allocator->Allocate(size + sizeof(T), __alignof(T));
-		return new (p) T(size, PointerMath::add(p, sizeof(T)));
+		return new (p) T(size, PointerMath::Add(p, sizeof(T)));
 	}
 
 	/// <summary>
@@ -180,7 +190,7 @@ namespace VMFramework
 		T* p = nullptr;
 
 		//Allocate extra space to store array length in the bytes before the array
-		p = ((T*)allocator->allocate(sizeof(T) * (length + headerSize), __alignof(T))) + headerSize;
+		p = ((T*)allocator->Allocate(sizeof(T) * (length + headerSize), __alignof(T))) + headerSize;
 
 		//Store the length of the array in the header
 		*(((size_t*)p) - 1) = length;

@@ -54,6 +54,8 @@ namespace VMFramework
 		/// <inheritdoc/>
 		void Deallocate(void* address) override;
 
+		void ClearAllocator() override;
+
 		StackAllocator(const StackAllocator&) = delete;
 		StackAllocator& operator=(const StackAllocator&) = delete;
 	};

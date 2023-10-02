@@ -11,9 +11,16 @@
 
 namespace VMFramework
 {
+	constexpr uint64_t GibiByte = 1073741824;
+	constexpr uint64_t MebiByte = 1048576;
+	constexpr uint64_t KibiByte = 1024;
+
 	class MemoryManager
 	{
 	private:
+		/// <summary>
+		/// SharedMutex for concurrent read access and exclusive write access
+		/// </summary>
 		static std::shared_mutex _sharedMutex;
 
 		/// <summary>
@@ -37,10 +44,6 @@ namespace VMFramework
 		~MemoryManager();
 
 	public:
-		static constexpr uint64_t GibiByte = 1073741824;
-		static constexpr uint64_t MebiByte = 1048576;
-		static constexpr uint64_t KibiByte = 1024;
-
 		VMFramework::StackAllocator* m_systemAllocator = nullptr;
 
 		static MemoryManager* GetInstance();

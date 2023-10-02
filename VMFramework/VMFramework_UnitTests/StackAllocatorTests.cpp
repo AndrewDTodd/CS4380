@@ -99,3 +99,8 @@ TEST_F(AllocatorForStackOverflow, Validate_StackOverflowDetected)
 {
 	ASSERT_THROW(AllocateNew<uint32_t>(sizeof(uint32_t), _allocator), stack_overflow);
 }
+
+TEST(AllocatorTests, Validate_NullStartThrowsExeption)
+{
+	ASSERT_THROW(StackAllocator(0, nullptr), std::invalid_argument);
+}
