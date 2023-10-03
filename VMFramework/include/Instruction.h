@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-#include "Process.h"
+//#include "Process.h"
 
 namespace VMFramework
 {
@@ -11,13 +11,15 @@ namespace VMFramework
 	//requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>>
 	struct Instruction
 	{
-	private:
-		Instruction();
+	protected:
+		Instruction(RegisterType code): opcode(code)
+		{}
+
 	public:
 		/// <summary>
 		/// The numeric code associated with this operation
 		/// </summary>
-		RegisterType opcode;
+		const RegisterType opcode;
 
 		/// <summary>
 		/// Pure virtual abstract definition of Instruction's Op method. Deriving types implement this method to define what that Instruction does

@@ -1,6 +1,8 @@
 #include "../../include/Instructions/DIV.h"
 
-DIV::DIV(): opcode(17)
+#include "../../include/Process_4380.h"
+
+DIV::DIV(): Instruction(17)
 {}
 
 void DIV::Op(Process_4380* executingProcess)

@@ -2,21 +2,21 @@
 
 #include <iostream>
 
-TRP::TRP() : opcode(21)
+#include "../../include/Process_4380.h"
+
+TRP::TRP() : Instruction(21)
 {}
 
 void TRP::Op(Process_4380* executingProcess)
 {
-	int32_t trapNum = executingProcess->operandOne;
-
-	switch (trapNum)
+	switch (executingProcess->operandOne)
 	{
 	case (0):
 		executingProcess->Stop();
 		break;
 
 	case (1):
-		std::cout << reinterpret_cast<uint32_t>(executingProcess->m_registers[3]);
+		std::cout << executingProcess->m_registers[3];
 		break;
 
 	case(3):

@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <utility>
 
 #include "Instruction.h"
 //#include "Process.h"
@@ -18,7 +19,7 @@ namespace VMFramework
 	class ISA
 	{
 	protected:
-		using InstructionType = Instruction<GPRegisterType, GPRegisterType, ProcessType>;
+		using InstructionType = Instruction<GPRegisterType, RegisterType, ProcessType>;
 
 		InstructionType* m_instructionSet[cexp_setSize];
 
@@ -32,7 +33,7 @@ namespace VMFramework
 		{
 			for (size_t index = 0; index < numInstructions; index++)
 			{
-				m_instructionSet[instructions[index].opcode] = std::move(instructions[index]);
+				m_instructionSet[instructions[index]->opcode] = std::move(instructions[index]);
 			}
 		}
 

@@ -6,10 +6,37 @@
 #include <cassert>
 #include <new>
 
-#include "PointerMath.h"
-
 namespace VMFramework
 {
+	class PointerMath
+	{
+	public:
+		static void* AlignForward(void* address, const uint8_t& alignment);
+		static const void* AlignForward(const void* address, const uint8_t& alignment);
+
+		static void* AlignBackward(void* address, const uint8_t& alignment);
+		static const void* AlignBackward(const void* address, const uint8_t& alignment);
+
+		static uint8_t     AlignForwardAdjustment(const void* address, const uint8_t& alignment);
+		static uint8_t     AlignForwardAdjustmentWithHeader(const void* address, const uint8_t& alignment, const uint8_t& headerSize);
+
+		static uint8_t     AlignBackwardAdjustment(const void* address, const uint8_t& alignment);
+
+		static void* Add(void* p, const size_t& x);
+		static const void* Add(const void* p, const size_t& x);
+
+		static void* Subtract(void* p, const size_t& x);
+		static const void* Subtract(const void* p, const size_t& x);
+
+		//Class is static, do not attempt to make instance
+		PointerMath() = delete;
+		~PointerMath() = delete;
+		PointerMath(const PointerMath&) = delete;
+		PointerMath& operator=(const PointerMath&) = delete;
+		PointerMath(PointerMath&&) = delete;
+		PointerMath& operator=(PointerMath&&) = delete;
+	};
+
 	/// <summary>
 	/// Allocator base class is used to define specific types of memory allocators for different use cases
 	/// </summary>
@@ -230,6 +257,86 @@ namespace VMFramework
 
 		//Call Deallocate on the allocator with the address at the begining of the array with the additional header memory included
 		allocator->Deallocate(array - headerSize);
+	}
+
+	inline void* PointerMath::AlignForward(void* address, const uint8_t& alignment)
+	{
+		return (void*)((reinterpret_cast<uintptr_t>(address) + static_cast<uintptr_t>(alignment - 1)) & static_cast<uintptr_t>(~(alignment - 1)));
+	}
+
+	inline const void* PointerMath::AlignForward(const void* address, const uint8_t& alignment)
+	{
+		return (void*)((reinterpret_cast<uintptr_t>(address) + static_cast<uintptr_t>(alignment - 1)) & static_cast<uintptr_t>(~(alignment - 1)));
+	}
+
+	inline void* PointerMath::AlignBackward(void* address, const uint8_t& alignment)
+	{
+		return (void*)(reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(~(alignment - 1)));
+	}
+
+	inline const void* PointerMath::AlignBackward(const void* address, const uint8_t& alignment)
+	{
+		return (void*)(reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(~(alignment - 1)));
+	}
+
+	inline uint8_t PointerMath::AlignForwardAdjustment(const void* address, const uint8_t& alignment)
+	{
+		uint8_t adjustment = alignment - (reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(alignment - 1));
+
+		if (adjustment == alignment)
+			return 0; //already aligned
+
+		return adjustment;
+	}
+
+	inline uint8_t PointerMath::AlignForwardAdjustmentWithHeader(const void* address, const uint8_t& alignment, const uint8_t& headerSize)
+	{
+		uint8_t adjustment = AlignForwardAdjustment(address, alignment);
+
+		uint8_t neededSpace = headerSize;
+
+		if (adjustment < neededSpace)
+		{
+			neededSpace -= adjustment;
+
+			//Increase adjustment to fit header
+			adjustment += alignment * (neededSpace / alignment);
+
+			if (neededSpace % alignment > 0)
+				adjustment += alignment;
+		}
+
+		return adjustment;
+	}
+
+	inline uint8_t PointerMath::AlignBackwardAdjustment(const void* address, const uint8_t& alignment)
+	{
+		uint8_t adjustment = reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(alignment - 1);
+
+		if (adjustment == alignment)
+			return 0; //already aligned
+
+		return adjustment;
+	}
+
+	inline void* PointerMath::Add(void* p, const size_t& x)
+	{
+		return (void*)(reinterpret_cast<uintptr_t>(p) + x);
+	}
+
+	inline const void* PointerMath::Add(const void* p, const size_t& x)
+	{
+		return (const void*)(reinterpret_cast<uintptr_t>(p) + x);
+	}
+
+	inline void* PointerMath::Subtract(void* p, const size_t& x)
+	{
+		return (void*)(reinterpret_cast<uintptr_t>(p) - x);
+	}
+
+	inline const void* PointerMath::Subtract(const void* p, const size_t& x)
+	{
+		return (const void*)(reinterpret_cast<uintptr_t>(p) - x);
 	}
 }
 #endif //!ALLOCATOR_H

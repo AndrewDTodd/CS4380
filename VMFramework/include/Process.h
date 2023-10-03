@@ -36,14 +36,13 @@ namespace VMFramework
 		}
 	};
 
-	template<typename GPRegisterType, typename RegisterType>
+	template<typename Derived, typename GPRegisterType, typename RegisterType, typename ISAType>
 	//requires std::integral<RegisterType>
 	class Process
 	{
 		//friend class Instruction<GPRegisterType, RegisterType, Process>;
 	protected:
 		using ProcessRegisters = Registers<GPRegisterType, RegisterType>;
-		using ISAType = ISA<GPRegisterType, RegisterType, Process>;
 
 		/// <summary>
 		/// Register state of this thread of execution
@@ -58,22 +57,22 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to ISA to use
 		/// </summary>
-		ISAType* _ISA = nullptr;
+		const ISAType* _ISA = nullptr;
 
 		/// <summary>
 		/// Pointer to the begining of the program segment in memory
 		/// </summary>
-		const void* _programSegment = nullptr;
+		void* _programSegment = nullptr;
 
 		/// <summary>
 		/// Pointer to the begining of the code in the programSegment
 		/// </summary>
-		const void* _codeSegment = nullptr;
+		void* _codeSegment = nullptr;
 
 		/// <summary>
 		/// Reference to the Machines shared_mutex
 		/// </summary>
-		const std::shared_mutex& _machineMutex;
+		//std::shared_mutex& _machineMutex;
 
 		/// <summary>
 		/// Concurrent read lock used to lock Process and Instruction reads of Machine. Initialized at Process creation with lock established
@@ -83,7 +82,7 @@ namespace VMFramework
 		/// <summary>
 		/// Unique write lock used to lock Process and Instruction writes of Machine resources. Initialized at Process creation without lock established. Lock is made by writing Instruction call
 		/// </summary>
-		const std::unique_lock<std::shared_mutex> m_writeLock = nullptr;
+		const std::unique_lock<std::shared_mutex>* m_writeLock = nullptr;
 
 		bool _run = true;
 
@@ -126,12 +125,12 @@ namespace VMFramework
 		/// <param name="programStart">Pointer to the begining of the program in memory</param>
 		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 		/// <param name="isa">Pointer to the ISA instance to use</param>
-		Process(void* initialPC, StackAllocator* processStack, const void* programStart, const void* codeSegmentStart, const std::shared_mutex& machineMutex, ISAType* isa): 
-			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), _machineMutex(machineMutex), m_readLock(machineMutex), _ISA(isa)
+		Process(void* initialPC, StackAllocator* processStack, void* programStart, void* codeSegmentStart, std::shared_mutex& machineMutex, ISAType* isa): 
+			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), m_readLock(machineMutex), _ISA(isa)
 		{
 			this->m_registers.PC = reinterpret_cast<RegisterType*>(initialPC);
 
-			m_writeLock = std::unique_lock<std::shared_mutex>(_machineMutex, std::defer_lock);
+			m_writeLock = new std::unique_lock<std::shared_mutex>(machineMutex, std::defer_lock);
 		}
 
 		/// <summary>
@@ -155,7 +154,7 @@ namespace VMFramework
 		{
 			_run = false;
 
-			~Process();
+			delete this;
 		}
 	};
 }

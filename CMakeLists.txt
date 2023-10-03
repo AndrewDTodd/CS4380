@@ -48,11 +48,11 @@ set(VM_4380_INSTRUCTIONS
 )
 
 # Create executable for the execution of the project
-add_executable (VM_4380 main.cpp ${VM_4380_SOURCE})
+add_executable (VM_4380 main.cpp ${VM_4380_SOURCE} ${VM_4380_INSTRUCTIONS})
 target_link_libraries(VM_4380 PRIVATE VMFramework)
 
-target_include_directories(VMFramework PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
-target_include_directories(VMFramework PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions)
+target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
+target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions)
 
 ################################################################################################################################################################
 

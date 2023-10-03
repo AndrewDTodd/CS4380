@@ -1,6 +1,8 @@
 #include "../../include/Instructions/MOV.h"
 
-MOV::MOV() : opcode(7)
+#include "../../include/Process_4380.h"
+
+MOV::MOV() : Instruction(7)
 {}
 
 void MOV::Op(Process_4380* executingProcess)

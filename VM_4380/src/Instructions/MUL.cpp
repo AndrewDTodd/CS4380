@@ -1,6 +1,8 @@
 #include "../../include/Instructions/MUL.h"
 
-MUL::MUL() : opcode(16)
+#include "../../include/Process_4380.h"
+
+MUL::MUL() : Instruction(16)
 {}
 
 void MUL::Op(Process_4380* executingProcess)

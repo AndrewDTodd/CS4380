@@ -14,6 +14,7 @@
 namespace VMFramework
 {
 	MemoryManager* MemoryManager::s_instance = nullptr;
+	std::shared_mutex MemoryManager::_sharedMutex;
 
 	MemoryManager::MemoryManager()
 	{
@@ -32,15 +33,12 @@ namespace VMFramework
 
 			if (!MemoryManager::s_instance)
 			{
-				static MemoryManager s_singleton;
-				MemoryManager::s_instance = &s_singleton;
+				
+				MemoryManager::s_instance = new MemoryManager();
 				return MemoryManager::s_instance;
 			}
 		}
-		else
-		{
 			return MemoryManager::s_instance;
-		}
 	}
 
 	void MemoryManager::StartUp()

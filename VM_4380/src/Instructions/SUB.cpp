@@ -1,6 +1,8 @@
 #include "../../include/Instructions/SUB.h"
 
-SUB::SUB() : opcode(15)
+#include "../../include/Process_4380.h"
+
+SUB::SUB() : Instruction(15)
 {}
 
 void SUB::Op(Process_4380* executingProcess)

@@ -1,7 +1,10 @@
 #include "../../include/Instructions/ADD.h"
 
-ADD::ADD(): opcode(13)
-{}
+#include "../../include/Process_4380.h"
+
+ADD::ADD() : Instruction(13)
+{
+}
 
 void ADD::Op(Process_4380* executingProcess)
 {

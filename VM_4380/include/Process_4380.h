@@ -9,7 +9,9 @@
 
 using namespace VMFramework;
 
-class Process_4380 : public VMFramework::Process<int32_t, int32_t>
+class ISA_4380;
+
+class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t, ISA_4380>
 {
 	friend ADD;
 	friend DIV;
@@ -20,7 +22,7 @@ class Process_4380 : public VMFramework::Process<int32_t, int32_t>
 	friend MUL;
 	friend SUB;
 	friend TRP;
-private:
+protected:
 	int32_t opcode = 0;
 	int32_t operandOne = 0;
 	int32_t operandTwo = 0;
@@ -44,5 +46,16 @@ private:
 	/// Used to preform the execute step of the execution cycle
 	/// </summary>
 	inline void Execute() override;
+
+public:
+	/// <summary>
+	/// Create Process specifying where in the program it will begin execution
+	/// </summary>
+	/// <param name="initialPC">The address in the program to begin execution at</param>
+	/// <param name="processStack">Pointer to the StackAllocator for this process</param>
+	/// <param name="programStart">Pointer to the begining of the program in memory</param>
+	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
+	/// <param name="isa">Pointer to the ISA instance to use</param>
+	Process_4380(void* initialPC, StackAllocator* processStack, void* programStart, void* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
 };
 #endif //!PROCESS_4380_H

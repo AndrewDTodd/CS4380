@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "../Process_4380.h"
+class Process_4380;
 
 struct MOV : public VMFramework::Instruction<int32_t, int32_t, Process_4380>
 {

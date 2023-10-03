@@ -12,8 +12,6 @@
 #include <shared_mutex>
 #include <mutex>
 #include <stdexcept>
-#include <concepts>
-#include <type_traits>
 #include <fstream>
 #include <string>
 
@@ -27,7 +25,7 @@
 namespace VMFramework
 {
 	template<typename Derived, typename GPRegisterType, typename RegisterType, typename ProcessType, typename ISA>
-	requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>> && std::derived_from<ISA, VMFramework::ISA<GPRegisterType, RegisterType, ProcessType>>
+	requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<ProcessType, GPRegisterType, RegisterType, ISA>> && std::derived_from<ISA, VMFramework::ISA<GPRegisterType, RegisterType, ProcessType>>
 	class Machine
 	{
 		friend class Instruction<GPRegisterType, RegisterType, ProcessType>;
@@ -37,14 +35,17 @@ namespace VMFramework
 		/// <summary>
 		/// SharedMutex for concurrent read access and exclusive write access
 		/// </summary>
-		static std::shared_mutex _sharedMutex;
+		inline static std::shared_mutex _sharedMutex;
 
-		static std::mutex _launchMutex;
+		/// <summary>
+		/// Unique mutex for use in the LaunchProgram method to prevent deadlock
+		/// </summary>
+		std::mutex _launchMutex;
 
 		/// <summary>
 		/// After GetInstance is called this pointer will point to the singleton's instance
 		/// </summary>
-		static MachineType* s_instance;
+		inline static Derived* s_instance = nullptr;
 
 		/// <summary>
 		/// After StartUp will point to the machine's memory manager that is used to control dynamic memory allocation for stack and heaps as well as program segment
@@ -56,7 +57,7 @@ namespace VMFramework
 		/// <summary>
 		/// List of the processes/threads executing in the machine
 		/// </summary>
-		std::vector<ProcessType> m_processes = std::vector<ProcessType>();
+		std::vector<ProcessType*> m_processes = std::vector<ProcessType*>();
 
 		/// <summary>
 		/// Pointer to the begining (first byte) of the program's data in memory
@@ -66,7 +67,7 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to the start of the code segment
 		/// </summary>
-		void* m_beginingCode = nullptr;
+		void* m_codeSegment = nullptr;
 
 		/// <summary>
 		/// The total number of bytes in the programSegment
@@ -119,19 +120,7 @@ namespace VMFramework
 		/// Create a new process to execute starting at the specified program location
 		/// </summary>
 		/// <param name="startInstruction">Pointer to the location in the program where this process should begin execution</param>
-		virtual void SpawnProcess(void* startInstruction)
-		{
-			StackAllocator* processStack = AllocateNew<StackAllocator>(PROCESS_STACK_BYTES, this->m_memoryManager->m_systemAllocator);
-
-			ProcessType process(startInstruction, processStack, m_programSegment, m_beginingCode, _sharedMutex, &m_ISA);
-
-			this->m_processes.push_back(std::move(process));
-
-			std::thread thread(&process.Run, &process);
-
-			//wait for the thread to finish (only good for single thread program)
-			thread.join();
-		}
+		virtual void SpawnProcess(void* initialPC) = 0;
 
 	public:
 		/// <summary>
@@ -154,10 +143,7 @@ namespace VMFramework
 					return s_instance;
 				}
 			}
-			else
-			{
 				return s_instance;
-			}
 		}
 
 		/// <summary>
@@ -252,9 +238,9 @@ namespace VMFramework
 			if (offset < 0 || offset >= m_programSize)
 				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
 
-			m_beginingCode = m_programSegment + offset;
+			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
 
-			SpawnProcess(m_beginingCode);
+			SpawnProcess(m_codeSegment);
 		}
 	};
 }
