@@ -62,12 +62,12 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to the begining of the program segment in memory
 		/// </summary>
-		void* _programSegment = nullptr;
+		uint8_t* _programSegment = nullptr;
 
 		/// <summary>
 		/// Pointer to the begining of the code in the programSegment
 		/// </summary>
-		void* _codeSegment = nullptr;
+		uint8_t* _codeSegment = nullptr;
 
 		/// <summary>
 		/// Reference to the Machines shared_mutex
@@ -77,12 +77,12 @@ namespace VMFramework
 		/// <summary>
 		/// Concurrent read lock used to lock Process and Instruction reads of Machine. Initialized at Process creation with lock established
 		/// </summary>
-		const std::shared_lock<std::shared_mutex> m_readLock;
+		//const std::shared_lock<std::shared_mutex> m_readLock;
 
 		/// <summary>
-		/// Unique write lock used to lock Process and Instruction writes of Machine resources. Initialized at Process creation without lock established. Lock is made by writing Instruction call
+		/// Reference to the Machine instances mutex. Used for concurrent read access and exclusive write access
 		/// </summary>
-		const std::unique_lock<std::shared_mutex>* m_writeLock = nullptr;
+		const std::shared_mutex& _machineMutex;
 
 		bool _run = true;
 
@@ -125,12 +125,10 @@ namespace VMFramework
 		/// <param name="programStart">Pointer to the begining of the program in memory</param>
 		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 		/// <param name="isa">Pointer to the ISA instance to use</param>
-		Process(void* initialPC, StackAllocator* processStack, void* programStart, void* codeSegmentStart, std::shared_mutex& machineMutex, ISAType* isa): 
-			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), m_readLock(machineMutex), _ISA(isa)
+		Process(void* initialPC, StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISAType* isa): 
+			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), _machineMutex(machineMutex), _ISA(isa)
 		{
 			this->m_registers.PC = reinterpret_cast<RegisterType*>(initialPC);
-
-			m_writeLock = new std::unique_lock<std::shared_mutex>(machineMutex, std::defer_lock);
 		}
 
 		/// <summary>
@@ -152,9 +150,12 @@ namespace VMFramework
 		/// </summary>
 		void Stop()
 		{
-			_run = false;
+			if (_run)
+			{
+				_run = false;
 
-			delete this;
+				delete this;
+			}
 		}
 	};
 }

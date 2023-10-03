@@ -135,10 +135,18 @@ namespace VMFramework
 	/// <param name="size">The number of bytes needed to create instance of T</param>
 	/// <param name="allocator">Pointer to Allocator instance to get memory from</param>
 	/// <returns>Pointer to the allocated instance</returns>
-	template <class T> T* AllocateNew(const size_t& size, Allocator* allocator)
+	template <class T> T* AllocateNewAllocator(const size_t& size, Allocator* allocator)
 	{
-		void* p = allocator->Allocate(size + sizeof(T), __alignof(T));
-		return new (p) T(size, PointerMath::Add(p, sizeof(T)));
+		void* p = allocator->Allocate(size + sizeof(T), alignof(T));
+		try 
+		{
+			return new (p) T(size, PointerMath::Add(p, sizeof(T)));
+		}
+		catch (...) 
+		{
+			allocator->Deallocate(p); // Deallocate on exception
+			throw; // Re-throw the exception
+		}
 	}
 
 	/// <summary>
@@ -148,9 +156,40 @@ namespace VMFramework
 	/// <param name="size">The number of bytes needed to create instance of T</param>
 	/// <param name="allocator">Reference to Allocator instance to get memory from</param>
 	/// <returns>Pointer to the allocated instance</returns>
+	template <class T> T* AllocateNew(const size_t& size, Allocator& allocator)
+	{
+		void* p = allocator.Allocate(sizeof(T), alignof(T));
+		try
+		{
+			return new (p) T();
+		}
+		catch (...)
+		{
+			allocator.Deallocate(p);
+			throw;
+		}
+	}
+
+	/// <summary>
+	/// Will create a new instance of the Type using the memory in the passed Allocator
+	/// </summary>
+	/// <typeparam name="T">The type to allocate</typeparam>
+	/// <param name="size">The number of bytes needed to create instance of T</param>
+	/// <param name="allocator">Reference to Allocator instance to get memory from</param>
+	/// <param name="t">Reference to instance of Type to be copied for construction of new instance</param>
+	/// <returns>Pointer to the allocated instance</returns>
 	template <class T> T* AllocateNew(const size_t& size, Allocator& allocator, const T& t)
 	{
-		return new (allocator.Allocate(sizeof(T), __alignof(T))) T(t);
+		void* p = allocator.Allocate(sizeof(T), alignof(T));
+		try
+		{
+			return new (p) T(t);
+		}
+		catch (...)
+		{
+			allocator.Deallocate(p);
+			throw;
+		}
 	}
 
 	/// <summary>
@@ -184,7 +223,7 @@ namespace VMFramework
 		T* p = nullptr;
 
 		//Allocate extra space to store array length in the bytes before the array
-		p = ((T*)allocator->Allocate(sizeof(T) * (length + headerSize), __alignof(T))) + headerSize;
+		p = ((T*)allocator->Allocate(sizeof(T) * (length + headerSize), alignof(T))) + headerSize;
 
 		//Store the length in the header
 		*(((size_t*)p) - 1) = length;
@@ -217,7 +256,7 @@ namespace VMFramework
 		T* p = nullptr;
 
 		//Allocate extra space to store array length in the bytes before the array
-		p = ((T*)allocator->Allocate(sizeof(T) * (length + headerSize), __alignof(T))) + headerSize;
+		p = ((T*)allocator->Allocate(sizeof(T) * (length + headerSize), alignof(T))) + headerSize;
 
 		//Store the length of the array in the header
 		*(((size_t*)p) - 1) = length;
@@ -271,22 +310,22 @@ namespace VMFramework
 
 	inline void* PointerMath::AlignBackward(void* address, const uint8_t& alignment)
 	{
-		return (void*)(reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(~(alignment - 1)));
+		uintptr_t alignedAddress = reinterpret_cast<uintptr_t>(address) & ~(static_cast<uintptr_t>(alignment) - 1);
+		return reinterpret_cast<void*>(alignedAddress);
 	}
 
 	inline const void* PointerMath::AlignBackward(const void* address, const uint8_t& alignment)
 	{
-		return (void*)(reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(~(alignment - 1)));
+		uintptr_t alignedAddress = reinterpret_cast<uintptr_t>(address) & ~(static_cast<uintptr_t>(alignment) - 1);
+		return reinterpret_cast<void*>(alignedAddress);
 	}
 
 	inline uint8_t PointerMath::AlignForwardAdjustment(const void* address, const uint8_t& alignment)
 	{
-		uint8_t adjustment = alignment - (reinterpret_cast<uintptr_t>(address) & static_cast<uintptr_t>(alignment - 1));
+		uintptr_t alignedAddress = (reinterpret_cast<uintptr_t>(address) + alignment - 1) & ~(static_cast<uintptr_t>(alignment) - 1);
+		uint8_t adjustment = static_cast<uint8_t>(alignedAddress - reinterpret_cast<uintptr_t>(address));
 
-		if (adjustment == alignment)
-			return 0; //already aligned
-
-		return adjustment;
+		return adjustment == alignment ? 0 : adjustment;
 	}
 
 	inline uint8_t PointerMath::AlignForwardAdjustmentWithHeader(const void* address, const uint8_t& alignment, const uint8_t& headerSize)

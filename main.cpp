@@ -48,4 +48,8 @@ int main(int argc, char* argv[])
 			std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
 		}
 	}
+
+	VM->WaitForProcess();
+
+	VM->ShutDown();
 }

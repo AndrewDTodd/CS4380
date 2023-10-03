@@ -23,9 +23,24 @@ class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t,
 	friend SUB;
 	friend TRP;
 protected:
+	struct FetchBlock
+	{
+		int32_t opcode;
+		int32_t operandOne;
+		int32_t operandTwo;
+	};
+
 	int32_t opcode = 0;
 	int32_t operandOne = 0;
 	int32_t operandTwo = 0;
+
+	Instruction<int32_t, int32_t, Process_4380>* _instruction = nullptr;
+
+	/// <summary>
+	/// Internal healper to read the 4 byte little-endian opcode, operandOne and operandTwo from the PC
+	/// </summary>
+	/// <returns></returns>
+	//inline int32_t ReadLittleEndianInt32();
 
 	/// <summary>
 	/// Used to preform the fetch step of execution cycle
@@ -56,6 +71,6 @@ public:
 	/// <param name="programStart">Pointer to the begining of the program in memory</param>
 	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 	/// <param name="isa">Pointer to the ISA instance to use</param>
-	Process_4380(void* initialPC, StackAllocator* processStack, void* programStart, void* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
+	Process_4380(void* initialPC, StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
 };
 #endif //!PROCESS_4380_H

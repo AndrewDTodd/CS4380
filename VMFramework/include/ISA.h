@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <utility>
+#include <stdexcept>
+#include <string>
 
 #include "Instruction.h"
 //#include "Process.h"
@@ -39,6 +41,18 @@ namespace VMFramework
 
 		~ISA()
 		{
+		}
+
+		InstructionType* operator[](const size_t& index) const
+		{
+			if (index >= 0 && index < cexp_setSize)
+			{
+				return m_instructionSet[index];
+			}
+			else
+			{
+				throw std::out_of_range("Unknown opcode " + std::to_string(index));
+			}
 		}
 
 		//Do not attempt to copy

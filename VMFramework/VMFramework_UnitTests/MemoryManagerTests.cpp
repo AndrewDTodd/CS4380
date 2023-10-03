@@ -23,7 +23,7 @@ protected:
 	}
 };
 
-TEST_F(MemoryManagerTesting, DoubleStartUpExeption)
+TEST_F(MemoryManagerTesting, Validate_DoubleStartUpExeption)
 {
 	//First call to StartUp is valid
 	ASSERT_NO_THROW(_manager->StartUp());
@@ -32,8 +32,16 @@ TEST_F(MemoryManagerTesting, DoubleStartUpExeption)
 	ASSERT_THROW(_manager->StartUp(), std::runtime_error);
 }
 
-TEST_F(MemoryManagerTesting, GetInstanceProducesOneInstance)
+TEST_F(MemoryManagerTesting, Validate_ShutDownNoStartUpExeption)
 {
+	ASSERT_THROW(_manager->ShutDown(), std::runtime_error);
+	_manager->StartUp();
+}
+
+TEST_F(MemoryManagerTesting, Validate_GetInstanceProducesOneInstance)
+{
+	_manager->StartUp();
+
 	VMFramework::MemoryManager* _instance1 = VMFramework::MemoryManager::GetInstance();
 
 	ASSERT_EQ(_manager, _instance1);
