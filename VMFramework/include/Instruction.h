@@ -12,7 +12,7 @@ namespace VMFramework
 	struct Instruction
 	{
 	protected:
-		Instruction(RegisterType code): opcode(code)
+		Instruction(const RegisterType& code): opcode(code)
 		{}
 
 	public:

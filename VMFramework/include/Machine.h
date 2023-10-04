@@ -89,28 +89,6 @@ namespace VMFramework
 		/// </summary>
 		virtual void LoadProgram(char* programBinary)
 		{
-			//std::ifstream file(programBinary, std::ios::binary | std::ios::ate);
-			//if (file.is_open())
-			//{
-			//	std::streampos size = file.tellg();
-			//	m_programSize = file.tellg();
-			//}
-			//else
-			//	throw std::invalid_argument("Unable to open file at path: " + std::string(programBinary));
-
-			////May throw stack_overflow exeption if system memory insufficient for program. Handled in caller LaunchProgram
-			//m_programSegment = AllocateArray<uint8_t>(m_memoryManager->m_systemAllocator, m_programSize);
-
-			////Read file into m_programSegment byte array
-			//if (!file.read(static_cast<char*>(m_programSegment), m_programSize))
-			//{
-			//	file.close();
-			//	//Failed to read program into memory
-			//	throw std::runtime_error("Unknown error occured resulting in failure to load program");
-			//}
-
-			//file.close();
-
 			std::ifstream file(programBinary, std::ios::binary | std::ios::ate);
 
 			if (!file.is_open())
@@ -180,6 +158,12 @@ namespace VMFramework
 				std::cerr << "Error: " << loadEx.what() << std::endl;
 				return;
 			}
+			//This probably means the LaunchProgram method was called before VM initialization
+			catch (const std::exception& ex)
+			{
+				std::cerr << "Error: " << ex.what() << std::endl;
+				return;
+			}
 
 			//Get the offset to the initial PC from the first 4 bytes in program
 			//!!REMEMBER ITS IN LITTLE-ENDIAN!!!:(
@@ -234,6 +218,10 @@ namespace VMFramework
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+#ifdef _DEBUG
+			if (this->m_memoryManager)
+				throw std::runtime_error("Calling StartUp on an already active VM is invalid");
+#endif // _DEBUG
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager::GetInstance();
@@ -248,6 +236,11 @@ namespace VMFramework
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+#ifdef _DEBUG
+			if (this->m_memoryManager)
+				throw std::runtime_error("Calling StartUp on an already active VM is invalid");
+#endif // _DEBUG
+
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager::GetInstance();
@@ -283,6 +276,12 @@ namespace VMFramework
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+#ifdef _DEBUG
+			if (!this->m_memoryManager)
+				throw std::runtime_error("Calling ShutDown on an inactive (uninitialized) VM is invalid");
+#endif // _DEBUG
+
 
 			//Shut down the running processes
 			for (ProcessType* process : m_processes)
@@ -334,13 +333,19 @@ namespace VMFramework
 				std::cerr << "Error: " << loadEx.what() << std::endl;
 				return;
 			}
+			//This probably means the LaunchProgram method was called before VM initialization
+			catch (const std::exception& ex)
+			{
+				std::cerr << "Error: " << ex.what() << std::endl;
+				return;
+			}
 
 			//Get the offset to the initial PC from the first 4 bytes in program
 			//!!REMEMBER ITS IN LITTLE-ENDIAN!!!:(
 			int32_t offset = static_cast<int32_t>(m_programSegment[0]);
-			/*offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
+			offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
 			offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-			offset |= static_cast<int32_t>(m_programSegment[3]) << 24;*/
+			offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
 
 			if (offset < 0 || offset >= m_programSize)
 				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");

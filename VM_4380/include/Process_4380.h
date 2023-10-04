@@ -5,6 +5,8 @@
 
 #include <cstdint>
 
+#include <gtest/gtest_prod.h>
+
 #include "Instructions/Instructions.h"
 
 using namespace VMFramework;
@@ -13,14 +15,23 @@ class ISA_4380;
 
 class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t, ISA_4380>
 {
+	FRIEND_TEST(InstructionsTesting, Validate_ADD);
 	friend ADD;
+	FRIEND_TEST(InstructionsTesting, Validate_DIV);
 	friend DIV;
+	FRIEND_TEST(InstructionsTesting, Validate_JMP_L);
 	friend JMP_L;
+	FRIEND_TEST(InstructionsTesting, Validate_LDB_L);
 	friend LDB_L;
+	FRIEND_TEST(InstructionsTesting, Validate_LDR_L);
 	friend LDR_L;
+	FRIEND_TEST(InstructionsTesting, Validate_MOV);
 	friend MOV;
+	FRIEND_TEST(InstructionsTesting, Validate_MUL);
 	friend MUL;
+	FRIEND_TEST(InstructionsTesting, Validate_SUB);
 	friend SUB;
+	FRIEND_TEST(InstructionsTesting, Validate_TRP);
 	friend TRP;
 protected:
 	struct FetchBlock
@@ -45,21 +56,25 @@ protected:
 	/// <summary>
 	/// Used to preform the fetch step of execution cycle
 	/// </summary>
+	FRIEND_TEST(Process_4380Testing, Validate_Fetch);
 	inline void Fetch() override;
 
 	/// <summary>
 	/// Used to preform the increment step of the execution cycle
 	/// </summary>
+	FRIEND_TEST(Process_4380Testing, Validate_Increment);
 	inline void Increment() override;
 
 	/// <summary>
 	/// Used to preform the decode step of execution cycle
 	/// </summary>
+	FRIEND_TEST(Process_4380Testing, Validate_Decode);
 	inline void Decode() override;
 
 	/// <summary>
 	/// Used to preform the execute step of the execution cycle
 	/// </summary>
+	FRIEND_TEST(Process_4380Testing, Validate_Execute);
 	inline void Execute() override;
 
 public:

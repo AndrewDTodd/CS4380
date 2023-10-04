@@ -5,6 +5,8 @@
 
 #include <cstdint>
 
+#include <gtest/gtest_prod.h>
+
 #include "ISA_4380.h"
 #include "Process_4380.h"
 
@@ -18,5 +20,10 @@ private:
 	/// </summary>
 	/// <param name="startInstruction">Pointer to the location in the program where this process should begin execution</param>
 	void SpawnProcess(void* initialPC) override;
+
+	FRIEND_TEST(VM4380Testing, Validate_StartUp);
+	FRIEND_TEST(VM4380Testing, Validate_ShutDown);
+	FRIEND_TEST(VM4380Testing, Validate_LoadProgram);
+	FRIEND_TEST(VM4380Testing, Validate_SpawnProcess);
 };
 #endif //!VM4380_H

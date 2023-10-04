@@ -1,4 +1,4 @@
-# Project0_BinaryConversion  
+# Project1_VMv1.0.0  
 
 ###### **NOTE: all steps assume user is on Ubuntu 22.04 or compatible Debian system**  
 #### Steps to build  
@@ -41,4 +41,4 @@ To run the test suite enter the following
 
 To run the project program enter the following
 
-    ./B10ToB2
+    ./VM_4380 <optional path to bin>

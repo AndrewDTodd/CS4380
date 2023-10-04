@@ -2,9 +2,15 @@
 #define PROCESS_H
 
 #include <concepts>
+
 #include <thread>
 #include <shared_mutex>
 #include <mutex>
+
+#include <stdexcept>
+
+#include <sstream>
+#include <string>
 
 #include "StackAllocator.h"
 #include "MemoryManager.h"
@@ -129,6 +135,47 @@ namespace VMFramework
 			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), _machineMutex(machineMutex), _ISA(isa)
 		{
 			this->m_registers.PC = reinterpret_cast<RegisterType*>(initialPC);
+
+			if (initialPC == nullptr || programStart == nullptr || codeSegmentStart == nullptr)
+			{
+				throw std::runtime_error("Cannot spawn process without an initial PC value, or a pointer to the start of the program, or a pointer to the start of the code segment in the program");
+			}
+
+			if (codeSegmentStart < programStart)
+			{
+				std::stringstream stream;
+				stream << "The instruction portion of a program must be within the program space. Code start in program indicated as less than program start. Program start address : 0x" 
+					<< std::hex
+					<< reinterpret_cast<std::uintptr_t>(programStart)
+					<< ". Code start address: 0x"
+					<< reinterpret_cast<std::uintptr_t>(codeSegmentStart);
+
+				throw std::runtime_error(stream.str());
+			}
+
+			if (static_cast<uint8_t*>(initialPC) < codeSegmentStart)
+			{
+				std::stringstream stream;
+				stream << "The initial PC cannot be less than the beginning address of the code segment of the program. Initial PC: 0x"
+					<< std::hex
+					<< reinterpret_cast<std::uintptr_t>(initialPC)
+					<< ". Code start address: 0x"
+					<< reinterpret_cast<std::uintptr_t>(codeSegmentStart);
+
+				throw std::runtime_error(stream.str());
+			}
+
+			if (static_cast<uint8_t*>(initialPC) < programStart)
+			{
+				std::stringstream stream;
+				stream << "The initial PC cannot be less than the beginning address of the program. Initial PC: 0x"
+					<< std::hex
+					<< reinterpret_cast<std::uintptr_t>(initialPC)
+					<< ". Program start address: 0x"
+					<< reinterpret_cast<std::uintptr_t>(programStart);
+
+				throw std::runtime_error(stream.str());
+			}
 		}
 
 		/// <summary>

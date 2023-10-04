@@ -74,14 +74,19 @@ enable_testing()
 
 #set source for "runTests" unit testing executable
 set(UNIT_TESTS
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MemoryManagerTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/PointerMathTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/ProcessTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/StackAllocatorTests.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/InstructionsTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/ISA_4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/Process_4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/VM4380Tests.cpp
 )
 
 #Create executable for the execution of the project's tests
-add_executable(runTests ${UNIT_TESTS})
+add_executable(runTests ${UNIT_TESTS} ${VM_4380_SOURCE} ${VM_4380_INSTRUCTIONS})
 
 #include the gtest_main function from the gtest library to automatically run all tests from its provided main
 target_link_libraries(runTests PRIVATE GTest::gtest_main)

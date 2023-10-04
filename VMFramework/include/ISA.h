@@ -31,11 +31,20 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="instructions">Pointer to array of defined Instructions to populate ISA with</param>
 		/// <param name="numInstructions">The number of Instructions in the array</param>
-		ISA(InstructionType* instructions[], const size_t& numInstructions)
+		ISA(InstructionType* instructions[], const size_t& numInstructions) : m_instructionSet{}
 		{
 			for (size_t index = 0; index < numInstructions; index++)
 			{
-				m_instructionSet[instructions[index]->opcode] = std::move(instructions[index]);
+				if (instructions[index]->opcode < cexp_setSize && instructions[index]->opcode >= 0)
+				{
+					m_instructionSet[instructions[index]->opcode] = std::move(instructions[index]);
+				}
+				else
+				{
+					throw std::out_of_range("The instructionSet collection has been initialized with " + std::to_string(cexp_setSize) + 
+						" spaces. The specified opcode (" + std::to_string(instructions[index]->opcode) +
+						") is out of range for the instructionSet collection. Set the cexp_setSize varable to increase the set size if this opcode is correct");
+				}
 			}
 		}
 
