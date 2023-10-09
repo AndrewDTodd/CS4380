@@ -1,4 +1,4 @@
-# CMakeList.txt : CMake project for VMFramework, include source and define
+# CMakeList.txt : CMake project for AssemblerFramework, include source and define
 # project specific logic here.
 #
 cmake_minimum_required (VERSION 3.14)
@@ -14,12 +14,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Machine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Assembler.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Directive.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instruction.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/SingletonWrapper.cpp
 )
 
-add_library(VMFramework STATIC ${SOURCE_FILES})
+add_library(ASMFramework STATIC ${SOURCE_FILES})
 #include the header files in the include directory
-target_include_directories(VMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(ASMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

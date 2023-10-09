@@ -87,7 +87,7 @@ namespace VMFramework
 		/// <summary>
 		/// Loads the program data into the m_programSegment
 		/// </summary>
-		virtual void LoadProgram(char* programBinary)
+		virtual void LoadProgram(const char* programBinary)
 		{
 			std::ifstream file(programBinary, std::ios::binary | std::ios::ate);
 
@@ -133,7 +133,7 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
 		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
-		virtual inline void LaunchProgram_INTERNAL(char* programBinary)
+		virtual inline void LaunchProgram_INTERNAL(const char* programBinary)
 		{
 			//Lock has already been obtained by the calling StartUp(char*) method
 			try
@@ -306,7 +306,7 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
 		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
-		virtual void LaunchProgram(char* programBinary)
+		virtual void LaunchProgram(const char* programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -354,6 +354,11 @@ namespace VMFramework
 
 			SpawnProcess(m_codeSegment);
 		}
+
+		Machine(const Machine&) = delete;
+		Machine& operator=(const Machine&) = delete;
+		Machine(Machine&&) = delete;
+		Machine& operator=(Machine&&) = delete;
 	};
 }
 #endif //!MACHINE_H

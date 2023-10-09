@@ -23,7 +23,7 @@ Process_4380::Process_4380(void* initialPC, StackAllocator* processStack, uint8_
 //
 //}
 
-inline void Process_4380::Fetch()
+void Process_4380::Fetch()
 {
 	//Fetch 12 byte block from program at the PC location
 	FetchBlock block;
@@ -34,13 +34,13 @@ inline void Process_4380::Fetch()
 	operandTwo = block.operandTwo;
 }
 
-inline void Process_4380::Increment()
+void Process_4380::Increment()
 {
 	//Increment the PC by 3 (3 * 4 bytes for int32_t, or 12 bytes)
 	m_registers.PC += 3;
 }
 
-inline void Process_4380::Decode()
+void Process_4380::Decode()
 {
 	////Reinterpret the ints as little-endian
 	//opcode = (opcode & 0x000000FF) << 24 |
@@ -70,7 +70,7 @@ inline void Process_4380::Decode()
 	}
 }
 
-inline void Process_4380::Execute()
+void Process_4380::Execute()
 {
 	try
 	{

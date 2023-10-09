@@ -1,5 +1,5 @@
-#ifndef INSTRUCTION_H
-#define INSTRUCTION_H
+#ifndef VM_INSTRUCTION_H
+#define VM_INSTRUCTION_H
 
 #include <concepts>
 
