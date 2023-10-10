@@ -13,14 +13,22 @@
 
 #include <iostream>
 
+#include <utility>
+
+
+#include "Workpiece.h"
+#include "Pass.h"
+#include "LanguageDefinition.h"
+
 namespace ASMFramework
 {
-	Assembler::Assembler(const DerivedFromPass auto&... passes, const Workpiece& workpiece): m_workpiece(&workpiece)
+	Assembler::Assembler(const DerivedFromPass auto&... pass, const Workpiece& workpiece, const LanguageDefinition& langDef): m_workpiece(&workpiece), _languageSpec(&langDef)
 	{
-		(m_passes.push_back(&passes), ...);
+		(m_passes.emplace_back(&pass), ...);
 	}
 	Assembler::~Assembler()
-	{}
+	{
+	}
 
 	void Assembler::ProcessASM(const char* assemblyPath)
 	{
@@ -29,6 +37,11 @@ namespace ASMFramework
 		if (!file.is_open())
 		{
 			throw std::invalid_argument("Unable to open file at path: " + std::string(assemblyPath));
+		}
+
+		for (auto& pass : m_passes)
+		{
+			pass->Execute(m_workpiece, m_fileStream, _languageSpec);
 		}
 	}
 }

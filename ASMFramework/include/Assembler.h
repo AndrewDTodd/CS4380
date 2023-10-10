@@ -18,6 +18,7 @@
 
 #include "Pass.h"
 #include "Workpiece.h"
+#include "LanguageDefinition.h"
 
 namespace ASMFramework
 {
@@ -33,7 +34,9 @@ namespace ASMFramework
 
 		const std::ifstream* m_fileStream = nullptr;
 
-		Assembler(const DerivedFromPass auto&... passes, const Workpiece& workpiece);
+		const LanguageDefinition* _languageSpec = nullptr;
+
+		Assembler(const DerivedFromPass auto&... pass, const Workpiece& workpiece, const LanguageDefinition& langDef);
 		~Assembler();
 
 	public:
@@ -41,7 +44,7 @@ namespace ASMFramework
 		/// Called to set the Assembler to assembling the assembly code in the file at the assemblyPath location
 		/// </summary>
 		/// <param name="assemblyPath">String containing the path to the assembly file to process</param>
-		/// <exeption cref="std::invalid_argument">Thrown if the file at assemblyPath cannot be opened</exeption>
+		/// <exception cref="std::invalid_argument">Thrown if the file at assemblyPath cannot be opened</exception>
 		virtual void ProcessASM(const char* assemblyPath);
 
 		Assembler(const Assembler&) = delete;
