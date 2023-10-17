@@ -3,17 +3,11 @@
 
 #include <concepts>
 #include <type_traits>
-
 #include <stdexcept>
-
 #include <cstdint>
-
 #include <shared_mutex>
-
 #include <memory>
-
 #include <vector>
-
 #include <fstream>
 
 #include "Pass.h"
@@ -30,18 +24,18 @@ namespace ASMFramework
 	protected:
 		const std::vector<Pass*> m_passes;
 
-		Workpiece* m_workpiece = nullptr;
+		const Workpiece* m_workpiece = nullptr;
 
-		const std::ifstream* m_fileStream = nullptr;
+		const std::unique_ptr<const std::ifstream> m_fileStream = nullptr;
 
-		const LanguageDefinition* _languageSpec = nullptr;
+		const LanguageDefinition* const& _languageSpec = nullptr;
 
 		Assembler(const DerivedFromPass auto&... pass, const Workpiece& workpiece, const LanguageDefinition& langDef);
 		~Assembler();
 
 	public:
 		/// <summary>
-		/// Called to set the Assembler to assembling the assembly code in the file at the assemblyPath location
+		/// Called to start the Assembler assembling the assembly code in the file at the assemblyPath location
 		/// </summary>
 		/// <param name="assemblyPath">String containing the path to the assembly file to process</param>
 		/// <exception cref="std::invalid_argument">Thrown if the file at assemblyPath cannot be opened</exception>

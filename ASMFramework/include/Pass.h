@@ -13,7 +13,7 @@ namespace ASMFramework
 	class Pass
 	{
 	public:
-		virtual void Execute(Workpiece* workpiece, const std::ifstream* fileStream, const LanguageDefinition*& langDef) const = 0;
+		virtual void Execute(const Workpiece* const& workpiece, const std::unique_ptr<const std::ifstream>& fileStream, const LanguageDefinition* const& langDef) const = 0;
 	};
 }
 #endif // !PASS_H

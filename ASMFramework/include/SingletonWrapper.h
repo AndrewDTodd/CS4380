@@ -8,21 +8,33 @@
 
 #include <memory>
 
-template<class T>
-class SingletonWrapper;
-
 namespace ASMFramework
 {
 	template<class Derived>
-	requires std::derived_from<Derived, SingletonWrapper<Derived>>
 	class SingletonWrapper
 	{
 	protected:
-		static std::shared_ptr<Derived> s_instance;
+		inline static std::shared_ptr<Derived> s_instance;
 
-		static std::shared_mutex _sharedMutex;
+		inline static std::shared_mutex _sharedMutex;
+
+		/// <summary>
+		/// Default constructor is private, Machine is a singleton. Internal use only
+		/// </summary>
+		SingletonWrapper()
+		{}
+
+		/// <summary>
+		/// Default destructor is private, Machine is a singleton. Internal use only
+		/// </summary>
+		~SingletonWrapper()
+		{}
 
 	public:
+		/// <summary>
+		/// Get an instance of a shared_ptr to the singleton's instance
+		/// </summary>
+		/// <returns>shared_ptr to instance</returns>
 		static std::shared_ptr<Derived> GetInstance()
 		{
 			//Aquire concurrent lock for read access
@@ -36,7 +48,7 @@ namespace ASMFramework
 
 				if (!s_instance)
 				{
-					s_instance = new Derived();
+					s_instance = std::make_shared<Derived>();
 					return s_instance;
 				}
 			}

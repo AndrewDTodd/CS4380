@@ -116,7 +116,7 @@ set(VM_4380_UNIT_TESTS
 )
 
 set(ASM_FRAMEWORK_UNIT_TESTS
-
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/ASMFramework_UnitTests/SingletonWrapperTests.cpp
 )
 
 set(ASM_4380_UNIT_TESTS

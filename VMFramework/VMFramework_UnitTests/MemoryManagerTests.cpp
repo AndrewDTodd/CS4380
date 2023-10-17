@@ -4,7 +4,7 @@
 
 #include "../include/MemoryManager.h"
 
-//These tests will only succeed in Debug mode build as the methods tested only preform function in Debug mode
+//These tests will only succeed in Debug mode build as the methods tested only preform test case in Debug mode
 #ifdef _DEBUG
 class MemoryManagerTesting : public ::testing::Test
 {

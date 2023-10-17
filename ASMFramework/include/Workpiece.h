@@ -4,11 +4,8 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
-
 #include <cstdint>
-
 #include <shared_mutex>
-
 #include <memory>
 
 struct Directive;

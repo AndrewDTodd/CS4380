@@ -18,8 +18,7 @@ set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Directive.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instruction.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/LanguageDefinition.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Pass.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/SingletonWrapper.cpp
+	
 )
 
 add_library(ASMFramework STATIC ${SOURCE_FILES})

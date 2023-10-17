@@ -4,7 +4,6 @@
 #include <string>
 
 #include "Workpiece.h"
-#include "SingletonWrapper.h"
 
 namespace ASMFramework
 {
