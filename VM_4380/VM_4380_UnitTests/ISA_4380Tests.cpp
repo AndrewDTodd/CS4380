@@ -5,8 +5,7 @@
 
 #include "../include/ISA_4380.h"
 
-#include "../include/Instructions/JMP_L.h"
-#include "../include/Instructions/TRP.h"
+#include "../include/Instructions/Instructions.h"
 
 class ISA_4380Testing : public ::testing::Test
 {

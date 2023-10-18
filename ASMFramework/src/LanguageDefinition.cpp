@@ -9,10 +9,11 @@
 
 namespace ASMFramework
 {
-	LanguageDefinition::LanguageDefinition(const DerivedFromDirective auto&... directive, const DerivedFromInstruction auto&... instruction)
+	LanguageDefinition::LanguageDefinition(const DerivedFromDirective auto&... directive, const DerivedFromInstruction auto&... instruction, std::string&& keyword...)
 	{
 		(m_languageDirectives.emplace(directive._mnemonic, &directive), ...);
 		(m_languageDirectives.emplace(instruction._mnemonic, &instruction), ...);
+		(m_reservedKeywords.emplace(std::forward<std::string&&>(keyword)), ...);
 	}
 	LanguageDefinition::~LanguageDefinition()
 	{

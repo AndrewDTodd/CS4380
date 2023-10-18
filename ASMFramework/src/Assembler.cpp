@@ -16,7 +16,7 @@
 
 namespace ASMFramework
 {
-	Assembler::Assembler(const DerivedFromPass auto&... pass, const Workpiece& workpiece, const LanguageDefinition& langDef): m_workpiece(&workpiece), _languageSpec(&langDef)
+	Assembler::Assembler(const Workpiece& workpiece, const LanguageDefinition& langDef, const DerivedFromPass auto&... pass): m_workpiece(&workpiece), _languageSpec(&langDef)
 	{
 		(m_passes.emplace_back(&pass), ...);
 	}

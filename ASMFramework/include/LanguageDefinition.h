@@ -2,6 +2,7 @@
 #define LANGUAGE_DEFINITION_H
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include <string>
 
@@ -11,21 +12,26 @@
 #include "Instruction.h"
 
 template<typename T>
-concept DerivedFromDirective = std::derived_from<T, Directive>;
+concept DerivedFromDirective = std::derived_from<T, ASMFramework::Directive>;
 
 template<typename T>
-concept DerivedFromInstruction = std::derived_from<T, Instruction>;
+concept DerivedFromInstruction = std::derived_from<T, ASMFramework::Instruction>;
+
+template<typename T>
+concept StringType = std::is_same_v<T, std::string>;
 
 namespace ASMFramework
 {
 	class LanguageDefinition
 	{
 	protected:
-		std::unordered_map<std::string, const Directive*> m_languageDirectives;
+		const std::unordered_map<std::string, const Directive*> m_languageDirectives;
 
-		std::unordered_map<std::string, const Instruction*> m_languageInstructions;
+		const std::unordered_map<std::string, const Instruction*> m_languageInstructions;
 
-		LanguageDefinition(const DerivedFromDirective auto&... directive, const DerivedFromInstruction auto&... instruction);
+		const std::unordered_set<std::string> m_reservedKeywords;
+
+		LanguageDefinition(const DerivedFromDirective auto&... directive, const DerivedFromInstruction auto&... instruction, std::string&& keyword...);
 		~LanguageDefinition();
 
 	public:

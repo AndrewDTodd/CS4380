@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Machine.cpp
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
 )

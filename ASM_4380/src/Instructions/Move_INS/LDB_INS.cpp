@@ -1,0 +1,11 @@
+#include "../../../include/Instructions/Move_INS/LDB_INS.h"
+
+#include <stdexcept>
+
+LDB_INS::LDB_INS() : Instruction("LDB")
+{}
+
+void LDB_INS::Implementation(const Workpiece* const& workpiece) const
+{
+	throw NotImplemented();
+}
