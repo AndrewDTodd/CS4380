@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-RUN_INS::RUN_INS() : Instruction("RUN")
+RUN_INS::RUN_INS() : ASMInstruction("RUN")
 {}
 
 void RUN_INS::Implementation(const Workpiece* const& workpiece) const

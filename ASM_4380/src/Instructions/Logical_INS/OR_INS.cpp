@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-OR_INS::OR_INS() : Instruction("OR")
+OR_INS::OR_INS() : ASMInstruction("OR")
 {}
 
 void OR_INS::Implementation(const Workpiece* const& workpiece) const

@@ -1,11 +1,11 @@
 #ifndef ALLC_INS_H
 #define ALLC_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct ALLC_INS : public ASMFramework::Instruction
+struct ALLC_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ALLC_INS();

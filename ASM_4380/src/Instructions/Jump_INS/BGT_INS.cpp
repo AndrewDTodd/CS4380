@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-BGT_INS::BGT_INS() : Instruction("BGT")
+BGT_INS::BGT_INS() : ASMInstruction("BGT")
 {}
 
 void BGT_INS::Implementation(const Workpiece* const& workpiece) const

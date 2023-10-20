@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-BNZ_INS::BNZ_INS() : Instruction("BNZ")
+BNZ_INS::BNZ_INS() : ASMInstruction("BNZ")
 {}
 
 void BNZ_INS::Implementation(const Workpiece* const& workpiece) const

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-NOT_INS::NOT_INS() : Instruction("NOT")
+NOT_INS::NOT_INS() : ASMInstruction("NOT")
 {}
 
 void NOT_INS::Implementation(const Workpiece* const& workpiece) const

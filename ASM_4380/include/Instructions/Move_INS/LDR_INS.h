@@ -1,11 +1,11 @@
 #ifndef LDR_INS_H
 #define LDR_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct LDR_INS : public ASMFramework::Instruction
+struct LDR_INS : public ASMFramework::ASMInstruction
 {
 public:
 	LDR_INS();

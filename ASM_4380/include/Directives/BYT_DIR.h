@@ -1,11 +1,11 @@
 #ifndef BYT_DIR_H
 #define BYT_DIR_H
 
-#include <Directive.h>
+#include <ASMDirective.h>
 
 using namespace ASMFramework;
 
-struct BYT_DIR : public ASMFramework::Directive
+struct BYT_DIR : public ASMFramework::ASMDirective
 {
 public:
 	BYT_DIR();

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-LDB_INS::LDB_INS() : Instruction("LDB")
+LDB_INS::LDB_INS() : ASMInstruction("LDB")
 {}
 
 void LDB_INS::Implementation(const Workpiece* const& workpiece) const

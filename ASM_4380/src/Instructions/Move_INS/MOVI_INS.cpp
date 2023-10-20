@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-MOVI_INS::MOVI_INS() : Instruction("MOVI")
+MOVI_INS::MOVI_INS() : ASMInstruction("MOVI")
 {}
 
 void MOVI_INS::Implementation(const Workpiece* const& workpiece) const

@@ -1,11 +1,11 @@
 #ifndef CMP_INS_H
 #define CMP_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct CMP_INS : public ASMFramework::Instruction
+struct CMP_INS : public ASMFramework::ASMInstruction
 {
 public:
 	CMP_INS();

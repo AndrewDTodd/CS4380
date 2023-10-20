@@ -1,6 +1,6 @@
 #include "../../../include/Instructions/Move/MOV.h"
 
-#include "../../include/Process_4380.h"
+#include "../../../include/Process_4380.h"
 
 MOV::MOV() : Instruction(7)
 {}

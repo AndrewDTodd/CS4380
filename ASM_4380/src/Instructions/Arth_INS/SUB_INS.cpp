@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-SUB_INS::SUB_INS() : Instruction("SUB")
+SUB_INS::SUB_INS() : ASMInstruction("SUB")
 {}
 
 void SUB_INS::Implementation(const Workpiece* const& workpiece) const

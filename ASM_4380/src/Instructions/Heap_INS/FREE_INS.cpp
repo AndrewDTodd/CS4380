@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-FREE_INS::FREE_INS() : Instruction("FREE")
+FREE_INS::FREE_INS() : ASMInstruction("FREE")
 {}
 
 void FREE_INS::Implementation(const Workpiece* const& workpiece) const

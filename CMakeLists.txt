@@ -15,95 +15,44 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 endif()
 
 #setting project scope
-project ("Project1_VM")
+project ("Project2_VMv2_ASMv1")
 
 #Google tests require mimimum c++ version 14
 #setting minimum c++ version to 20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#this CMake variable is used by the VM_4380 unit test that needs a path to a test bin
+set(VM_TEST_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/TestBins/we.bin" CACHE STRING "VM_4380 Unit Test bin file path")
+
+add_definitions(-DBIN_PATH="${VM_TEST_BIN_PATH}")
+
 #Add the VMFramework subdirectory
 add_subdirectory(VMFramework)
+#Add the VM_4380 subdirectory
+add_subdirectory(VM_4380)
 
 #Add the AssemblerFramework subdirectory
 add_subdirectory(ASMFramework)
+#Add the ASM_4380 subdirectory
+add_subdirectory(ASM_4380)
 
-#VM_4380 target section
+#root reference to all targets source
 ################################################################################################################################################################
 
-#set source for VM_4380 executable
-set(VM_4380_SOURCE
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/ISA_4380.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Process_4380.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/VM4380.cpp
-
-)
-
-set(VM_4380_INSTRUCTIONS_ARTH
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/ADD.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/DIV.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/MUL.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/SUB.cpp
-
-)
-
-set(VM_4380_INSTRUCTIONS_COMP
+#ASMFramework Source
+############################################################################
+set(ASM_FRAMEWORK_SOURCE
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Assembler.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Directive.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Instruction.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/LanguageDefinition.cpp
 	
-
 )
+############################################################################
 
-set(VM_4380_INSTRUCTIONS_HEAP
-	
-
-)
-
-set(VM_4380_INSTRUCTIONS_JUMP
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Jump/JMP_L.cpp
-
-)
-
-set(VM_4380_INSTRUCTIONS_LOGICAL
-	
-
-)
-
-set(VM_4380_INSTRUCTIONS_MOVE
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDB_L.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDR_L.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/MOV.cpp
-
-)
-
-set(VM_4380_INSTRUCTIONS_MULTI_THREAD
-
-)
-
-set(VM_4380_INSTRUCTIONS_TRP
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/TRP/TRP.cpp
-
-)
-
-# Create executable for the virtual machine target of the project
-add_executable (VM_4380 ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_main.cpp ${VM_4380_SOURCE}
-${VM_4380_INSTRUCTIONS_ARTH}
-${VM_4380_INSTRUCTIONS_COMP}
-${VM_4380_INSTRUCTIONS_HEAP}
-${VM_4380_INSTRUCTIONS_JUMP}
-${VM_4380_INSTRUCTIONS_LOGICAL}
-${VM_4380_INSTRUCTIONS_MOVE}
-${VM_4380_INSTRUCTIONS_MULTI_THREAD}
-${VM_4380_INSTRUCTIONS_TRP})
-target_link_libraries(VM_4380 PRIVATE VMFramework)
-
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions)
-
-################################################################################################################################################################
-
-#ASM_4380 target section (Assembler_4380)
-################################################################################################################################################################
-
-#set source for ASM_4380 executable
+#ASM_4380 Source
+############################################################################
 set(ASM_4380_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/ASM4380.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/LanguageDefinition_4380.cpp
@@ -186,28 +135,115 @@ set(ASM_4380_INSTRUCTIONS_TRP
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/Instructions/TRP_INS/TRP_INS.cpp
 
 )
+############################################################################
 
+#VMFramework Source
+############################################################################
+set(VM_FRAMEWORK_SOURCE
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/Allocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/MemoryManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/StackAllocator.cpp
 
-# Create executable for the Assembler target of the project
-add_executable (ASM_4380 ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_main.cpp ${ASM_4380_SOURCE} 
-${ASM_4380_DIRECTIVES} 
-${ASM_4380_INSTRUCTIONS_ARTH} 
-${ASM_4380_INSTRUCTIONS_COMP} 
-${ASM_4380_INSTRUCTIONS_HEAP} 
-${ASM_4380_INSTRUCTIONS_JUMP} 
-${ASM_4380_INSTRUCTIONS_LOGICAL} 
-${ASM_4380_INSTRUCTIONS_MOVE} 
-${ASM_4380_INSTRUCTIONS_MULTI_THREAD} 
-${ASM_4380_INSTRUCTIONS_TRP})
-target_link_libraries(ASM_4380 PRIVATE ASMFramework)
+)
+############################################################################
 
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Directives)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions)
+#VM_4380 Source
+############################################################################
+set(VM_4380_SOURCE
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/ISA_4380.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Process_4380.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/VM4380.cpp
+
+)
+
+set(VM_4380_INSTRUCTIONS_ARTH
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/ADD.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/DIV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/MUL.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Arth/SUB.cpp
+
+)
+
+set(VM_4380_INSTRUCTIONS_COMP
+	
+
+)
+
+set(VM_4380_INSTRUCTIONS_HEAP
+	
+
+)
+
+set(VM_4380_INSTRUCTIONS_JUMP
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Jump/JMP_L.cpp
+
+)
+
+set(VM_4380_INSTRUCTIONS_LOGICAL
+	
+
+)
+
+set(VM_4380_INSTRUCTIONS_MOVE
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDR_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/MOV.cpp
+
+)
+
+set(VM_4380_INSTRUCTIONS_MULTI_THREAD
+
+)
+
+set(VM_4380_INSTRUCTIONS_TRP
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/TRP/TRP.cpp
+
+)
+############################################################################
 
 ################################################################################################################################################################
 
-#runTests target section
+#root reference to all targets unit test source
+################################################################################################################################################################
+
+#ASMFramework Unit Tests Source
+############################################################################
+set(ASM_FRAMEWORK_UNIT_TESTS
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/ASMFramework_UnitTests/SingletonWrapperTests.cpp
+
+)
+############################################################################
+
+#ASM_4380 Unit Tests Source
+############################################################################
+set(ASM_4380_UNIT_TESTS
+
+)
+############################################################################
+
+#VMFramework Unit Tests Source
+############################################################################
+set(VM_FRAMEWORK_UNIT_TESTS
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MemoryManagerTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/PointerMathTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/StackAllocatorTests.cpp
+
+)
+############################################################################
+
+#VM_4380 Unit Tests Source
+############################################################################
+set(VM_4380_UNIT_TESTS
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/InstructionsTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/ISA_4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/Process_4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/VM4380Tests.cpp
+)
+############################################################################
+
+################################################################################################################################################################
+
+#runAllTargetTests target section
 ################################################################################################################################################################
 #installation and setup of the gTest suite
 #build a tests executable for the execution of the projects tests
@@ -223,43 +259,47 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-#set source for "runTests" unit testing executable
-set(VM_FRAMEWORK_UNIT_TESTS
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MemoryManagerTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/PointerMathTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/StackAllocatorTests.cpp
-)
-
-set(VM_4380_UNIT_TESTS
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/InstructionsTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/ISA_4380Tests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/Process_4380Tests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/VM4380Tests.cpp
-)
-
-set(ASM_FRAMEWORK_UNIT_TESTS
-	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/ASMFramework_UnitTests/SingletonWrapperTests.cpp
-)
-
-set(ASM_4380_UNIT_TESTS
-
-)
-
 #Create executable for the execution of the project's tests
-add_executable(runTests ${VM_FRAMEWORK_UNIT_TESTS} ${VM_4380_UNIT_TESTS} 
-${VM_4380_SOURCE} ${VM_4380_INSTRUCTIONS} 
-${ASM_FRAMEWORK_UNIT_TESTS} ${ASM_4380_UNIT_TESTS} 
-${ASM_4380_SOURCE} ${ASM_4380_DIRECTIVES} ${ASM_4380_INSTRUCTIONS})
+add_executable(runAllTargetTests
+${ASM_FRAMEWORK_UNIT_TESTS} 
+
+${ASM_4380_UNIT_TESTS} 
+${ASM_4380_SOURCE} 
+${ASM_4380_DIRECTIVES} 
+${ASM_4380_INSTRUCTIONS_ARTH} 
+${ASM_4380_INSTRUCTIONS_COMP} 
+${ASM_4380_INSTRUCTIONS_HEAP} 
+${ASM_4380_INSTRUCTIONS_JUMP} 
+${ASM_4380_INSTRUCTIONS_LOGICAL} 
+${ASM_4380_INSTRUCTIONS_MOVE} 
+${ASM_4380_INSTRUCTIONS_MULTI_THREAD} 
+${ASM_4380_INSTRUCTIONS_TRP}
+
+${VM_FRAMEWORK_UNIT_TESTS} 
+
+${VM_4380_UNIT_TESTS} 
+${VM_4380_SOURCE} 
+${VM_4380_INSTRUCTIONS_ARTH} 
+${VM_4380_INSTRUCTIONS_COMP} 
+${VM_4380_INSTRUCTIONS_HEAP} 
+${VM_4380_INSTRUCTIONS_JUMP} 
+${VM_4380_INSTRUCTIONS_LOGICAL} 
+${VM_4380_INSTRUCTIONS_MOVE} 
+${VM_4380_INSTRUCTIONS_MULTI_THREAD} 
+${VM_4380_INSTRUCTIONS_TRP}
+)
+
+add_dependencies(runAllTargetTests VMFramework ASMFramework VM_4380 ASM_4380)
 
 #include the gtest_main function from the gtest library to automatically run all tests from its provided main
-target_link_libraries(runTests PRIVATE GTest::gtest_main)
+target_link_libraries(runAllTargetTests PRIVATE GTest::gtest_main)
 
 #include the VMFramework library
-target_link_libraries(runTests PRIVATE VMFramework)
+target_link_libraries(runAllTargetTests PRIVATE VMFramework)
 
 #include the AssemblerFramework library
-target_link_libraries(runTests PRIVATE ASMFramework)
+target_link_libraries(runAllTargetTests PRIVATE ASMFramework)
 
 include(GoogleTest)
-gtest_discover_tests(runTests)
+gtest_discover_tests(runAllTargetTests)
 ################################################################################################################################################################

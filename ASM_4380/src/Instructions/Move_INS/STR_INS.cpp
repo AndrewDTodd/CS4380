@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-STR_INS::STR_INS() : Instruction("STR")
+STR_INS::STR_INS() : ASMInstruction("STR")
 {}
 
 void STR_INS::Implementation(const Workpiece* const& workpiece) const

@@ -1,11 +1,11 @@
 #ifndef MULI_INS_H
 #define MULI_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct MULI_INS : public ASMFramework::Instruction
+struct MULI_INS : public ASMFramework::ASMInstruction
 {
 public:
 	MULI_INS();

@@ -1,11 +1,11 @@
 #ifndef INT_DIR_H
 #define INT_DIR_H
 
-#include <Directive.h>
+#include <ASMDirective.h>
 
 using namespace ASMFramework;
 
-struct INT_DIR : public ASMFramework::Directive
+struct INT_DIR : public ASMFramework::ASMDirective
 {
 public:
 	INT_DIR();

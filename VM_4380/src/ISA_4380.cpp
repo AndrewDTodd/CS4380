@@ -1,5 +1,7 @@
 #include "../include/ISA_4380.h"
 
+#include "../include/Instruction.h"
+
 #include <cstdint>
 
 using namespace VMFramework;

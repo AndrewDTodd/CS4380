@@ -1,11 +1,11 @@
 #ifndef BLK_INS_H
 #define BLK_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct BLK_INS : public ASMFramework::Instruction
+struct BLK_INS : public ASMFramework::ASMInstruction
 {
 public:
 	BLK_INS();

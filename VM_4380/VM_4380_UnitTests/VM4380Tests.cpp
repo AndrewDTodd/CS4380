@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "../include/VM4380.h"
-#include "../../VMFramework/include/Machine.h"
+#include <Machine.h>
 
 using namespace VMFramework;
 
@@ -71,7 +71,7 @@ TEST_F(VM4380Testing, Validate_LoadProgram)
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
 
-	ASSERT_NO_THROW({ _instance->LoadProgram("../../TestBins/we.bin"); });
+	ASSERT_NO_THROW({ _instance->LoadProgram(BIN_PATH); });
 
 	ASSERT_NE(_instance->m_programSegment, nullptr);
 	ASSERT_EQ(_instance->m_programSize, 78);

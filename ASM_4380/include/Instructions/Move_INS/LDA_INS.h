@@ -1,11 +1,11 @@
 #ifndef LDA_INS_H
 #define LDA_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct LDA_INS : public ASMFramework::Instruction
+struct LDA_INS : public ASMFramework::ASMInstruction
 {
 public:
 	LDA_INS();

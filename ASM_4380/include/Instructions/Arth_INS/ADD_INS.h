@@ -1,11 +1,11 @@
 #ifndef ADD_INS_H
 #define ADD_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct ADD_INS : public ASMFramework::Instruction
+struct ADD_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ADD_INS();

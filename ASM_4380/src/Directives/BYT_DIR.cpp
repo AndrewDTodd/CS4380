@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-BYT_DIR::BYT_DIR(): Directive(".BYT")
+BYT_DIR::BYT_DIR(): ASMDirective(".BYT")
 {}
 
 void BYT_DIR::Implementation(const Workpiece* const& workpiece) const

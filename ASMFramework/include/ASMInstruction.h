@@ -1,5 +1,5 @@
-#ifndef DIRECTIVE_H
-#define DIRECTIVE_H
+#ifndef ASM_INSTRUCTION_H
+#define ASM_INSTRUCTION_H
 
 #include <string>
 #include <stdexcept>
@@ -8,17 +8,17 @@
 
 namespace ASMFramework
 {
-	struct Directive
+	struct ASMInstruction
 	{
 	protected:
-		Directive(const std::string& mnemonic);
+		ASMInstruction(const std::string& mnemonic);
 
 		class NotImplemented : public std::exception
 		{
 		public:
 			const char* what() const noexcept override
 			{
-				return "Assembly Directive not yet implemented";
+				return "Assembly ASMInstruction not yet implemented";
 			}
 		};
 
@@ -28,4 +28,4 @@ namespace ASMFramework
 		virtual void Implementation(const Workpiece* const& workpiece) const = 0;
 	};
 }
-#endif // !DIRECTIVE_H
+#endif // !INSTRUCTION_H

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-ADI_INS::ADI_INS() : Instruction("ADI")
+ADI_INS::ADI_INS() : ASMInstruction("ADI")
 {}
 
 void ADI_INS::Implementation(const Workpiece* const& workpiece) const

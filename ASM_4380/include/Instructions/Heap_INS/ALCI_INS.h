@@ -1,11 +1,11 @@
 #ifndef ALCI_INS_H
 #define ALCI_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct ALCI_INS : public ASMFramework::Instruction
+struct ALCI_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ALCI_INS();

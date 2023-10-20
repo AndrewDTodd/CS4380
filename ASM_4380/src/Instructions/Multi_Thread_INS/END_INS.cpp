@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-END_INS::END_INS() : Instruction("END")
+END_INS::END_INS() : ASMInstruction("END")
 {}
 
 void END_INS::Implementation(const Workpiece* const& workpiece) const

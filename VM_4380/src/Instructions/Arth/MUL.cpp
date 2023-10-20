@@ -1,6 +1,6 @@
 #include "../../../include/Instructions/Arth/MUL.h"
 
-#include "../../include/Process_4380.h"
+#include "../../../include/Process_4380.h"
 
 MUL::MUL() : Instruction(16)
 {}

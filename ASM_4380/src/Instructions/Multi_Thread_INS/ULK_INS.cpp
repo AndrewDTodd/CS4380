@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-ULK_INS::ULK_INS() : Instruction("ULK")
+ULK_INS::ULK_INS() : ASMInstruction("ULK")
 {}
 
 void ULK_INS::Implementation(const Workpiece* const& workpiece) const

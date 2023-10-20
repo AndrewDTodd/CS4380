@@ -1,11 +1,11 @@
 #ifndef END_INS_H
 #define END_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct END_INS : public ASMFramework::Instruction
+struct END_INS : public ASMFramework::ASMInstruction
 {
 public:
 	END_INS();

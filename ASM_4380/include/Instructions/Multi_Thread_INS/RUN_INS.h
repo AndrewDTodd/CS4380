@@ -1,11 +1,11 @@
 #ifndef RUN_INS_H
 #define RUN_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct RUN_INS : public ASMFramework::Instruction
+struct RUN_INS : public ASMFramework::ASMInstruction
 {
 public:
 	RUN_INS();

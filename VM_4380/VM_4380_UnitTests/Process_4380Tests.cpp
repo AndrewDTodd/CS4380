@@ -4,9 +4,11 @@
 #include <shared_mutex>
 #include <cstdint>
 
+#include "../include/Instructions/Instructions.h"
+
 #include "../include/Process_4380.h"
 #include "../include/ISA_4380.h"
-#include "../../VMFramework/include/StackAllocator.h"
+#include <StackAllocator.h>
 
 using namespace VMFramework;
 

@@ -1,11 +1,11 @@
 #ifndef DIVI_INS_H
 #define DIVI_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct DIVI_INS : public ASMFramework::Instruction
+struct DIVI_INS : public ASMFramework::ASMInstruction
 {
 public:
 	DIVI_INS();

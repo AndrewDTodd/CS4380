@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-DIVI_INS::DIVI_INS() : Instruction("DIVI")
+DIVI_INS::DIVI_INS() : ASMInstruction("DIVI")
 {}
 
 void DIVI_INS::Implementation(const Workpiece* const& workpiece) const

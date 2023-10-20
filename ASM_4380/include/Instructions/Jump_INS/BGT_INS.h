@@ -1,11 +1,11 @@
 #ifndef BGT_INS_H
 #define BGT_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct BGT_INS : public ASMFramework::Instruction
+struct BGT_INS : public ASMFramework::ASMInstruction
 {
 public:
 	BGT_INS();

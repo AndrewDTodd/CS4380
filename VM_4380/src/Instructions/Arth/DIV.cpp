@@ -1,6 +1,6 @@
 #include "../../../include/Instructions/Arth/DIV.h"
 
-#include "../../include/Process_4380.h"
+#include "../../../include/Process_4380.h"
 
 DIV::DIV(): Instruction(17)
 {}

@@ -22,7 +22,7 @@ namespace ASMFramework
 	class Assembler
 	{
 	protected:
-		const std::vector<Pass*> m_passes;
+		const std::vector<const Pass*> m_passes;
 
 		const Workpiece* m_workpiece = nullptr;
 
@@ -36,7 +36,16 @@ namespace ASMFramework
 		/// <param name="workpiece">Reference to the Workpiece instance that will be operated upon by teh Assembler's passes</param>
 		/// <param name="langDef">Reference to the LanguageDefinition instance used to define the semantics of the Assembly Language the Assembler is being build for</param>
 		/// <param name="...pass">Variadic paramater specifying the Pass instances to use for the concrete implementation</param>
-		Assembler(const Workpiece& workpiece, const LanguageDefinition& langDef, const DerivedFromPass auto&... pass);
+		Assembler(const Workpiece& workpiece, const LanguageDefinition& langDef, const DerivedFromPass auto&... passes):
+			m_workpiece(&workpiece),
+			_languageSpec(&langDef),
+			m_passes{&passes...}
+		{
+		}
+
+		/// <summary>
+		/// Default destructor is internal. Assembler is abstract
+		/// </summary>
 		~Assembler();
 
 	public:

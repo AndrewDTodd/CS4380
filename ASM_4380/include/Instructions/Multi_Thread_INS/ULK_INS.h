@@ -1,11 +1,11 @@
 #ifndef ULK_INS_H
 #define ULK_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct ULK_INS : public ASMFramework::Instruction
+struct ULK_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ULK_INS();

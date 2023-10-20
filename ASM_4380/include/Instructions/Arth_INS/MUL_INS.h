@@ -1,11 +1,11 @@
 #ifndef MUL_INS_H
 #define MUL_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct MUL_INS : public ASMFramework::Instruction
+struct MUL_INS : public ASMFramework::ASMInstruction
 {
 public:
 	MUL_INS();

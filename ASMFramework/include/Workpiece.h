@@ -8,8 +8,8 @@
 #include <shared_mutex>
 #include <memory>
 
-struct Directive;
-struct Instruction;
+struct ASMDirective;
+struct ASMInstruction;
 
 namespace ASMFramework
 {
@@ -19,11 +19,11 @@ namespace ASMFramework
 
 		std::unordered_map<std::string, uint64_t> _symbolTable;
 
-		std::vector<const Directive*> _dataSegmentDir;
+		std::vector<const ASMDirective*> _dataSegmentDir;
 		std::vector<uint8_t> _dataSegmentBin;
 
 		//pair key is segment label, which can be "" for unlabled code segment
-		std::vector<std::pair<std::string, std::vector<const Instruction*>>> _codeSegmentItems;
+		std::vector<std::pair<std::string, std::vector<const ASMInstruction*>>> _codeSegmentItems;
 		std::vector<std::pair<std::string, std::vector<uint8_t>>> _codeSegmentBin;
 	};
 }

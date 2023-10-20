@@ -1,11 +1,11 @@
 #ifndef JMR_INS_H
 #define JMR_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct JMR_INS : public ASMFramework::Instruction
+struct JMR_INS : public ASMFramework::ASMInstruction
 {
 public:
 	JMR_INS();

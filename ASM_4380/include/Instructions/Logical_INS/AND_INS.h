@@ -1,11 +1,11 @@
 #ifndef AND_INS_H
 #define AND_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct AND_INS : public ASMFramework::Instruction
+struct AND_INS : public ASMFramework::ASMInstruction
 {
 public:
 	AND_INS();

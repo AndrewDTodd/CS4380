@@ -1,11 +1,11 @@
 #ifndef JMP_INS_H
 #define JMP_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct JMP_INS : public ASMFramework::Instruction
+struct JMP_INS : public ASMFramework::ASMInstruction
 {
 public:
 	JMP_INS();

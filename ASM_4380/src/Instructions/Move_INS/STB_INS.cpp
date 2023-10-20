@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-STB_INS::STB_INS() : Instruction("STB")
+STB_INS::STB_INS() : ASMInstruction("STB")
 {}
 
 void STB_INS::Implementation(const Workpiece* const& workpiece) const

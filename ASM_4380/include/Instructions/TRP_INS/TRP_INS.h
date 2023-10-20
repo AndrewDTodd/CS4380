@@ -1,11 +1,11 @@
 #ifndef TRP_INS_H
 #define TRP_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct TRP_INS : public ASMFramework::Instruction
+struct TRP_INS : public ASMFramework::ASMInstruction
 {
 public:
 	TRP_INS();

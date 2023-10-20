@@ -1,11 +1,11 @@
 #ifndef NOT_INS_H
 #define NOT_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct NOT_INS : public ASMFramework::Instruction
+struct NOT_INS : public ASMFramework::ASMInstruction
 {
 public:
 	NOT_INS();

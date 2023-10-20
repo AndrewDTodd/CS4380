@@ -1,6 +1,6 @@
 #include "../../../include/Instructions/Move/LDB_L.h"
 
-#include "../../include/Process_4380.h"
+#include "../../../include/Process_4380.h"
 
 LDB_L::LDB_L() : Instruction(12)
 {}

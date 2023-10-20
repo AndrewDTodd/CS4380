@@ -1,11 +1,11 @@
 #ifndef BNZ_INS_H
 #define BNZ_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct BNZ_INS : public ASMFramework::Instruction
+struct BNZ_INS : public ASMFramework::ASMInstruction
 {
 public:
 	BNZ_INS();

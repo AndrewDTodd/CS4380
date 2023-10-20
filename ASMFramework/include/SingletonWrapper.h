@@ -19,13 +19,13 @@ namespace ASMFramework
 		inline static std::shared_mutex _sharedMutex;
 
 		/// <summary>
-		/// Default constructor is private, Machine is a singleton. Internal use only
+		/// Default constructor is private, SingletonWrapper is a singleton. Internal use only
 		/// </summary>
 		SingletonWrapper()
 		{}
 
 		/// <summary>
-		/// Default destructor is private, Machine is a singleton. Internal use only
+		/// Default destructor is private, SingletonWrapper is a singleton. Internal use only
 		/// </summary>
 		~SingletonWrapper()
 		{}

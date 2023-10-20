@@ -1,4 +1,4 @@
-#include "../include/VM4380.h"
+#include "include/VM4380.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -52,4 +52,6 @@ int main(int argc, char* argv[])
 	VM->WaitForProcess();
 
 	VM->ShutDown();
+
+	return 0;
 }

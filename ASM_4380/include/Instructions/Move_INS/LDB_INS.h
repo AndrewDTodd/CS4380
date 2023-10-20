@@ -1,11 +1,11 @@
 #ifndef LDB_INS_H
 #define LDB_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct LDB_INS : public ASMFramework::Instruction
+struct LDB_INS : public ASMFramework::ASMInstruction
 {
 public:
 	LDB_INS();

@@ -1,11 +1,11 @@
 #ifndef STB_INS_H
 #define STB_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct STB_INS : public ASMFramework::Instruction
+struct STB_INS : public ASMFramework::ASMInstruction
 {
 public:
 	STB_INS();

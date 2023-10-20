@@ -1,11 +1,11 @@
 #ifndef SUB_INS_H
 #define SUB_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct SUB_INS : public ASMFramework::Instruction
+struct SUB_INS : public ASMFramework::ASMInstruction
 {
 public:
 	SUB_INS();

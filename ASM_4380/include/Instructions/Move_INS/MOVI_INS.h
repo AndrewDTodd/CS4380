@@ -1,11 +1,11 @@
 #ifndef MOVI_INS_H
 #define MOVI_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct MOVI_INS : public ASMFramework::Instruction
+struct MOVI_INS : public ASMFramework::ASMInstruction
 {
 public:
 	MOVI_INS();

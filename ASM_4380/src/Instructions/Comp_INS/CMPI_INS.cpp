@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-CMPI_INS::CMPI_INS() : Instruction("CMPI")
+CMPI_INS::CMPI_INS() : ASMInstruction("CMPI")
 {}
 
 void CMPI_INS::Implementation(const Workpiece* const& workpiece) const

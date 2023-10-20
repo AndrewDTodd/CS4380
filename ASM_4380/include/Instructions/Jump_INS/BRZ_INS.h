@@ -1,11 +1,11 @@
 #ifndef BRZ_INS_H
 #define BRZ_INS_H
 
-#include <Instruction.h>
+#include <ASMInstruction.h>
 
 using namespace ASMFramework;
 
-struct BRZ_INS : public ASMFramework::Instruction
+struct BRZ_INS : public ASMFramework::ASMInstruction
 {
 public:
 	BRZ_INS();

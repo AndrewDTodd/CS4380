@@ -1,6 +1,6 @@
 #include "../../../include/Instructions/Arth/SUB.h"
 
-#include "../../include/Process_4380.h"
+#include "../../../include/Process_4380.h"
 
 SUB::SUB() : Instruction(15)
 {}
