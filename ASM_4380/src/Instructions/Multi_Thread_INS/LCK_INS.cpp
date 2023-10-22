@@ -5,7 +5,7 @@
 LCK_INS::LCK_INS() : ASMInstruction("LCK")
 {}
 
-void LCK_INS::Implementation(const Workpiece* const& workpiece) const
+void LCK_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

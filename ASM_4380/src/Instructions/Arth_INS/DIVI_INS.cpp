@@ -5,7 +5,7 @@
 DIVI_INS::DIVI_INS() : ASMInstruction("DIVI")
 {}
 
-void DIVI_INS::Implementation(const Workpiece* const& workpiece) const
+void DIVI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

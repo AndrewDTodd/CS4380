@@ -2,7 +2,7 @@
 
 #include <memory>
 
-void PassTwo::Execute(const Workpiece* const& workpiece, const std::unique_ptr<const std::ifstream>& fileStream, const LanguageDefinition* const& langDef) const
+void PassTwo::Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
 {
 
 }

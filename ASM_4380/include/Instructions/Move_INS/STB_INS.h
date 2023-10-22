@@ -3,13 +3,13 @@
 
 #include <ASMInstruction.h>
 
-using namespace ASMFramework;
+
 
 struct STB_INS : public ASMFramework::ASMInstruction
 {
 public:
 	STB_INS();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !STB_INS_H

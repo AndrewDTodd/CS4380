@@ -11,7 +11,7 @@ namespace ASMFramework
 	struct ASMDirective
 	{
 	protected:
-		ASMDirective(const std::string& mnemonic);
+		ASMDirective(std::string&& mnemonic);
 
 		class NotImplemented : public std::exception
 		{

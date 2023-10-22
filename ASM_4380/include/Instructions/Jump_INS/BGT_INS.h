@@ -3,13 +3,13 @@
 
 #include <ASMInstruction.h>
 
-using namespace ASMFramework;
+
 
 struct BGT_INS : public ASMFramework::ASMInstruction
 {
 public:
 	BGT_INS();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !JMP_INS_H

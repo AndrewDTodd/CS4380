@@ -3,11 +3,9 @@
 
 #include <Pass.h>
 
-using namespace ASMFramework;
-
-class PassThree : public Pass
+class PassThree : public ASMFramework::Pass
 {
 public:
-	void Execute(const Workpiece* const& workpiece, const std::unique_ptr<const std::ifstream>& fileStream, const LanguageDefinition* const& langDef) const override;
+	void Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const override;
 };
 #endif // !PASS_THREE_H

@@ -24,11 +24,11 @@ namespace ASMFramework
 	protected:
 		const std::vector<const Pass*> m_passes;
 
-		const Workpiece* m_workpiece = nullptr;
+		Workpiece* m_workpiece = nullptr;
 
-		const std::unique_ptr<const std::ifstream> m_fileStream = nullptr;
+		const std::unique_ptr<std::ifstream> m_fileStream = nullptr;
 
-		const LanguageDefinition* const& _languageSpec = nullptr;
+		const LanguageDefinition* _languageSpec = nullptr;
 
 		/// <summary>
 		/// Assembler base class constructor. Assembler should be treated as abstract. No instances should be made
@@ -36,10 +36,10 @@ namespace ASMFramework
 		/// <param name="workpiece">Reference to the Workpiece instance that will be operated upon by teh Assembler's passes</param>
 		/// <param name="langDef">Reference to the LanguageDefinition instance used to define the semantics of the Assembly Language the Assembler is being build for</param>
 		/// <param name="...pass">Variadic paramater specifying the Pass instances to use for the concrete implementation</param>
-		Assembler(const Workpiece& workpiece, const LanguageDefinition& langDef, const DerivedFromPass auto&... passes):
-			m_workpiece(&workpiece),
-			_languageSpec(&langDef),
-			m_passes{&passes...}
+		Assembler(Workpiece* workpiece, const LanguageDefinition* langDef, const DerivedFromPass auto*... passes):
+			m_workpiece(workpiece),
+			_languageSpec(langDef),
+			m_passes{passes...}
 		{
 		}
 

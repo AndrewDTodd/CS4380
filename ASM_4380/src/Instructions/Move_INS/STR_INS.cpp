@@ -5,7 +5,7 @@
 STR_INS::STR_INS() : ASMInstruction("STR")
 {}
 
-void STR_INS::Implementation(const Workpiece* const& workpiece) const
+void STR_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

@@ -3,13 +3,13 @@
 
 #include <ASMInstruction.h>
 
-using namespace ASMFramework;
+
 
 struct ALCI_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ALCI_INS();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !ALCI_INS_H

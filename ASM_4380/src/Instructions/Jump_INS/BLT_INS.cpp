@@ -5,7 +5,7 @@
 BLT_INS::BLT_INS() : ASMInstruction("BLT")
 {}
 
-void BLT_INS::Implementation(const Workpiece* const& workpiece) const
+void BLT_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

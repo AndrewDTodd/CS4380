@@ -5,7 +5,7 @@
 OR_INS::OR_INS() : ASMInstruction("OR")
 {}
 
-void OR_INS::Implementation(const Workpiece* const& workpiece) const
+void OR_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

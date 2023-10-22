@@ -3,13 +3,13 @@
 
 #include <ASMInstruction.h>
 
-using namespace ASMFramework;
+
 
 struct NOT_INS : public ASMFramework::ASMInstruction
 {
 public:
 	NOT_INS();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !NOT_INS_H

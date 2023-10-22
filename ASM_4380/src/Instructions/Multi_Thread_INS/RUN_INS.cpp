@@ -5,7 +5,7 @@
 RUN_INS::RUN_INS() : ASMInstruction("RUN")
 {}
 
-void RUN_INS::Implementation(const Workpiece* const& workpiece) const
+void RUN_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

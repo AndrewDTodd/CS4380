@@ -5,7 +5,7 @@
 BLK_INS::BLK_INS() : ASMInstruction("BLK")
 {}
 
-void BLK_INS::Implementation(const Workpiece* const& workpiece) const
+void BLK_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

@@ -5,7 +5,7 @@
 CMPI_INS::CMPI_INS() : ASMInstruction("CMPI")
 {}
 
-void CMPI_INS::Implementation(const Workpiece* const& workpiece) const
+void CMPI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

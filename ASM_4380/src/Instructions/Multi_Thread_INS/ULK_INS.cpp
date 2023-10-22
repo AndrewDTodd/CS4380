@@ -5,7 +5,7 @@
 ULK_INS::ULK_INS() : ASMInstruction("ULK")
 {}
 
-void ULK_INS::Implementation(const Workpiece* const& workpiece) const
+void ULK_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

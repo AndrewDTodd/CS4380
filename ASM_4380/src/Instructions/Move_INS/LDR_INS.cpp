@@ -5,7 +5,7 @@
 LDR_INS::LDR_INS() : ASMInstruction("LDR")
 {}
 
-void LDR_INS::Implementation(const Workpiece* const& workpiece) const
+void LDR_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

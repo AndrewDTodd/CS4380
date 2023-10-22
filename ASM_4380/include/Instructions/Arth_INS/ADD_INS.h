@@ -3,13 +3,11 @@
 
 #include <ASMInstruction.h>
 
-using namespace ASMFramework;
-
 struct ADD_INS : public ASMFramework::ASMInstruction
 {
 public:
 	ADD_INS();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !ADD_INS_H

@@ -3,13 +3,11 @@
 
 #include <ASMDirective.h>
 
-using namespace ASMFramework;
-
 struct INT_DIR : public ASMFramework::ASMDirective
 {
 public:
 	INT_DIR();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !INT_DIR_H

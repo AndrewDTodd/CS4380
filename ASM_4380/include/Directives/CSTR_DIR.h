@@ -3,13 +3,11 @@
 
 #include <ASMDirective.h>
 
-using namespace ASMFramework;
-
 struct CSTR_DIR : public ASMFramework::ASMDirective
 {
 public:
 	CSTR_DIR();
 
-	void Implementation(const Workpiece* const& workpiece) const override;
+	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
 };
 #endif // !CSTR_DIR_H

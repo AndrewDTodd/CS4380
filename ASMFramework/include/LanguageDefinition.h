@@ -84,7 +84,7 @@ namespace ASMFramework
 		/// <param name="key">The key to search the ASMDirective under (directive mnemonic)</param>
 		/// <returns>Pointer to the ASMDirective if found</returns>
 		/// <exception cref="std::out_of_range">If the key is not found an out_of_range exception is thrown</exception>
-		const ASMDirective* GetDirective(const std::string& key) const;
+		const ASMFramework::ASMDirective* GetDirective(const std::string& key) const;
 
 		/// <summary>
 		/// Get a pointer to the directive with the provided key (mnemonic)
@@ -92,7 +92,7 @@ namespace ASMFramework
 		/// <param name="key">The key to search the ASMDirective under (directive mnemonic)</param>
 		/// <param name="out_directive">A reference to a pointer for a ASMDirective, to point to the located ASMDirective if one is found. nullptr otherewise</param>
 		/// <returns>True if a ASMDirective was found under the provided key</returns>
-		bool TryGetDirective(const std::string& key, const ASMDirective*& out_directive) const;
+		bool TryGetDirective(const std::string& key, const ASMFramework::ASMDirective*& out_directive) const;
 
 		/// <summary>
 		/// Deturmine if there is a directive with the provided key (mnemonic)
@@ -107,7 +107,7 @@ namespace ASMFramework
 		/// <param name="key">The key to search the ASMInstruction under (directive mnemonic)</param>
 		/// <returns>Pointer to the ASMInstruction if found</returns>
 		/// <exception cref="std::out_of_range">If the key is not found an out_of_range exception is thrown</exception>
-		const ASMInstruction* GetInstruction(const std::string& key) const;
+		const ASMFramework::ASMInstruction* GetInstruction(const std::string& key) const;
 
 		/// <summary>
 		/// Get a pointer to the instruction with the provided key (mnemonic)
@@ -115,7 +115,7 @@ namespace ASMFramework
 		/// <param name="key">The key to search the ASMInstruction under (directive mnemonic)</param>
 		/// <param name="out_instruction">A reference to a pointer for a ASMInstruction, to point to the located ASMInstruction if one is found. nullptr otherewise</param>
 		/// <returns>True if a ASMInstruction was found under the provided key</returns>
-		bool TryGetInstruction(const std::string& key, const ASMInstruction*& out_instruction) const;
+		bool TryGetInstruction(const std::string& key, const ASMFramework::ASMInstruction*& out_instruction) const;
 
 		/// <summary>
 		/// Deturmine if there is a instruction with the provided key (mnemonic)
@@ -123,6 +123,13 @@ namespace ASMFramework
 		/// <param name="key">The key to search the ASMInstruction under (directive mnemonic)</param>
 		/// <returns>True if a ASMInstruction was found under the provided key</returns>
 		bool ContainsInstruction(const std::string& key) const;
+
+		/// <summary>
+		/// Deturmine if the language has a reserved keyword with the provided key
+		/// </summary>
+		/// <param name="key">The key to search the Keyword under</param>
+		/// <returns>True if the Keyword was found, false otherwise</returns>
+		bool ContainsKeyword(const std::string& key) const;
 
 		LanguageDefinition(const LanguageDefinition&) = delete;
 		LanguageDefinition& operator=(const LanguageDefinition&) = delete;

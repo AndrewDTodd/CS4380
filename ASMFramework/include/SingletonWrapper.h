@@ -48,12 +48,16 @@ namespace ASMFramework
 
 				if (!s_instance)
 				{
-					s_instance = std::make_shared<Derived>();
+					Derived* derived = new Derived;
+					auto customDelete = [](Derived* d) {};
+					s_instance = std::shared_ptr<Derived>(derived, customDelete);
 					return s_instance;
 				}
 			}
 			return s_instance;
 		}
+
+		virtual void ShutDown() = 0;
 
 		SingletonWrapper(const SingletonWrapper&) = delete;
 		SingletonWrapper& operator=(const SingletonWrapper&) = delete;

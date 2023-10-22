@@ -29,7 +29,7 @@ namespace ASMFramework
 			throw std::invalid_argument("Unable to open file at path: " + std::string(assemblyPath));
 		}
 
-		const_cast<std::unique_ptr<const std::ifstream>&>(m_fileStream) = std::make_unique<const std::ifstream>(std::move(fileStream));
+		const_cast<std::unique_ptr<std::ifstream>&>(m_fileStream) = std::make_unique<std::ifstream>(std::move(fileStream));
 
 		for (auto& pass : m_passes)
 		{

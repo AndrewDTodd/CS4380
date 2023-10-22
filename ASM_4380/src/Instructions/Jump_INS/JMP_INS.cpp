@@ -5,7 +5,7 @@
 JMP_INS::JMP_INS() : ASMInstruction("JMP")
 {}
 
-void JMP_INS::Implementation(const Workpiece* const& workpiece) const
+void JMP_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

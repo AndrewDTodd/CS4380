@@ -5,7 +5,7 @@
 JMR_INS::JMR_INS() : ASMInstruction("JMR")
 {}
 
-void JMR_INS::Implementation(const Workpiece* const& workpiece) const
+void JMR_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

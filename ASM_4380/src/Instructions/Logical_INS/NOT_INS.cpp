@@ -5,7 +5,7 @@
 NOT_INS::NOT_INS() : ASMInstruction("NOT")
 {}
 
-void NOT_INS::Implementation(const Workpiece* const& workpiece) const
+void NOT_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

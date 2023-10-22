@@ -5,7 +5,7 @@
 ADI_INS::ADI_INS() : ASMInstruction("ADI")
 {}
 
-void ADI_INS::Implementation(const Workpiece* const& workpiece) const
+void ADI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

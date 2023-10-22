@@ -5,7 +5,7 @@
 FREE_INS::FREE_INS() : ASMInstruction("FREE")
 {}
 
-void FREE_INS::Implementation(const Workpiece* const& workpiece) const
+void FREE_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

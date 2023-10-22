@@ -4,6 +4,6 @@
 
 namespace ASMFramework
 {
-	ASMInstruction::ASMInstruction(const std::string& mnemonic): _mnemonic(std::move(mnemonic))
+	ASMInstruction::ASMInstruction(std::string&& mnemonic): _mnemonic(std::move(mnemonic))
 	{}
 }

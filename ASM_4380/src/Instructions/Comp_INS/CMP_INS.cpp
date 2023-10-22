@@ -5,7 +5,7 @@
 CMP_INS::CMP_INS() : ASMInstruction("CMP")
 {}
 
-void CMP_INS::Implementation(const Workpiece* const& workpiece) const
+void CMP_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

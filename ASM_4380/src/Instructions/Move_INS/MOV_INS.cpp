@@ -5,7 +5,7 @@
 MOV_INS::MOV_INS() : ASMInstruction("MOV")
 {}
 
-void MOV_INS::Implementation(const Workpiece* const& workpiece) const
+void MOV_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

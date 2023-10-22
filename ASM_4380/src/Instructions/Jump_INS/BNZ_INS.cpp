@@ -5,7 +5,7 @@
 BNZ_INS::BNZ_INS() : ASMInstruction("BNZ")
 {}
 
-void BNZ_INS::Implementation(const Workpiece* const& workpiece) const
+void BNZ_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

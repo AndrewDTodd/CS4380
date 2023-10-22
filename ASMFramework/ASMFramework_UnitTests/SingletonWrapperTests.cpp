@@ -8,7 +8,16 @@
 
 class TESTSingleton : public ASMFramework::SingletonWrapper<TESTSingleton>
 {
+	friend class ASMFramework::SingletonWrapper<TESTSingleton>;
+private:
+	TESTSingleton() = default;
+	~TESTSingleton() = default;
 
+public:
+	void ShutDown() override
+	{
+		this->~TESTSingleton();
+	}
 };
 
 class SingletonWrapperTesting : public ::testing::Test
@@ -23,6 +32,7 @@ protected:
 
 	void TearDown() override
 	{
+		_instance->ShutDown();
 	}
 };
 

@@ -5,7 +5,7 @@
 BRZ_INS::BRZ_INS() : ASMInstruction("BRZ")
 {}
 
-void BRZ_INS::Implementation(const Workpiece* const& workpiece) const
+void BRZ_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

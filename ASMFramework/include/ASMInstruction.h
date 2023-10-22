@@ -11,7 +11,7 @@ namespace ASMFramework
 	struct ASMInstruction
 	{
 	protected:
-		ASMInstruction(const std::string& mnemonic);
+		ASMInstruction(std::string&& mnemonic);
 
 		class NotImplemented : public std::exception
 		{

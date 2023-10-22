@@ -40,7 +40,7 @@ namespace ASMFramework
 
 	bool LanguageDefinition::ContainsDirective(const std::string& key) const
 	{
-		return m_languageDirectives.find(key) != m_languageDirectives.end();
+		return m_languageDirectives.contains(key);
 	}
 
 	const ASMInstruction* LanguageDefinition::GetInstruction(const std::string& key) const
@@ -66,6 +66,11 @@ namespace ASMFramework
 
 	bool LanguageDefinition::ContainsInstruction(const std::string& key) const
 	{
-		return m_languageInstructions.find(key) != m_languageInstructions.end();
+		return m_languageInstructions.contains(key);
+	}
+
+	bool LanguageDefinition::ContainsKeyword(const std::string& key) const
+	{
+		return m_reservedKeywords.contains(key);
 	}
 }

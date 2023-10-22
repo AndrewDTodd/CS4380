@@ -4,6 +4,6 @@
 
 namespace ASMFramework
 {
-	ASMDirective::ASMDirective(const std::string& mnemonic): _mnemonic(std::move(mnemonic))
+	ASMDirective::ASMDirective(std::string&& mnemonic): _mnemonic(std::move(mnemonic))
 	{}
 }

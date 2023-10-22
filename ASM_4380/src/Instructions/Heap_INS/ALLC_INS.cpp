@@ -5,7 +5,7 @@
 ALLC_INS::ALLC_INS() : ASMInstruction("ALLC")
 {}
 
-void ALLC_INS::Implementation(const Workpiece* const& workpiece) const
+void ALLC_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }

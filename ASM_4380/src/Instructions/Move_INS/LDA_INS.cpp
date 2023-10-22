@@ -4,7 +4,7 @@
 LDA_INS::LDA_INS() : ASMInstruction("LDA")
 {}
 
-void LDA_INS::Implementation(const Workpiece* const& workpiece) const
+void LDA_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
 {
 	throw NotImplemented();
 }
