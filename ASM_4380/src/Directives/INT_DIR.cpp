@@ -67,6 +67,6 @@ size_t INT_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const 
 	//Did not match any expected argument types
 	else
 	{
-		throw std::runtime_error("Unrecognized argument format for .INT directive \"" + argument + "\"");
+		throw std::runtime_error("Unrecognized argument format for .INT directive \"" + argument + "\". Expected formats are #d+, or 0xd+");
 	}
 }

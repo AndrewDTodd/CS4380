@@ -8,6 +8,8 @@
 
 #include "Workpiece.h"
 
+#include "rootConfig.h"
+
 namespace ASMFramework
 {
 	struct ASMDirective
@@ -26,7 +28,8 @@ namespace ASMFramework
 			if constexpr (is_little_endian)
 			{
 				//Target is little-endian already
-				const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&static_cast<TargetType>(value));
+				TargetType castValue = static_cast<TargetType>(value);
+				const uint8_t* bytes = reinterpret_cast<const uint8_t*>(&castValue);
 				for (size_t i = 0; i < sizeof(TargetType); i++)
 				{
 					workpiece->_dataSegmentBin.push_back(bytes[i]);

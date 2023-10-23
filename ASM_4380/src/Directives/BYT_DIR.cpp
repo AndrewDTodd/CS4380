@@ -49,6 +49,6 @@ size_t BYT_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const 
 	//Did not match any expected argument types
 	else
 	{
-		throw std::runtime_error("Unrecognized argument format for .BYT directive \"" + argument + "\"");
+		throw std::runtime_error("Unrecognized argument format for .BYT directive \"" + argument + "\". Expected formats are #d+, 0xd+, or '.'");
 	}
 }

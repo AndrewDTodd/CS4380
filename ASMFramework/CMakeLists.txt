@@ -29,9 +29,9 @@ add_definitions(-DVERSION_PATCH=${VERSION_PATCH})
 add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
 
 set(SOURCE_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Assembler.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ASMDirective.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ASMInstruction.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Assembler.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/LanguageDefinition.cpp
 	
 )

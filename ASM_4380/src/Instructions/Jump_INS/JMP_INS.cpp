@@ -14,29 +14,16 @@ size_t JMP_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 #endif // _DEBUG
 
 	const int32_t opcode = 1;
-	const std::string& argument = args[0];
+	const std::string& labelName = args[0];
 
-	try
-	{
-		uint64_t& address = workpiece->_symbolTable.at(argument);
+	uint64_t& offset = ASMFramework::ASMInstruction::GetLabelOffset(labelName, workpiece);
 
-		SerializeToBuffer<int32_t, int32_t>(opcode, buffer);
-		SerializeToBuffer<int32_t, int32_t>(static_cast<int32_t>(address), buffer);
+	SerializeToBuffer<int32_t>(buffer, opcode, static_cast<int32_t>(offset));
 
-		if (address == 0)
-		{
-			size_t offset = buffer.size() - sizeof(int32_t);
+	if (offset == 0)
+		AddUnresolvedLabel(labelName, buffer, workpiece);
 
-			workpiece->_unresolvedLabels[argument].push_back(reinterpret_cast<void*>(buffer.data() + offset));
-		}
+	SerializeToBuffer<int32_t>(buffer, 0);
 
-		SerializeToBuffer<int32_t, int32_t>(0, buffer);
-
-		return sizeof(int32_t) * 3;
-	}
-	//If the label argument of JMP isnt in the symbol table we must assume the assembly contains an invalid label name
-	catch (const std::out_of_range& rangeEx)
-	{
-		throw std::runtime_error("The label argument for JMP - \"" + argument + "\" - is undefined (not contained within the sybol table)");
-	}
+	return sizeof(int32_t) * 3;
 }

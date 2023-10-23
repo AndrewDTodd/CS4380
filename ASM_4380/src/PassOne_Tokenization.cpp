@@ -39,7 +39,7 @@ std::pair<std::vector<std::string>, std::string> PassOne_Tokenization::TokenizeL
     {
         //Process withoutComment to extract the tokens
         //Old regex string (\.\w+)|('.')|('\\[tnr]')|(\#\d+)
-        std::regex rgx(R"delim(((?<=^|\s)\.?\w+(?=\s+|$))|((?<=\s)'.'(?=\s+|$))|((?<=\s)'\\[tnr]'(?=\s+|$))|((?<=\s)\#\d+(?=\s+|$))|((?<=\s)".*?"(?=\s+|$)))delim", std::regex_constants::ECMAScript);
+        std::regex rgx(R"delim((\.?\w+(?=\,*\s+|$))|('.'(?=\s+|$))|('\\[tnr]'(?=\s+|$))|(\#\d+(?=\s+|$))|(".*?"(?=\s+|$)))delim", std::regex_constants::ECMAScript);
             std::sregex_iterator iter(withoutComment.begin(), withoutComment.end(), rgx);
             std::sregex_iterator end;
 
