@@ -10,6 +10,6 @@ struct BGT_INS : public ASMFramework::ASMInstruction
 public:
 	BGT_INS();
 
-	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
+	size_t Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const override;
 };
 #endif // !JMP_INS_H

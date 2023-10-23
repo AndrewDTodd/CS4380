@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <shared_mutex>
 #include <memory>
+#include <concepts>
 
 namespace ASMFramework
 {
@@ -15,14 +16,16 @@ namespace ASMFramework
 
 	struct DataSegmentItem
 	{
-		const ASMDirective* const& _directive;
+		size_t _lineNum;
+		const ASMDirective* _directive;
 		std::vector<std::string> _dirArgs;
 		std::string _lineComment;
 	};
 
 	struct CodeSegmentItem
 	{
-		const ASMInstruction* const& _instruction;
+		size_t _lineNum;
+		const ASMInstruction* _instruction;
 		std::vector<std::string> _instrArgs;
 		std::string _lineComment;
 	};
@@ -32,6 +35,7 @@ namespace ASMFramework
 		std::shared_mutex _sharedMutex;
 
 		std::unordered_map<std::string, uint64_t> _symbolTable;
+		std::unordered_map<std::string, std::vector<void*>> _unresolvedLabels;
 
 		//key is directive label, which can be "" for unlabled directive
 		std::vector<std::pair<std::string, DataSegmentItem>> _dataSegmentItems;
@@ -39,7 +43,7 @@ namespace ASMFramework
 
 		//key is segment label, which can be "" for unlabled code segment
 		std::vector<std::pair<std::string, std::vector<CodeSegmentItem>>> _codeSegmentItems;
-		std::vector<std::pair<std::string, std::vector<uint8_t>>> _codeSegmentBin;
+		std::vector<std::pair<std::string, std::vector<uint8_t>>> _codeSegmentBins;
 	};
 }
 #endif // !WORKPIECE_H

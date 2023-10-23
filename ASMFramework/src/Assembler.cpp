@@ -35,5 +35,7 @@ namespace ASMFramework
 		{
 			pass->Execute(m_workpiece, m_fileStream, _languageSpec);
 		}
+
+		fileStream.close();
 	}
 }

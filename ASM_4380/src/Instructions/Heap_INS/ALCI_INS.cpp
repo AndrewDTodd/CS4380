@@ -5,7 +5,7 @@
 ALCI_INS::ALCI_INS() : ASMInstruction("ALCI")
 {}
 
-void ALCI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t ALCI_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

@@ -1,5 +1,5 @@
-#ifndef PASS_ONE_H
-#define PASS_ONE_H
+#ifndef PASS_ONE_TOKENIZATION_H
+#define PASS_ONE_TOKENIZATION_H
 
 #include <Pass.h>
 #include <LanguageDefinition.h>
@@ -19,12 +19,12 @@ private:
 
 	void ProcessDataSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
 
-	void HandleDirective(std::string&& label, const std::string& directive, const std::vector<std::string>& arguments, std::string&& comment, 
+	void HandleDirective(const size_t& lineNum, std::string&& label, const std::string& directive, const std::vector<std::string>& arguments, std::string&& comment, 
 		ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef) const;
 
 	void ProcessCodeSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
 
-	void HandleInstruction(const std::string& instruction, const std::vector<std::string>& arguments, std::string&& comment, 
+	void HandleInstruction(const size_t& lineNum, const std::string& instruction, const std::vector<std::string>& arguments, std::string&& comment, 
 		std::vector<ASMFramework::CodeSegmentItem>* const& segment, const ASMFramework::LanguageDefinition* const& langDef) const;
 
 	void HandleCodeSegmentItem(const std::string& label, const std::vector<ASMFramework::CodeSegmentItem>& segment,
@@ -33,4 +33,4 @@ private:
 public:
 	void Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const override;
 };
-#endif // !PASS_ONE_H
+#endif // !PASS_ONE_TOKENIZATION_H

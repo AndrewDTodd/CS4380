@@ -5,7 +5,7 @@
 ADI_INS::ADI_INS() : ASMInstruction("ADI")
 {}
 
-void ADI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t ADI_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

@@ -8,6 +8,6 @@ struct STR_DIR: public ASMFramework::ASMDirective
 public:
 	STR_DIR();
 
-	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
+	size_t Implementation(ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const override;
 };
 #endif // !STR_DIR_H

@@ -5,7 +5,7 @@
 CMPI_INS::CMPI_INS() : ASMInstruction("CMPI")
 {}
 
-void CMPI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t CMPI_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

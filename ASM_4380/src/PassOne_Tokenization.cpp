@@ -38,7 +38,8 @@ std::pair<std::vector<std::string>, std::string> PassOne_Tokenization::TokenizeL
     if (!withoutComment.empty())
     {
         //Process withoutComment to extract the tokens
-        std::regex rgx(R"delim((\.?\w+)|('.')|('\\[tnr]')|(\#\d+))delim", std::regex_constants::ECMAScript);
+        //Old regex string (\.\w+)|('.')|('\\[tnr]')|(\#\d+)
+        std::regex rgx(R"delim(((?<=^|\s)\.?\w+(?=\s+|$))|((?<=\s)'.'(?=\s+|$))|((?<=\s)'\\[tnr]'(?=\s+|$))|((?<=\s)\#\d+(?=\s+|$))|((?<=\s)".*?"(?=\s+|$)))delim", std::regex_constants::ECMAScript);
             std::sregex_iterator iter(withoutComment.begin(), withoutComment.end(), rgx);
             std::sregex_iterator end;
 
@@ -57,16 +58,16 @@ void PassOne_Tokenization::AddLabel(const std::string& label, ASMFramework::Work
     workpiece->_symbolTable.emplace(label, 0);
 }
 
-void PassOne_Tokenization::HandleDirective(std::string&& label, const std::string& directive, const std::vector<std::string>& arguments, std::string&& comment, 
+void PassOne_Tokenization::HandleDirective(const size_t& lineNum, std::string&& label, const std::string& directive, const std::vector<std::string>& arguments, std::string&& comment, 
     ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef) const
 {
-    workpiece->_dataSegmentItems.emplace_back(label, ASMFramework::DataSegmentItem{ langDef->GetDirective(directive), arguments, comment });
+    workpiece->_dataSegmentItems.emplace_back(label, ASMFramework::DataSegmentItem{ lineNum, langDef->GetDirective(directive), arguments, comment });
 }
 
-void PassOne_Tokenization::HandleInstruction(const std::string& instruction, const std::vector<std::string>& arguments, std::string&& comment,
+void PassOne_Tokenization::HandleInstruction(const size_t& lineNum, const std::string& instruction, const std::vector<std::string>& arguments, std::string&& comment,
     std::vector<ASMFramework::CodeSegmentItem>* const& segment, const ASMFramework::LanguageDefinition* const& langDef) const
 {
-    segment->emplace_back(ASMFramework::CodeSegmentItem{ langDef->GetInstruction(instruction), arguments, comment });
+    segment->emplace_back(ASMFramework::CodeSegmentItem{ lineNum, langDef->GetInstruction(instruction), arguments, comment });
 }
 
 void PassOne_Tokenization::HandleCodeSegmentItem(const std::string& label, const std::vector<ASMFramework::CodeSegmentItem>& segment,
@@ -140,12 +141,12 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
                 AddLabel(firstToken, workpiece);
 
                 //At this point we know the second token is a directive
-                HandleDirective(std::move(firstToken), secondToken, tokens, std::move(comment), workpiece, langDef);
+                HandleDirective(lineNum, std::move(firstToken), secondToken, tokens, std::move(comment), workpiece, langDef);
             }
             else
             {
                 //firstToken is a directive
-                HandleDirective("", firstToken, tokens, std::move(comment), workpiece, langDef);
+                HandleDirective(lineNum, "", firstToken, tokens, std::move(comment), workpiece, langDef);
             }
         }
     }
@@ -212,12 +213,12 @@ void PassOne_Tokenization::ProcessCodeSegment(size_t& lineNum, ASMFramework::Wor
                 segment.clear();
 
                 //At this point we know the second token is  the first instruction of this new code segment
-                HandleInstruction(secondToken, tokens, std::move(comment), &segment, langDef);
+                HandleInstruction(lineNum, secondToken, tokens, std::move(comment), &segment, langDef);
             }
             else
             {
                 //firstToken is an instruction. add it to the segment buffer
-                HandleInstruction(firstToken, tokens, std::move(comment), &segment, langDef);
+                HandleInstruction(lineNum, firstToken, tokens, std::move(comment), &segment, langDef);
             }
         }
     }

@@ -15,12 +15,29 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 endif()
 
 #setting project scope
-project ("Project2_VMv2_ASMv1")
+project ("4380")
 
 #Google tests require mimimum c++ version 14
 #setting minimum c++ version to 20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(UNIX AND NOT APPLE)
+	add_definitions(-DTARGET_OS="Linux")
+elseif(WIN32)
+	add_definitions(-DTARGET_OS="Windows")
+elseif(UNIX AND APPLE)
+	add_definitions(-DTARGET_OS="MacOS")
+else()
+	add_definitions(-DTARGET_OS="Unkown")
+endif()
+
+configure_file(
+	"${CMAKE_SOURCE_DIR}/rootConfig.h.in"
+	"${CMAKE_SOURCE_DIR}/rootConfig.h"
+)
+
+include_directories(${CMAKE_SOURCE_DIR})
 
 #this CMake variable is used by the VM_4380 unit test that needs a path to a test bin
 set(VM_TEST_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/TestBins/we.bin" CACHE STRING "VM_4380 Unit Test bin file path")
@@ -57,7 +74,7 @@ set(ASM_4380_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/ASM4380.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/LanguageDefinition_4380.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassOne_Tokenization.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassTwo.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassTwo_Assemble.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassThree.cpp
 
 )

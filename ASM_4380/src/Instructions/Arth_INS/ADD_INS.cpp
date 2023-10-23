@@ -5,7 +5,7 @@
 ADD_INS::ADD_INS(): ASMInstruction("ADD")
 {}
 
-void ADD_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t ADD_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

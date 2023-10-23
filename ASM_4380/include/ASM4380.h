@@ -1,8 +1,8 @@
 #ifndef ASM_4380_H
 #define ASM_4380_H
 
-//#include "../../ASMFramework/include/Assembler.h"
-//#include "../../ASMFramework/include/SingletonWrapper.h"
+#include <cstdint>
+
 #include <Assembler.h>
 #include <SingletonWrapper.h>
 #include <Workpiece.h>
@@ -10,7 +10,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "PassOne_Tokenization.h"
-#include "PassTwo.h"
+#include "PassTwo_Assemble.h"
 #include "PassThree.h"
 
 #include "LanguageDefinition_4380.h"
@@ -22,7 +22,7 @@ class ASM4380 : public ASMFramework::Assembler, public ASMFramework::SingletonWr
 private:
 	//Passes instantiation ****************************************************************
 	PassOne_Tokenization _passOne;
-	PassTwo _passTwo;
+	PassTwo_Assemble _passTwo;
 	PassThree _passThree;
 	//*************************************************************************************
 

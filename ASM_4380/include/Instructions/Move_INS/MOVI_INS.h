@@ -10,6 +10,6 @@ struct MOVI_INS : public ASMFramework::ASMInstruction
 public:
 	MOVI_INS();
 
-	void Implementation(const ASMFramework::Workpiece* const& workpiece) const override;
+	size_t Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const override;
 };
 #endif // !MOVI_INS_H

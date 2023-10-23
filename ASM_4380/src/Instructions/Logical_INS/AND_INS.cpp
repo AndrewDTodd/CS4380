@@ -5,7 +5,7 @@
 AND_INS::AND_INS() : ASMInstruction("AND")
 {}
 
-void AND_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t AND_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

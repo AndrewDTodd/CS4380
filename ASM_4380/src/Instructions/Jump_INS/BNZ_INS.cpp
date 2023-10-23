@@ -5,7 +5,7 @@
 BNZ_INS::BNZ_INS() : ASMInstruction("BNZ")
 {}
 
-void BNZ_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t BNZ_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

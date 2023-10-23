@@ -5,7 +5,7 @@
 DIVI_INS::DIVI_INS() : ASMInstruction("DIVI")
 {}
 
-void DIVI_INS::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t DIVI_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }

@@ -5,7 +5,7 @@
 CSTR_DIR::CSTR_DIR(): ASMDirective(".CSTR")
 {}
 
-void CSTR_DIR::Implementation(const ASMFramework::Workpiece* const& workpiece) const
+size_t CSTR_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 	throw NotImplemented();
 }
