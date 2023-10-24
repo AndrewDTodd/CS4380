@@ -7,6 +7,8 @@
 
 #include "../include/Instructions/Instructions.h"
 
+using namespace VMFramework;
+
 class ISA_4380Testing : public ::testing::Test
 {
 protected:
@@ -37,7 +39,7 @@ public:
 	}
 };
 
-Instruction<int32_t, int32_t, Process_4380>* _passInstructions[] = { new PassIns() };
+VMFramework::Instruction<int32_t, int32_t, Process_4380>* _passInstructions[] = { new PassIns() };
 
 class PassISA : public VMFramework::ISA<int32_t, int32_t, Process_4380>
 {
@@ -62,7 +64,7 @@ public:
 	}
 };
 
-Instruction<int32_t, int32_t, Process_4380>* _failInstructions[] = { new FailIns() };
+VMFramework::Instruction<int32_t, int32_t, Process_4380>* _failInstructions[] = { new FailIns() };
 
 class FailISA : public VMFramework::ISA<int32_t, int32_t, Process_4380>
 {

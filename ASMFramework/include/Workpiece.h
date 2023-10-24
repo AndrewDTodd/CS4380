@@ -2,6 +2,7 @@
 #define WORKPIECE_H
 
 #include <vector>
+#include <list>
 #include <unordered_map>
 #include <utility>
 #include <cstdint>
@@ -43,7 +44,7 @@ namespace ASMFramework
 
 		//key is segment label, which can be "" for unlabled code segment
 		std::vector<std::pair<std::string, std::vector<CodeSegmentItem>>> _codeSegmentItems;
-		std::vector<std::pair<std::string, std::vector<uint8_t>>> _codeSegmentBins;
+		std::list<std::pair<std::string, std::vector<uint8_t>>> _codeSegmentBins;
 	};
 }
 #endif // !WORKPIECE_H

@@ -19,6 +19,8 @@
 #include "Process.h"
 #include "ISA.h"
 
+#include "rootConfig.h"
+
 #define PROCESS_STACK_MiB 8
 #define PROCESS_STACK_BYTES (MebiByte * PROCESS_STACK_MiB)
 
@@ -143,25 +145,33 @@ namespace VMFramework
 			//invalid_argument: could not find file at path given
 			catch (const std::invalid_argument& invalidArgEx)
 			{
-				std::cerr << "Error: " << invalidArgEx.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << invalidArgEx.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//Program too big to load into VM
 			catch (const stack_overflow& overflowEx)
 			{
-				std::cerr << "Error: Could not load program into VM, not enough memory in system" << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: Could not load program into VM, not enough memory in system" << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//Could not deturmine program size, memory allocation failed, or could not load program into memory
 			catch (const std::runtime_error& loadEx)
 			{
-				std::cerr << "Error: " << loadEx.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << loadEx.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//This probably means the LaunchProgram method was called before VM initialization
 			catch (const std::exception& ex)
 			{
-				std::cerr << "Error: " << ex.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << ex.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 
@@ -253,7 +263,9 @@ namespace VMFramework
 			}
 			catch (std::runtime_error runtimeEx)
 			{
-				std::cerr << "Error: " << runtimeEx.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << runtimeEx.what() << std::endl;
+				RESET_TERMINAL
 			}
 		}
 
@@ -308,6 +320,10 @@ namespace VMFramework
 		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
 		virtual void LaunchProgram(const char* programBinary)
 		{
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << programBinary << std::endl;
+			RESET_TERMINAL
+
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
 
@@ -318,25 +334,33 @@ namespace VMFramework
 			//invalid_argument: could not find file at path given
 			catch (const std::invalid_argument& invalidArgEx)
 			{
-				std::cerr << "Error: " << invalidArgEx.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << invalidArgEx.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//Program too big to load into VM
 			catch (const stack_overflow& overflowEx)
 			{
-				std::cerr << "Error: Could not load program into VM, not enough memory in system" << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: Could not load program into VM, not enough memory in system" << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//Could not deturmine program size, memory allocation failed, or could not load program into memory
 			catch (const std::runtime_error& loadEx)
 			{
-				std::cerr << "Error: " << loadEx.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << loadEx.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 			//This probably means the LaunchProgram method was called before VM initialization
 			catch (const std::exception& ex)
 			{
-				std::cerr << "Error: " << ex.what() << std::endl;
+				RED_TERMINAL
+					std::cerr << "Error: " << ex.what() << std::endl;
+				RESET_TERMINAL
 				return;
 			}
 

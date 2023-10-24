@@ -4,14 +4,17 @@
 #include "Process.h"
 
 #include <cstdint>
+#include <cstring>
+#include <stdexcept>
+#include <iostream>
 
 #include <gtest/gtest_prod.h>
 
+#include "ISA_4380.h"
+
 #include "Instructions/Instructions.h"
 
-using namespace VMFramework;
-
-class ISA_4380;
+#include "rootConfig.h"
 
 class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t, ISA_4380>
 {
@@ -45,7 +48,7 @@ protected:
 	int32_t operandOne = 0;
 	int32_t operandTwo = 0;
 
-	Instruction<int32_t, int32_t, Process_4380>* _instruction = nullptr;
+	VMFramework::Instruction<int32_t, int32_t, Process_4380>* _instruction = nullptr;
 
 	/// <summary>
 	/// Internal healper to read the 4 byte little-endian opcode, operandOne and operandTwo from the PC
@@ -57,25 +60,66 @@ protected:
 	/// Used to preform the fetch step of execution cycle
 	/// </summary>
 	FRIEND_TEST(Process_4380Testing, Validate_Fetch);
-	inline void Fetch() override;
+	inline void Fetch() override
+	{
+		//Fetch 12 byte block from program at the PC location
+		FetchBlock block;
+		std::memcpy(&block, m_registers.PC, sizeof(FetchBlock));
+
+		opcode = block.opcode;
+		operandOne = block.operandOne;
+		operandTwo = block.operandTwo;
+	}
 
 	/// <summary>
 	/// Used to preform the increment step of the execution cycle
 	/// </summary>
 	FRIEND_TEST(Process_4380Testing, Validate_Increment);
-	inline void Increment() override;
+	inline void Increment() override
+	{
+		//Increment the PC by 3 (3 * 4 bytes for int32_t, or 12 bytes)
+		m_registers.PC += 3;
+	}
 
 	/// <summary>
 	/// Used to preform the decode step of execution cycle
 	/// </summary>
 	FRIEND_TEST(Process_4380Testing, Validate_Decode);
-	inline void Decode() override;
+	inline void Decode() override
+	{
+		try
+		{
+			_instruction = _ISA->operator[](opcode);
+		}
+		catch (const std::out_of_range& opCodeEx)
+		{
+			RED_TERMINAL
+				std::cerr << "Error: " << opCodeEx.what() << std::endl;
+			RESET_TERMINAL
+
+			Stop();
+		}
+	}
 
 	/// <summary>
 	/// Used to preform the execute step of the execution cycle
 	/// </summary>
 	FRIEND_TEST(Process_4380Testing, Validate_Execute);
-	inline void Execute() override;
+	inline void Execute() override
+	{
+		try
+		{
+			_instruction->Op(this);
+		}
+		catch (const std::exception& ex)
+		{
+			RED_TERMINAL
+				std::cerr << "Error: " << ex.what() << std::endl;
+			RESET_TERMINAL
+
+			Stop();
+		}
+	}
 
 public:
 	/// <summary>
@@ -86,6 +130,6 @@ public:
 	/// <param name="programStart">Pointer to the begining of the program in memory</param>
 	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 	/// <param name="isa">Pointer to the ISA instance to use</param>
-	Process_4380(void* initialPC, StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
+	Process_4380(void* initialPC, VMFramework::StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
 };
 #endif //!PROCESS_4380_H

@@ -1,7 +1,7 @@
 #ifndef PASS_H
 #define PASS_H
 
-#include <fstream>
+#include <filesystem>
 
 #include <memory>
 
@@ -13,7 +13,7 @@ namespace ASMFramework
 	class Pass
 	{
 	public:
-		virtual void Execute(Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const LanguageDefinition* const& langDef) const = 0;
+		virtual void Execute(Workpiece* const& workpiece, const std::filesystem::path& filePath, const LanguageDefinition* const& langDef) const = 0;
 	};
 }
 #endif // !PASS_H

@@ -8,7 +8,7 @@
 #include <shared_mutex>
 #include <memory>
 #include <vector>
-#include <fstream>
+#include <filesystem>
 
 #include "Pass.h"
 #include "Workpiece.h"
@@ -26,7 +26,7 @@ namespace ASMFramework
 
 		Workpiece* m_workpiece = nullptr;
 
-		const std::unique_ptr<std::ifstream> m_fileStream = nullptr;
+		std::filesystem::path m_filePath;
 
 		const LanguageDefinition* _languageSpec = nullptr;
 

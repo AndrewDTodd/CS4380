@@ -9,6 +9,8 @@
 #include <iostream>
 #include <utility>
 
+#include "rootConfig.h"
+
 
 #include "../include/Workpiece.h"
 #include "../include/Pass.h"
@@ -22,20 +24,20 @@ namespace ASMFramework
 
 	void Assembler::ProcessASM(const char* assemblyPath)
 	{
-		std::ifstream fileStream(assemblyPath);
+		BLUE_TERMINAL
+			std::cout << "Assembling program at >> " << assemblyPath << std::endl;
+		RESET_TERMINAL
 
-		if (!fileStream.is_open())
+		m_filePath = std::filesystem::path(assemblyPath);
+
+		if (!std::filesystem::exists(m_filePath))
 		{
-			throw std::invalid_argument("Unable to open file at path: " + std::string(assemblyPath));
+			throw std::invalid_argument("No file at path provided: " + std::string(assemblyPath));
 		}
-
-		const_cast<std::unique_ptr<std::ifstream>&>(m_fileStream) = std::make_unique<std::ifstream>(std::move(fileStream));
 
 		for (auto& pass : m_passes)
 		{
-			pass->Execute(m_workpiece, m_fileStream, _languageSpec);
+			pass->Execute(m_workpiece, m_filePath, _languageSpec);
 		}
-
-		fileStream.close();
 	}
 }

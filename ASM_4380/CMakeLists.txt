@@ -1,7 +1,7 @@
-# CMakeList.txt : CMakeLists for ASM_4380 executable, include source and define
+# CMakeList.txt : CMakeLists for ASM4380 executable, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.20)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -43,7 +43,7 @@ set(ASM_4380_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/src/LanguageDefinition_4380.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PassOne_Tokenization.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PassTwo_Assemble.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/PassThree.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/PassThree_Serialize.cpp
 
 )
 
@@ -122,7 +122,7 @@ set(ASM_4380_INSTRUCTIONS_TRP
 )
 
 # Create executable for the Assembler target of the project
-add_executable (ASM_4380 ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_main.cpp 
+add_executable (ASM4380 ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_main.cpp 
 ${ASM_4380_SOURCE} 
 ${ASM_4380_DIRECTIVES} 
 ${ASM_4380_INSTRUCTIONS_ARTH} 
@@ -135,21 +135,21 @@ ${ASM_4380_INSTRUCTIONS_MULTI_THREAD}
 ${ASM_4380_INSTRUCTIONS_TRP})
 
 #Signify that the ASM_4380 target depends upon the ASMFramework linbrary target
-add_dependencies(ASM_4380 ASMFramework)
+add_dependencies(ASM4380 ASMFramework)
 
 #Include the ASMFramework library
-target_link_libraries(ASM_4380 PRIVATE ASMFramework)
+target_link_libraries(ASM4380 PRIVATE ASMFramework)
 
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Directives)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Arth_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Comp_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Heap_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Jump_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Logical_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Move_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Multi_Thread_INS)
-target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/TRP_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Directives)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Arth_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Comp_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Heap_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Jump_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Logical_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Move_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Multi_Thread_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/TRP_INS)
 
 ################################################################################################################################################################
 
@@ -160,6 +160,7 @@ target_include_directories(ASM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380
 include(FetchContent)
 FetchContent_Declare(
 	googletest
+	DOWNLOAD_EXTRACT_TIMESTAMP true
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 
@@ -175,7 +176,7 @@ set(ASM_4380_UNIT_TESTS
 )
 
 #Create executable for the execution of the project's tests
-add_executable(ASM_4380Tests ${ASM_4380_UNIT_TESTS} 
+add_executable(ASM4380_Tests ${ASM_4380_UNIT_TESTS} 
 ${ASM_4380_SOURCE} 
 ${ASM_4380_DIRECTIVES} 
 ${ASM_4380_INSTRUCTIONS_ARTH} 
@@ -188,14 +189,14 @@ ${ASM_4380_INSTRUCTIONS_MULTI_THREAD}
 ${ASM_4380_INSTRUCTIONS_TRP})
 
 #Signify that the ASM_4380Tests executable depends upon the ASMFramework library
-add_dependencies(ASM_4380Tests ASMFramework)
+add_dependencies(ASM4380_Tests ASMFramework)
 
 #include the gtest_main function from the gtest library to automatically run all tests from its provided main
-target_link_libraries(ASM_4380Tests PRIVATE GTest::gtest_main)
+target_link_libraries(ASM4380_Tests PRIVATE GTest::gtest_main)
 
 #include the AssemblerFramework library
-target_link_libraries(ASM_4380Tests PRIVATE ASMFramework)
+target_link_libraries(ASM4380_Tests PRIVATE ASMFramework)
 
 include(GoogleTest)
-gtest_discover_tests(ASM_4380Tests)
+gtest_discover_tests(ASM4380_Tests)
 ################################################################################################################################################################

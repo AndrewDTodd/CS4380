@@ -1,7 +1,10 @@
 ﻿# CMakeList.txt : CMake project for Project1_VM, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.20)
+
+#setting project scope
+project ("4380")
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -14,9 +17,6 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
 	add_definitions(-D_DEBUG)
 endif()
 
-#setting project scope
-project ("4380")
-
 #Google tests require mimimum c++ version 14
 #setting minimum c++ version to 20
 set(CMAKE_CXX_STANDARD 20)
@@ -24,12 +24,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(UNIX AND NOT APPLE)
 	add_definitions(-DTARGET_OS="Linux")
+	add_definitions(-D_LINUX_TARGET)
 elseif(WIN32)
 	add_definitions(-DTARGET_OS="Windows")
+	add_definitions(-D_WIN_TARGET)
 elseif(UNIX AND APPLE)
 	add_definitions(-DTARGET_OS="MacOS")
+	add_definitions(-D_MAC_TARGET)
 else()
 	add_definitions(-DTARGET_OS="Unkown")
+endif()
+
+if(UNIX)
+    add_definitions(
+        -DRESET="\\033[0m"
+        -DRED="\\033[31m"
+        -DGREEN="\\033[32m"
+        -DYELLOW="\\033[33m"
+        -DBLUE="\\033[34m"
+		-DDIMB="\\033[2m"
+		-DNORM_TXT="\\03[22m"
+    )
 endif()
 
 configure_file(
@@ -75,7 +90,7 @@ set(ASM_4380_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/LanguageDefinition_4380.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassOne_Tokenization.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassTwo_Assemble.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassThree.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/src/PassThree_Serialize.cpp
 
 )
 
@@ -268,6 +283,7 @@ include(FetchContent)
 FetchContent_Declare(
 	googletest
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+	DOWNLOAD_EXTRACT_TIMESTAMP true
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -306,7 +322,7 @@ ${VM_4380_INSTRUCTIONS_MULTI_THREAD}
 ${VM_4380_INSTRUCTIONS_TRP}
 )
 
-add_dependencies(runAllTargetTests VMFramework ASMFramework VM_4380 ASM_4380)
+add_dependencies(runAllTargetTests VMFramework ASMFramework VM4380 ASM4380)
 
 #include the gtest_main function from the gtest library to automatically run all tests from its provided main
 target_link_libraries(runAllTargetTests PRIVATE GTest::gtest_main)

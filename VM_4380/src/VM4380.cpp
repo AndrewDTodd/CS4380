@@ -1,5 +1,7 @@
 #include "../include/VM4380.h"
 
+using namespace VMFramework;
+
 void VM4380::SpawnProcess(void* initialPC)
 {
 	StackAllocator* processStack = AllocateNewAllocator<StackAllocator>(PROCESS_STACK_BYTES, this->m_memoryManager->m_systemAllocator);

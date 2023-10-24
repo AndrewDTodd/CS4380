@@ -5,11 +5,9 @@
 
 #include <cstdint>
 
-#include "Process_4380.h"
+class Process_4380;
 
-using namespace VMFramework;
-
-class ISA_4380 : public ISA<int32_t, int32_t, Process_4380>
+class ISA_4380 : public VMFramework::ISA<int32_t, int32_t, Process_4380>
 {
 public:
 	ISA_4380();

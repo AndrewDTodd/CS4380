@@ -5,7 +5,7 @@
 #include <LanguageDefinition.h>
 #include <Workpiece.h>
 
-#include <fstream>
+#include <filesystem>
 #include <memory>
 #include <vector>
 #include <string>
@@ -19,7 +19,9 @@ private:
 
 	void ProcessCodeSegment(size_t& byteNum, ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef) const;
 
+	void ProcessUnresolvedLabels(ASMFramework::Workpiece* const& workpiece) const;
+
 public:
-	void Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const override;
+	void Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const override;
 };
 #endif // !PASS_TWO_ASSEMBLE_H

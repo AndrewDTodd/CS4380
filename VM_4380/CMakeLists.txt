@@ -1,7 +1,7 @@
-# CMakeList.txt : CMakeLists for VM_4380, include source and define
+# CMakeList.txt : CMakeLists for VM4380, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.20)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -90,7 +90,7 @@ set(VM_4380_INSTRUCTIONS_TRP
 )
 
 # Create executable for the virtual machine target of the project
-add_executable (VM_4380 ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380_main.cpp 
+add_executable (VM4380 ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380_main.cpp 
 ${VM_4380_SOURCE} 
 ${VM_4380_INSTRUCTIONS_ARTH} 
 ${VM_4380_INSTRUCTIONS_COMP} 
@@ -102,20 +102,20 @@ ${VM_4380_INSTRUCTIONS_MULTI_THREAD}
 ${VM_4380_INSTRUCTIONS_TRP})
 
 #Signify that the VM_4380 executable depends upon the VMFramework library
-add_dependencies(VM_4380 VMFramework)
+add_dependencies(VM4380 VMFramework)
 
 #include the VMFramework library
-target_link_libraries(VM_4380 PRIVATE VMFramework)
+target_link_libraries(VM4380 PRIVATE VMFramework)
 
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Arth)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Comp)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Heap)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Jump)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Logical)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Move)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Multi_Thread)
-target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/TRP)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Arth)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Comp)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Heap)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Jump)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Logical)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Move)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Multi_Thread)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/TRP)
 
 ################################################################################################################################################################
 
@@ -126,6 +126,7 @@ target_include_directories(VM_4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/i
 include(FetchContent)
 FetchContent_Declare(
 	googletest
+	DOWNLOAD_EXTRACT_TIMESTAMP true
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 
@@ -144,7 +145,7 @@ set(VM_4380_UNIT_TESTS
 )
 
 #Create executable for the execution of the project's tests
-add_executable(VM_4380Tests ${VM_4380_UNIT_TESTS} 
+add_executable(VM4380_Tests ${VM_4380_UNIT_TESTS} 
 ${VM_4380_SOURCE} 
 ${VM_4380_INSTRUCTIONS_ARTH} 
 ${VM_4380_INSTRUCTIONS_COMP} 
@@ -156,14 +157,14 @@ ${VM_4380_INSTRUCTIONS_MULTI_THREAD}
 ${VM_4380_INSTRUCTIONS_TRP})
 
 #Signify that the VM_4380Tests executable depends upon the VMFramework library
-add_dependencies(VM_4380Tests VMFramework)
+add_dependencies(VM4380_Tests VMFramework)
 
 #include the gtest_main function from the gtest library to automatically run all tests from its provided main
-target_link_libraries(VM_4380Tests PRIVATE GTest::gtest_main)
+target_link_libraries(VM4380_Tests PRIVATE GTest::gtest_main)
 
 #include the VMFramework library
-target_link_libraries(VM_4380Tests PRIVATE VMFramework)
+target_link_libraries(VM4380_Tests PRIVATE VMFramework)
 
 include(GoogleTest)
-gtest_discover_tests(VM_4380Tests)
+gtest_discover_tests(VM4380_Tests)
 ################################################################################################################################################################

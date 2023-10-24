@@ -1,6 +1,7 @@
 #include "../include/ISA_4380.h"
 
 #include "../include/Instruction.h"
+#include "../include/Process_4380.h"
 
 #include <cstdint>
 

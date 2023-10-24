@@ -5,7 +5,7 @@
 #include <LanguageDefinition.h>
 #include <Workpiece.h>
 
-#include <fstream>
+#include <filesystem>
 #include <memory>
 #include <vector>
 #include <string>
@@ -17,12 +17,12 @@ private:
 
 	void AddLabel(const std::string& label, ASMFramework::Workpiece* const& workpiece) const;
 
-	void ProcessDataSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
+	void ProcessDataSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, std::ifstream& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
 
 	void HandleDirective(const size_t& lineNum, std::string&& label, const std::string& directive, const std::vector<std::string>& arguments, std::string&& comment, 
 		ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef) const;
 
-	void ProcessCodeSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
+	void ProcessCodeSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, std::ifstream& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const;
 
 	void HandleInstruction(const size_t& lineNum, const std::string& instruction, const std::vector<std::string>& arguments, std::string&& comment, 
 		std::vector<ASMFramework::CodeSegmentItem>* const& segment, const ASMFramework::LanguageDefinition* const& langDef) const;
@@ -31,6 +31,6 @@ private:
 		ASMFramework::Workpiece* const& workpiece) const;
 
 public:
-	void Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const override;
+	void Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const override;
 };
 #endif // !PASS_ONE_TOKENIZATION_H

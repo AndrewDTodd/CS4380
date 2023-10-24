@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <regex>
 #include <utility>
+#include <iostream>
 
 std::pair<std::vector<std::string>, std::string> PassOne_Tokenization::TokenizeLine(const std::string& line) const
 {
@@ -76,10 +77,10 @@ void PassOne_Tokenization::HandleCodeSegmentItem(const std::string& label, const
     workpiece->_codeSegmentItems.emplace_back(label, segment);
 }
 
-void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
+void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, std::ifstream& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
 {
     std::string line;
-    while (std::getline(*fileStream.get(), line))
+    while (std::getline(fileStream, line))
     {
         lineNum++;
         auto tokenAndComment = TokenizeLine(line);
@@ -98,10 +99,10 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
             if (langDef->ContainsInstruction(firstToken))
             {
                 lineNum--;
-                fileStream.get()->seekg(std::ios_base::beg);
+                fileStream.seekg(std::ios_base::beg);
                 for (int i = 0; i < lineNum; i++)
                 {
-                    std::getline(*fileStream.get(), line);
+                    std::getline(fileStream, line);
                 }
                 break;
             }
@@ -130,10 +131,10 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
                 if (langDef->ContainsInstruction(secondToken))
                 {
                     lineNum--;
-                    fileStream.get()->seekg(std::ios_base::beg);
+                    fileStream.seekg(std::ios_base::beg);
                     for (int i = 0; i < lineNum; i++)
                     {
-                        std::getline(*fileStream.get(), line);
+                        std::getline(fileStream, line);
                     }
                     break;
                 }
@@ -152,12 +153,12 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
     }
 }
 
-void PassOne_Tokenization::ProcessCodeSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
+void PassOne_Tokenization::ProcessCodeSegment(size_t& lineNum, ASMFramework::Workpiece* const& workpiece, std::ifstream& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
 {
     std::string line;
     std::vector<ASMFramework::CodeSegmentItem> segment;
     std::string segmentLabel = "";
-    while (std::getline(*fileStream.get(), line))
+    while (std::getline(fileStream, line))
     {
         lineNum++;
         auto tokenAndComment = TokenizeLine(line);
@@ -228,13 +229,24 @@ void PassOne_Tokenization::ProcessCodeSegment(size_t& lineNum, ASMFramework::Wor
         HandleCodeSegmentItem(segmentLabel, segment, workpiece);
 }
 
-void PassOne_Tokenization::Execute(ASMFramework::Workpiece* const& workpiece, const std::unique_ptr<std::ifstream>& fileStream, const ASMFramework::LanguageDefinition* const& langDef) const
+void PassOne_Tokenization::Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const
 {
     size_t lineNumber = 0;
+
+    std::ifstream fileStream(filePath.string());
+
+    if (!fileStream.is_open())
+        throw std::runtime_error("Unable to open file at path: " + filePath.string());
 
     //Data segment, if there is one, is first. Will break when code segment is reached and set the fileStream to that line
     ProcessDataSegment(lineNumber, workpiece, fileStream, langDef);
 
     //Process the code segment after the data segment
     ProcessCodeSegment(lineNumber, workpiece, fileStream, langDef);
+
+    fileStream.close();
+
+    GREEN_TERMINAL
+        std::cout << " >>> Tokenization Complete" << std::endl;
+    RESET_TERMINAL
 }

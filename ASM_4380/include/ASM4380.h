@@ -11,7 +11,7 @@
 
 #include "PassOne_Tokenization.h"
 #include "PassTwo_Assemble.h"
-#include "PassThree.h"
+#include "PassThree_Serialize.h"
 
 #include "LanguageDefinition_4380.h"
 
@@ -23,7 +23,7 @@ private:
 	//Passes instantiation ****************************************************************
 	PassOne_Tokenization _passOne;
 	PassTwo_Assemble _passTwo;
-	PassThree _passThree;
+	PassThree_Serialize _passThree;
 	//*************************************************************************************
 
 	//Workpiece instantiation *************************************************************
@@ -47,5 +47,7 @@ protected:
 
 public:
 	void ShutDown() override;
+
+	void ProcessASM(const char* assemblyPath) override;
 };
 #endif // !ASM_4380_H

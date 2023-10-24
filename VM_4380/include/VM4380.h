@@ -10,9 +10,7 @@
 #include "ISA_4380.h"
 #include "Process_4380.h"
 
-using namespace VMFramework;
-
-class VM4380 : public Machine<VM4380, int32_t, int32_t, Process_4380, ISA_4380>
+class VM4380 : public VMFramework::Machine<VM4380, int32_t, int32_t, Process_4380, ISA_4380>
 {
 private:
 	/// <summary>

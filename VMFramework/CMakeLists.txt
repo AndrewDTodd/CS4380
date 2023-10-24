@@ -1,7 +1,7 @@
 # CMakeList.txt : CMake project for VMFramework, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.20)
 
 #add _DEBUG macro based on build type for code that should compile differently in Debug vs Release
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -14,9 +14,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 2)
+set(VERSION_MAJOR 1)
 #A release that may add new features but remains backward compatible with the previous version
-set(VERSION_MINOR 0)
+set(VERSION_MINOR 1)
 #A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
 set(VERSION_PATCH 0)
 #A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
@@ -32,6 +32,7 @@ set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/VMFramework_GetVersion.cpp
 
 )
 
@@ -46,6 +47,7 @@ target_include_directories(VMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includ
 include(FetchContent)
 FetchContent_Declare(
 	googletest
+	DOWNLOAD_EXTRACT_TIMESTAMP true
 	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 
