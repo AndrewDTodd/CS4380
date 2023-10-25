@@ -1,4 +1,4 @@
-# Project1_VMv1.0.0  
+# Project2_ASMv1.0.0  
 
 ###### **NOTE: all steps assume user is on Ubuntu 22.04 or compatible Debian system**  
 #### Steps to build  
@@ -32,13 +32,23 @@ Enter the following command to run the build script
 ##### Step 1: navigate to build directory  
 The previouse steps have created and built the programs in a new directory. Enter the following to navigate to this directory  
 
-    cd build/linux-x64-release
+    cd build/x64-release
 
 ##### Step 2: run desired programs
-To run the test suite enter the following
+To run the monolithic test suite enter the following
 
-    ./runTests
+    ./runAllTargetTests
 
-To run the project program enter the following
+To run the project programs we need to navigate into their directories or include the path in the execute command. You can enter the following
 
-    ./VM_4380 <optional path to bin>
+To run the VM  
+
+    ./VM_4380/VM4380 <optional path to bin>
+
+To run the Assember  
+    
+    ./ASM_4380/ASM4380 <optional path to asm>
+
+To run any target's unit tests  
+
+    ./(target directory)/(target name)Tests
