@@ -20,7 +20,7 @@ size_t STR_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 
 		int32_t registerID = GetRegisterID<int32_t>(args[0], 0, 15);
 
-		uint64_t& offset = GetLabelOffset(args[2], workpiece);
+		uint64_t& offset = GetLabelOffset(labelName, workpiece);
 
 		SerializeToBuffer<int32_t>(buffer, opcode, registerID, offset);
 

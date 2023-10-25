@@ -30,6 +30,8 @@ class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t,
 	friend LDR_L;
 	FRIEND_TEST(InstructionsTesting, Validate_MOV);
 	friend MOV;
+	friend STB_L;
+	friend STR_L;
 	FRIEND_TEST(InstructionsTesting, Validate_MUL);
 	friend MUL;
 	FRIEND_TEST(InstructionsTesting, Validate_SUB);

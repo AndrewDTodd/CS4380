@@ -13,6 +13,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <fstream>
+#include <filesystem>
 #include <string>
 
 #include "MemoryManager.h"
@@ -91,6 +92,20 @@ namespace VMFramework
 		/// </summary>
 		virtual void LoadProgram(const char* programBinary)
 		{
+			std::filesystem::path filePath(programBinary);
+			if (!std::filesystem::exists(filePath))
+			{
+				throw std::invalid_argument("No file at path provided: " + filePath.string());
+			}
+
+			if (filePath.extension() != ".bin")
+			{
+				YELLOW_TERMINAL
+					std::cerr << "**Warning** >> The extension for the provided file is " << filePath.extension() << ", expected .bin. Is this a valid program?" << std::endl;
+					std::cout << std::endl;
+				RESET_TERMINAL
+			}
+
 			std::ifstream file(programBinary, std::ios::binary | std::ios::ate);
 
 			if (!file.is_open())
@@ -364,12 +379,21 @@ namespace VMFramework
 				return;
 			}
 
-			//Get the offset to the initial PC from the first 4 bytes in program
-			//!!REMEMBER ITS IN LITTLE-ENDIAN!!!:(
-			int32_t offset = static_cast<int32_t>(m_programSegment[0]);
-			offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
-			offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-			offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
+			int32_t offset;
+			if constexpr (is_little_endian)
+			{
+				offset = *reinterpret_cast<int32_t*>(m_programSegment);
+			}
+			else
+			{
+				//This is only applicable if system is big-endian
+				//Get the offset to the initial PC from the first 4 bytes in program
+				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
+				offset  = static_cast<int32_t>(m_programSegment[0]);
+				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
+				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
+				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
+			}
 
 			if (offset < 0 || offset >= m_programSize)
 				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");

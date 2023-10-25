@@ -46,6 +46,8 @@ protected:
 	~ASM4380();
 
 public:
+	static bool _trapZero;
+
 	void ShutDown() override;
 
 	void ProcessASM(const char* assemblyPath) override;

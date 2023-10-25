@@ -57,7 +57,11 @@ include_directories(${CMAKE_SOURCE_DIR})
 #this CMake variable is used by the VM_4380 unit test that needs a path to a test bin
 set(VM_TEST_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/VM_4380_UnitTests/TestBins/we.bin" CACHE STRING "VM_4380 Unit Test bin file path")
 
+#this CMake variable is used by the Assembler unit test that needs a path to test exceptions handing
+set(ASSEMBLER_TEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_UnitTests/TestDocs/test.txt" CACHE STRING "Assember Unit Test file path")
+
 add_definitions(-DBIN_PATH="${VM_TEST_BIN_PATH}")
+add_definitions(-DTEST_TXT_PATH="${ASSEMBLER_TEST_PATH}")
 
 #Add the VMFramework subdirectory
 add_subdirectory(VMFramework)
@@ -220,6 +224,8 @@ set(VM_4380_INSTRUCTIONS_MOVE
 	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDB_L.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/LDR_L.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/MOV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/STB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/src/Instructions/Move/STR_L.cpp
 
 )
 
@@ -249,6 +255,10 @@ set(ASM_FRAMEWORK_UNIT_TESTS
 #ASM_4380 Unit Tests Source
 ############################################################################
 set(ASM_4380_UNIT_TESTS
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_UnitTests/ASM4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_UnitTests/PassOneTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_UnitTests/PassTwoTests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/ASM_4380_UnitTests/PassThreeTests.cpp
 
 )
 ############################################################################

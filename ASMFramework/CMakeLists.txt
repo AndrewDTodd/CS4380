@@ -60,7 +60,9 @@ enable_testing()
 
 #set source for "ASMFrameworkTests" unit testing executable
 set(ASM_FRAMEWORK_UNIT_TESTS
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework_UnitTests/SingletonWrapperTests.cpp
+
 )
 
 #Create executable for the execution of the project's tests

@@ -20,6 +20,7 @@ namespace ASMFramework
 		static const std::regex decimalPattern;
 		static const std::regex hexPattern;
 		static const std::regex asciiPattern;
+		static const std::regex asciiEscape;
 		static const std::regex stringPattern;
 
 		template<std::integral InputType, std::integral TargetType>

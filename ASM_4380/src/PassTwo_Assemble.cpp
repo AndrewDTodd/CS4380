@@ -140,12 +140,12 @@ void PassTwo_Assemble::ProcessUnresolvedLabels(ASMFramework::Workpiece* const& w
 			throw std::logic_error("**Debug logic_error** When trying to resolve a deferred label reference \"" + label.first +
 				"\", found that the label isn't in the symbol table!!! This should be impossible at this stage of execution. Good luck figuring this one out");
 		}
-#endif // _DEBUG
 
-#ifdef _DEBUG
-			if (labelOffset == 0)
-				throw std::logic_error("**Debug logic_error** When trying to resolve a deferred label reference \""+ label.first + 
-					"\", found that the label has no assigned offset!!!This should be impossible at this stage of execution. Good luck figuring this one out");
+		if (labelOffset == 0)
+			throw std::logic_error("**Debug logic_error** When trying to resolve a deferred label reference \""+ label.first + 
+				"\", found that the label has no assigned offset!!!This should be impossible at this stage of execution. Good luck figuring this one out");
+#else
+		labelOffset = workpiece->_symbolTable.at(label.first);
 #endif // _DEBUG
 		for (auto& voidPtr : label.second)
 		{

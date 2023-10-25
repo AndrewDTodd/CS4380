@@ -107,8 +107,8 @@
       "name": "linux-base",
       "hidden": true,
       "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build",
-      "installDir": "${sourceDir}/install",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++"
@@ -125,7 +125,7 @@
       }
     },
     {
-      "name": "linux-x64-debug",
+      "name": "x64-Debug",
       "displayName": "g++ x64 Debug",
       "inherits": "linux-base",
       "architecture": {
@@ -134,15 +134,17 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
-      }
+      },
+      "buildCommandArgs": "-j16"
     },
     {
-      "name": "linux-x64-release",
+      "name": "x64-Release",
       "displayName": "g++ x64 Release",
-      "inherits": "linux-x64-debug",
+      "inherits": "x64-Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
-      }
+      },
+      "buildCommandArgs": "-j16"
     }
   ]
 }

@@ -77,6 +77,8 @@ set(VM_4380_INSTRUCTIONS_MOVE
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDB_L.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDR_L.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/MOV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STR_L.cpp
 
 )
 

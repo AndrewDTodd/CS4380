@@ -20,6 +20,8 @@
 #include "Move/LDB_L.h"
 #include "Move/LDR_L.h"
 #include "Move/MOV.h"
+#include "Move/STB_L.h"
+#include "Move/STR_L.h"
 
 //Multi_Thread
 

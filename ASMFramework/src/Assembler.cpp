@@ -32,7 +32,15 @@ namespace ASMFramework
 
 		if (!std::filesystem::exists(m_filePath))
 		{
-			throw std::invalid_argument("No file at path provided: " + std::string(assemblyPath));
+			throw std::invalid_argument("No file at path provided: " + m_filePath.string());
+		}
+
+		if (m_filePath.extension() != ".asm")
+		{
+			YELLOW_TERMINAL
+				std::cerr << "**Warning** >> The extension for the provided file is " << m_filePath.extension() << ", expected .asm. Is this a valid assembly file? Use the .asm extension." << std::endl;
+				std::cout << std::endl;
+			RESET_TERMINAL
 		}
 
 		for (auto& pass : m_passes)

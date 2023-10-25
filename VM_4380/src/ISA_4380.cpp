@@ -15,11 +15,13 @@ Instruction<int32_t, int32_t, Process_4380>* instructions[] =
 	new LDB_L(),
 	new LDR_L(),
 	new MOV(),
+	new STB_L(),
+	new STR_L(),
 	new MUL(),
 	new SUB(),
 	new TRP()
 };
 
-ISA_4380::ISA_4380(): ISA<int32_t, int32_t, Process_4380>(instructions, 9)
+ISA_4380::ISA_4380(): ISA<int32_t, int32_t, Process_4380>(instructions, 11)
 {
 }

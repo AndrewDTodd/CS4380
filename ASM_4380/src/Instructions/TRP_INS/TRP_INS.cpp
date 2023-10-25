@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "../../../include/ASM4380.h"
+
 TRP_INS::TRP_INS() : ASMInstruction("TRP")
 {}
 
@@ -20,6 +22,9 @@ size_t TRP_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 		throw std::runtime_error("Value provided to .TRP instruciton - \"" + std::to_string(trapNum) + "\" - is invalid. Valid traps are 0 - 7");
 
 	SerializeToBuffer<int32_t>(buffer, opcode, trapNum, 0);
+
+	if (trapNum == 0)
+		ASM4380::_trapZero = true;
 
 	return sizeof(int32_t) * 3;
 }

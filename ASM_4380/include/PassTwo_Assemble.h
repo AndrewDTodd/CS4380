@@ -10,6 +10,8 @@
 #include <vector>
 #include <string>
 
+#include <gtest/gtest_prod.h>
+
 class PassTwo_Assemble : public ASMFramework::Pass
 {
 private:
@@ -23,5 +25,7 @@ private:
 
 public:
 	void Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const override;
+
+	FRIEND_TEST(PassTwoTesting, Validate_Execute);
 };
 #endif // !PASS_TWO_ASSEMBLE_H

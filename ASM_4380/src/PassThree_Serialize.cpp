@@ -3,6 +3,9 @@
 #include <filesystem>
 #include <iostream>
 #include "rootConfig.h"
+#include <stdexcept>
+
+#include "../include/ASM4380.h"
 
 size_t PassThree_Serialize::SerializeInitialPC(std::ofstream& fileStream, ASMFramework::Workpiece* const& workpiece) const
 {
@@ -46,6 +49,9 @@ size_t PassThree_Serialize::SerializeCodeSegment(std::ofstream& fileStream, ASMF
 
 void PassThree_Serialize::Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const
 {
+	if (!ASM4380::_trapZero)
+		throw std::runtime_error("The program doesn't contain a TRAP 0 (.TRP 0). Canceling serialization, program is invalid");
+
 	std::filesystem::path binaryPath = filePath;
 	binaryPath.replace_extension(".bin");
 

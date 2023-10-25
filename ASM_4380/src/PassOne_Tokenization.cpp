@@ -94,7 +94,7 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
 
             if (langDef->ContainsKeyword(firstToken))
                 throw std::runtime_error("First token at line number" + std::to_string(lineNum) + " is a reserved keyword \"" + firstToken + 
-                    "\" and is not valid in this context. Expected a Label, Directive, or an Instruction mnemonic");
+                    "\" and is not valid in this context. Expected either a Label or Directive/Instruction mnemonic");
 
             if (langDef->ContainsInstruction(firstToken))
             {
