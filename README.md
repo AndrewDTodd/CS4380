@@ -32,7 +32,7 @@ Enter the following command to run the build script
 ##### Step 1: navigate to build directory  
 The previouse steps have created and built the programs in a new directory. Enter the following to navigate to this directory  
 
-    cd build/x64-release
+    cd build/x64-Release
 
 ##### Step 2: run desired programs
 To run the monolithic test suite enter the following
