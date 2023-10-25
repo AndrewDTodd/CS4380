@@ -134,8 +134,7 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "buildCommandArgs": "-j16"
+      }
     },
     {
       "name": "x64-Release",
@@ -143,8 +142,7 @@
       "inherits": "x64-Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
-      },
-      "buildCommandArgs": "-j16"
+      }
     }
   ]
 }
