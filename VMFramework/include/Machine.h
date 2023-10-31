@@ -90,27 +90,26 @@ namespace VMFramework
 		/// <summary>
 		/// Loads the program data into the m_programSegment
 		/// </summary>
-		virtual void LoadProgram(const char* programBinary)
+		virtual void LoadProgram(const std::filesystem::path& binPath)
 		{
-			std::filesystem::path filePath(programBinary);
-			if (!std::filesystem::exists(filePath))
+			if (!std::filesystem::exists(binPath))
 			{
-				throw std::invalid_argument("No file at path provided: " + filePath.string());
+				throw std::invalid_argument("No file at path provided: " + binPath.string());
 			}
 
-			if (filePath.extension() != ".bin")
+			if (binPath.extension() != ".bin")
 			{
 				YELLOW_TERMINAL
-					std::cerr << "**Warning** >> The extension for the provided file is " << filePath.extension() << ", expected .bin. Is this a valid program?" << std::endl;
+					std::cerr << "**Warning** >> The extension for the provided file is " << binPath.extension() << ", expected .bin. Is this a valid program?" << std::endl;
 					std::cout << std::endl;
 				RESET_TERMINAL
 			}
 
-			std::ifstream file(programBinary, std::ios::binary | std::ios::ate);
+			std::ifstream file(binPath.string(), std::ios::binary | std::ios::ate);
 
 			if (!file.is_open())
 			{
-				throw std::invalid_argument("Unable to open file at path: " + std::string(programBinary));
+				throw std::invalid_argument("Unable to open file at path: " + binPath.string());
 			}
 
 			// Get the file size
@@ -150,12 +149,12 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
 		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
-		virtual inline void LaunchProgram_INTERNAL(const char* programBinary)
+		virtual inline void LaunchProgram_INTERNAL(const std::filesystem::path& binPath)
 		{
 			//Lock has already been obtained by the calling StartUp(char*) method
 			try
 			{
-				LoadProgram(programBinary);
+				LoadProgram(binPath);
 			}
 			//invalid_argument: could not find file at path given
 			catch (const std::invalid_argument& invalidArgEx)
@@ -190,12 +189,21 @@ namespace VMFramework
 				return;
 			}
 
-			//Get the offset to the initial PC from the first 4 bytes in program
-			//!!REMEMBER ITS IN LITTLE-ENDIAN!!!:(
-			int32_t offset = static_cast<int32_t>(m_programSegment[0]);
-			/*offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
-			offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-			offset |= static_cast<int32_t>(m_programSegment[3]) << 24;*/
+			int32_t offset;
+			if constexpr (is_little_endian)
+			{
+				offset = *reinterpret_cast<int32_t*>(m_programSegment);
+			}
+			else
+			{
+				//This is only applicable if system is big-endian
+				//Get the offset to the initial PC from the first 4 bytes in program
+				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
+				offset  = static_cast<int32_t>(m_programSegment[0]);
+				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
+				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
+				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
+			}
 
 			if (offset < 0 || offset >= m_programSize)
 				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
@@ -257,7 +265,40 @@ namespace VMFramework
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(char* programBinary)
+		void StartUp(const char* programBinary)
+		{
+			//Lock the Machine for a write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+#ifdef _DEBUG
+			if (this->m_memoryManager)
+				throw std::runtime_error("Calling StartUp on an already active VM is invalid");
+#endif // _DEBUG
+
+
+			//Aquire pointer to MemoryManager instance and initialize the subsystem
+			this->m_memoryManager = MemoryManager::GetInstance();
+			this->m_memoryManager->StartUp();
+
+			std::filesystem::path filePath(programBinary);
+
+			//lauch the provided program
+			try
+			{
+				LaunchProgram_INTERNAL(programBinary);
+			}
+			catch (std::runtime_error runtimeEx)
+			{
+				RED_TERMINAL
+					std::cerr << "Error: " << runtimeEx.what() << std::endl;
+				RESET_TERMINAL
+			}
+		}
+
+		/// <summary>
+		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
+		/// </summary>
+		/// <param name="programBinary">Path to a valid program binary to run</param>
+		void StartUp(const std::filesystem::path& programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -335,12 +376,10 @@ namespace VMFramework
 		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
 		virtual void LaunchProgram(const char* programBinary)
 		{
-			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << programBinary << std::endl;
-			RESET_TERMINAL
-
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			std::filesystem::path filePath(programBinary);
 
 			try
 			{
@@ -399,6 +438,85 @@ namespace VMFramework
 				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
 
 			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
+
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << programBinary << std::endl;
+			RESET_TERMINAL
+
+			SpawnProcess(m_codeSegment);
+		}
+
+		/// <summary>
+		/// Will attempt to load the binary at the specified path and run the program
+		/// </summary>
+		/// <param name="programBinary">Path to a valid program binary to run</param>
+		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
+		virtual void LaunchProgram(const std::filesystem::path& programBinary)
+		{
+			//Lock the Machine for a write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			try
+			{
+				LoadProgram(programBinary);
+			}
+			//invalid_argument: could not find file at path given
+			catch (const std::invalid_argument& invalidArgEx)
+			{
+				RED_TERMINAL
+					std::cerr << "Error: " << invalidArgEx.what() << std::endl;
+				RESET_TERMINAL
+					return;
+			}
+			//Program too big to load into VM
+			catch (const stack_overflow& overflowEx)
+			{
+				RED_TERMINAL
+					std::cerr << "Error: Could not load program into VM, not enough memory in system" << std::endl;
+				RESET_TERMINAL
+					return;
+			}
+			//Could not deturmine program size, memory allocation failed, or could not load program into memory
+			catch (const std::runtime_error& loadEx)
+			{
+				RED_TERMINAL
+					std::cerr << "Error: " << loadEx.what() << std::endl;
+				RESET_TERMINAL
+					return;
+			}
+			//This probably means the LaunchProgram method was called before VM initialization
+			catch (const std::exception& ex)
+			{
+				RED_TERMINAL
+					std::cerr << "Error: " << ex.what() << std::endl;
+				RESET_TERMINAL
+					return;
+			}
+
+			int32_t offset;
+			if constexpr (is_little_endian)
+			{
+				offset = *reinterpret_cast<int32_t*>(m_programSegment);
+			}
+			else
+			{
+				//This is only applicable if system is big-endian
+				//Get the offset to the initial PC from the first 4 bytes in program
+				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
+				offset  = static_cast<int32_t>(m_programSegment[0]);
+				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
+				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
+				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
+			}
+
+			if (offset < 0 || offset >= m_programSize)
+				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
+
+			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
+
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << programBinary << std::endl;
+			RESET_TERMINAL
 
 			SpawnProcess(m_codeSegment);
 		}

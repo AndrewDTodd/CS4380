@@ -16,11 +16,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
 set(VERSION_MAJOR 1)
 #A release that may add new features but remains backward compatible with the previous version
-set(VERSION_MINOR 1)
+set(VERSION_MINOR 2)
 #A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
 set(VERSION_PATCH 0)
 #A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
-set(VERSION_BUILD 0)
+set(VERSION_BUILD 1)
 
 #Add versioning definitions for the ASM_4380 executable
 add_definitions(-DVERSION_MAJOR=${VERSION_MAJOR})

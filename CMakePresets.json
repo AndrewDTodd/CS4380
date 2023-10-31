@@ -113,6 +113,9 @@
         "CMAKE_C_COMPILER": "gcc",
         "CMAKE_CXX_COMPILER": "g++"
       },
+      "environment": {
+        "CMAKE_BUILD_PARALLEL_LEVEL": "12"
+      },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
           "intelliSenseMode": "linux-gcc-x64"

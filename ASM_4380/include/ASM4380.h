@@ -51,5 +51,7 @@ public:
 	void ShutDown() override;
 
 	void ProcessASM(const char* assemblyPath) override;
+
+	void ProcessASM(std::filesystem::path&& assemblyPath) override;
 };
 #endif // !ASM_4380_H

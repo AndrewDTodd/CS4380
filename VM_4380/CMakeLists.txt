@@ -19,21 +19,6 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 1)
-#A release that may add new features but remains backward compatible with the previous version
-set(VERSION_MINOR 1)
-#A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
-set(VERSION_PATCH 0)
-#A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
-set(VERSION_BUILD 0)
-
-#Add versioning definitions for the ASM_4380 executable
-add_definitions(-DVERSION_MAJOR=${VERSION_MAJOR})
-add_definitions(-DVERSION_MINOR=${VERSION_MINOR})
-add_definitions(-DVERSION_PATCH=${VERSION_PATCH})
-add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
-
 #VM_4380 target section
 ################################################################################################################################################################
 
@@ -109,15 +94,16 @@ add_dependencies(VM4380 VMFramework)
 #include the VMFramework library
 target_link_libraries(VM4380 PRIVATE VMFramework)
 
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Arth)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Comp)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Heap)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Jump)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Logical)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Move)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Multi_Thread)
-target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/TRP)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Arth)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Comp)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Heap)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Jump)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Logical)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Move)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Multi_Thread)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/TRP)
 
 ################################################################################################################################################################
 

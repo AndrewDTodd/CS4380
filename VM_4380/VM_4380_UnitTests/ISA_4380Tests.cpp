@@ -5,7 +5,7 @@
 
 #include "../include/ISA_4380.h"
 
-#include "../include/Instructions/Instructions.h"
+#include "../include/Instructions/VM_Instructions.h"
 
 using namespace VMFramework;
 

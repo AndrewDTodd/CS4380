@@ -1,5 +1,5 @@
-#ifndef INSTRUCTIONS_H
-#define INSTRUCTIONS_H
+#ifndef ASM_INSTRUCTIONS_H
+#define ASM_INSTRUCTIONS_H
 
 //Arithmetic
 #include "Arth_INS/ADD_INS.h"
@@ -51,4 +51,4 @@
 //TRP
 #include "TRP_INS/TRP_INS.h"
 
-#endif // !INSTRUCTIONS_H
+#endif // !ASM_INSTRUCTIONS_H

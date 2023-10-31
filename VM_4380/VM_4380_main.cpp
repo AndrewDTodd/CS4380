@@ -13,7 +13,13 @@ int main(int argc, char* argv[])
 {
 	std::cout << "VM4380: virtual machine for ISA_4380 architecture" << std::endl;
 	DIMB_TEXT
-		std::cout << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << '.' << VERSION_PATCH << '_' << TARGET_OS << " (" <<
+		std::cout << " version " << VM4380_VERSION_MAJOR << '.' << VM4380_VERSION_MINOR << '.' << VM4380_VERSION_PATCH << 
+#ifdef _DEBUG
+		'd'
+#else
+		'r'
+#endif // _DEBUG
+		<< '_' << TARGET_OS << " (" <<
 		VMFramework::GetFrameworkVersion() << ')' << std::endl;
 	RESET_TERMINAL
 
@@ -23,56 +29,50 @@ int main(int argc, char* argv[])
 
 	VM->StartUp();
 
+	std::filesystem::path filePath;
 	if (argc > 1)
 	{
-		try
-		{
-			VM->LaunchProgram(argv[1]);
-		}
-		catch (const std::runtime_error& programError)
-		{
-			RED_TERMINAL
-				std::cerr << "Error: " << programError.what() << std::endl;
-			RESET_TERMINAL
-		}
-		catch (const std::exception& ex)
-		{
-			RED_TERMINAL
-				std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
-			RESET_TERMINAL
-		}
+		filePath = std::filesystem::path(argv[1]);
 	}
 	else
 	{
 		std::cout << std::endl << "Specify a path to a valid program (.bin) to assemble" << std::endl << " path << ";
 
-		char filePath[maxPathLength];
-		std::cin.getline(filePath, maxPathLength);
+		char inputPath[maxPathLength];
+		std::cin.getline(inputPath, maxPathLength);
+
+		filePath = std::filesystem::path(inputPath);
 
 		CLEAR_TERMINAL
 
 		std::cout << "VM4380: virtual machine for ISA_4380 architecture" << std::endl;
 		DIMB_TEXT
-			std::cout << " version " << VERSION_MAJOR << '.' << VERSION_MINOR << '.' << VERSION_PATCH << '_' << TARGET_OS << " (" <<
+			std::cout << " version " << VM4380_VERSION_MAJOR << '.' << VM4380_VERSION_MINOR << '.' << VM4380_VERSION_PATCH << 
+#ifdef _DEBUG
+			'd'
+#else
+			'r'
+#endif // _DEBUG
+			<< '_' << TARGET_OS << " (" <<
 			VMFramework::GetFrameworkVersion() << ')' << std::endl;
 		RESET_TERMINAL
+	}
 
-		try
-		{
-			VM->LaunchProgram(filePath);
-		}
-		catch (const std::runtime_error& programError)
-		{
-			RED_TERMINAL
-				std::cerr << "Error: " << programError.what() << std::endl;
-			RESET_TERMINAL
-		}
-		catch (const std::exception& ex)
-		{
-			RED_TERMINAL
-				std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
-			RESET_TERMINAL
-		}
+	try
+	{
+		VM->LaunchProgram(filePath);
+	}
+	catch (const std::runtime_error& programError)
+	{
+		RED_TERMINAL
+			std::cerr << "Error: " << programError.what() << std::endl;
+		RESET_TERMINAL
+	}
+	catch (const std::exception& ex)
+	{
+		RED_TERMINAL
+			std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
+		RESET_TERMINAL
 	}
 
 	VM->WaitForProcess();

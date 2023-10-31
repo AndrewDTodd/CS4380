@@ -10,7 +10,7 @@
 #include "Directives/INT_DIR.h"
 #include "Directives/STR_DIR.h"
 
-#include "Instructions/Instructions.h"
+#include "Instructions/ASM_Instructions.h"
 
 class LanguageDefinition_4380 : public ASMFramework::LanguageDefinition
 {

@@ -1,5 +1,5 @@
-#ifndef INSTRUCTIONS_H
-#define INSTRUCTIONS_H
+#ifndef VM_INSTRUCTIONS_H
+#define VM_INSTRUCTIONS_H
 
 //Arithmetic
 #include "Arth/ADD.h"
@@ -28,4 +28,4 @@
 //TRP
 #include "TRP/TRP.h"
 
-#endif //!INSTRUCTIONS_H
+#endif //!VM_INSTRUCTIONS_H

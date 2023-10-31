@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../include/Instructions/Instructions.h"
+#include "../include/Instructions/VM_Instructions.h"
 
 #include <stdexcept>
 #include <shared_mutex>

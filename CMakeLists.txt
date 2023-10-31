@@ -22,6 +22,36 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
+set(ASM4380_VERSION_MAJOR 1)
+#A release that may add new features but remains backward compatible with the previous version
+set(ASM4380_VERSION_MINOR 1)
+#A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
+set(ASM4380_VERSION_PATCH 0)
+#A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
+set(ASM4380_VERSION_BUILD 0)
+
+#Add versioning definitions for the ASM_4380 executable
+add_definitions(-DASM4380_VERSION_MAJOR=${ASM4380_VERSION_MAJOR})
+add_definitions(-DASM4380_VERSION_MINOR=${ASM4380_VERSION_MINOR})
+add_definitions(-DASM4380_VERSION_PATCH=${ASM4380_VERSION_PATCH})
+add_definitions(-DASM4380_VERSION_BUILD=${ASM4380_VERSION_BUILD})
+
+#A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
+set(VM4380_VERSION_MAJOR 1)
+#A release that may add new features but remains backward compatible with the previous version
+set(VM4380_VERSION_MINOR 1)
+#A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
+set(VM4380_VERSION_PATCH 0)
+#A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
+set(VM4380_VERSION_BUILD 0)
+
+#Add versioning definitions for the ASM_4380 executable
+add_definitions(-DVM4380_VERSION_MAJOR=${VM4380_VERSION_MAJOR})
+add_definitions(-DVM4380_VERSION_MINOR=${VM4380_VERSION_MINOR})
+add_definitions(-DVM4380_VERSION_PATCH=${VM4380_VERSION_PATCH})
+add_definitions(-DVM4380_VERSION_BUILD=${VM4380_VERSION_BUILD})
+
 if(UNIX AND NOT APPLE)
 	add_definitions(-DTARGET_OS="Linux")
 	add_definitions(-D_LINUX_TARGET)
@@ -283,6 +313,62 @@ set(VM_4380_UNIT_TESTS
 )
 ############################################################################
 
+################################################################################################################################################################
+
+#monoSystem target section
+################################################################################################################################################################
+
+# Create monoSystem executable for the joined VM and Assembler thing
+add_executable (monoSystem ${CMAKE_CURRENT_SOURCE_DIR}/MonolithicMain.cpp 
+${ASM_4380_SOURCE} 
+${ASM_4380_DIRECTIVES} 
+${ASM_4380_INSTRUCTIONS_ARTH} 
+${ASM_4380_INSTRUCTIONS_COMP} 
+${ASM_4380_INSTRUCTIONS_HEAP} 
+${ASM_4380_INSTRUCTIONS_JUMP} 
+${ASM_4380_INSTRUCTIONS_LOGICAL} 
+${ASM_4380_INSTRUCTIONS_MOVE} 
+${ASM_4380_INSTRUCTIONS_MULTI_THREAD} 
+${ASM_4380_INSTRUCTIONS_TRP}
+
+${VM_4380_SOURCE} 
+${VM_4380_INSTRUCTIONS_ARTH} 
+${VM_4380_INSTRUCTIONS_COMP} 
+${VM_4380_INSTRUCTIONS_HEAP} 
+${VM_4380_INSTRUCTIONS_JUMP} 
+${VM_4380_INSTRUCTIONS_LOGICAL} 
+${VM_4380_INSTRUCTIONS_MOVE} 
+${VM_4380_INSTRUCTIONS_MULTI_THREAD} 
+${VM_4380_INSTRUCTIONS_TRP})
+
+#Signify that the ASM_4380 target depends upon the ASMFramework library target and VMFramework library target
+add_dependencies(monoSystem ASMFramework VMFramework)
+
+#Include the ASMFramework library
+target_link_libraries(monoSystem PRIVATE ASMFramework VMFramework)
+
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Directives)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Arth_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Comp_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Heap_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Jump_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Logical_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Move_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Multi_Thread_INS)
+target_include_directories(monoSystem PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/TRP_INS)
+
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Arth)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Comp)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Heap)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Jump)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Logical)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Move)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/Multi_Thread)
+target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/include/Instructions/TRP)
 ################################################################################################################################################################
 
 #runAllTargetTests target section

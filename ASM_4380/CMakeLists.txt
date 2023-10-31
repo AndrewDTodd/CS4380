@@ -19,21 +19,6 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 1)
-#A release that may add new features but remains backward compatible with the previous version
-set(VERSION_MINOR 0)
-#A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
-set(VERSION_PATCH 0)
-#A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
-set(VERSION_BUILD 0)
-
-#Add versioning definitions for the ASM_4380 executable
-add_definitions(-DVERSION_MAJOR=${VERSION_MAJOR})
-add_definitions(-DVERSION_MINOR=${VERSION_MINOR})
-add_definitions(-DVERSION_PATCH=${VERSION_PATCH})
-add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
-
 #ASM_4380 target section (Assembler_4380)
 ################################################################################################################################################################
 
@@ -134,22 +119,23 @@ ${ASM_4380_INSTRUCTIONS_MOVE}
 ${ASM_4380_INSTRUCTIONS_MULTI_THREAD} 
 ${ASM_4380_INSTRUCTIONS_TRP})
 
-#Signify that the ASM_4380 target depends upon the ASMFramework linbrary target
+#Signify that the ASM_4380 target depends upon the ASMFramework library target
 add_dependencies(ASM4380 ASMFramework)
 
 #Include the ASMFramework library
 target_link_libraries(ASM4380 PRIVATE ASMFramework)
 
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Directives)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Arth_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Comp_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Heap_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Jump_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Logical_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Move_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/Multi_Thread_INS)
-target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380/include/Instructions/TRP_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Directives)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Arth_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Comp_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Heap_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Jump_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Logical_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Move_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Multi_Thread_INS)
+target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/TRP_INS)
 
 ################################################################################################################################################################
 

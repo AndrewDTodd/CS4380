@@ -50,11 +50,18 @@ namespace ASMFramework
 
 	public:
 		/// <summary>
-		/// Called to start the Assembler assembling the assembly code in the file at the assemblyPath location
+		/// Initiate the assembly process on the assebmly code in the file at assemblyPath
 		/// </summary>
 		/// <param name="assemblyPath">String containing the path to the assembly file to process</param>
-		/// <exception cref="std::invalid_argument">Thrown if the file at assemblyPath cannot be opened</exception>
+		/// <exception cref="std::invalid_argument">Thrown if the provided path is invalid</exception>
 		virtual void ProcessASM(const char* assemblyPath);
+
+		/// <summary>
+		/// Initiate the assembly process on the assebmly code in the file at assemblyPath
+		/// </summary>
+		/// <param name="assemblyPath">Filesystem path object containing the path information to the assembly code file</param>
+		/// <exception cref="std::invalid_argument">Thrown if the provided path is invalid</exception>
+		virtual void ProcessASM(std::filesystem::path&& assemblyPath);
 
 		Assembler(const Assembler&) = delete;
 		Assembler& operator=(const Assembler&) = delete;

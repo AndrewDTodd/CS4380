@@ -12,7 +12,7 @@
 
 #include "ISA_4380.h"
 
-#include "Instructions/Instructions.h"
+#include "Instructions/VM_Instructions.h"
 
 #include "rootConfig.h"
 
