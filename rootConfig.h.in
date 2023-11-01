@@ -6,6 +6,7 @@
 #include <type_traits>
 constexpr bool is_little_endian = std::endian::native == std::endian::little;
 
+#include <iostream>
 #if defined(_LINUX_TARGET) || defined(_MAC_TARGET)
 #define GREEN_TERMINAL std::cout << GREEN;
 #define RED_TERMINAL std::cout << RED;

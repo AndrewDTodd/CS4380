@@ -17,12 +17,12 @@ namespace ASMFramework
 	{
 	}
 
-	const ASMDirective* LanguageDefinition::GetDirective(const std::string& key) const
+	/*const ASMDirective* LanguageDefinition::GetDirective(const std::string& key) const
 	{
 		return m_languageDirectives.at(key);
-	}
+	}*/
 
-	bool LanguageDefinition::TryGetDirective(const std::string& key, const ASMDirective*& out_directive) const
+	/*bool LanguageDefinition::TryGetDirective(const std::string& key, const ASMDirective*& out_directive) const
 	{
 		auto itr = m_languageDirectives.find(key);
 
@@ -36,19 +36,19 @@ namespace ASMFramework
 		out_directive = nullptr;
 
 		return false;
-	}
+	}*/
 
-	bool LanguageDefinition::ContainsDirective(const std::string& key) const
+	/*bool LanguageDefinition::ContainsDirective(const std::string& key) const
 	{
 		return m_languageDirectives.contains(key);
-	}
+	}*/
 
-	const ASMInstruction* LanguageDefinition::GetInstruction(const std::string& key) const
+	/*const ASMInstruction* LanguageDefinition::GetInstruction(const std::string& key) const
 	{
 		return m_languageInstructions.at(key);
-	}
+	}*/
 
-	bool LanguageDefinition::TryGetInstruction(const std::string& key, const ASMInstruction*& out_instruction) const
+	/*bool LanguageDefinition::TryGetInstruction(const std::string& key, const ASMInstruction*& out_instruction) const
 	{
 		auto itr = m_languageInstructions.find(key);
 
@@ -62,15 +62,15 @@ namespace ASMFramework
 		out_instruction = nullptr;
 
 		return false;
-	}
+	}*/
 
-	bool LanguageDefinition::ContainsInstruction(const std::string& key) const
+	/*bool LanguageDefinition::ContainsInstruction(const std::string& key) const
 	{
 		return m_languageInstructions.contains(key);
-	}
+	}*/
 
-	bool LanguageDefinition::ContainsKeyword(const std::string& key) const
+	/*bool LanguageDefinition::ContainsKeyword(const std::string& key) const
 	{
 		return m_reservedKeywords.contains(key);
-	}
+	}*/
 }

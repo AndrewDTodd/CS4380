@@ -22,7 +22,7 @@ void PassTwo_Assemble::ProcessDataSegment(size_t& byteNum, ASMFramework::Workpie
 			catch (const std::out_of_range& rangeEx)
 			{
 				RED_TERMINAL
-				std::cerr << "Error: **Debug** When trying to get the address in the symbol table associated with \"" + item.first + "\" out_of_range exception was thrown" +
+					std::cerr << "Error: **Debug** When trying to get the address in the symbol table associated with \"" + item.first + "\" out_of_range exception was thrown" +
 					"\nThere must be something wrong with pass one's capturing of labels" << std::endl;
 				RESET_TERMINAL
 
@@ -44,7 +44,7 @@ void PassTwo_Assemble::ProcessDataSegment(size_t& byteNum, ASMFramework::Workpie
 		catch (const std::runtime_error& rtEx)
 		{
 			RED_TERMINAL
-			std::cerr << "At line " + std::to_string(dataItem._lineNum) + " when processing directive with mnemonic \"" + 
+				std::cerr << "At line " + std::to_string(dataItem._lineNum) + " when processing directive with mnemonic \"" + 
 				dataItem._directive->_mnemonic + "\"\nError: " + rtEx.what() << std::endl;
 			RESET_TERMINAL
 
@@ -54,7 +54,7 @@ void PassTwo_Assemble::ProcessDataSegment(size_t& byteNum, ASMFramework::Workpie
 		catch (const ASMFramework::ASMDirective::NotImplemented& ex)
 		{
 			RED_TERMINAL
-			std::cerr << "At line " + std::to_string(dataItem._lineNum) + " when processing directive with mnemonic \"" +
+				std::cerr << "At line " + std::to_string(dataItem._lineNum) + " when processing directive with mnemonic \"" +
 				dataItem._directive->_mnemonic + "\"\nError: " + ex.what() << std::endl;
 			RESET_TERMINAL
 
@@ -83,7 +83,7 @@ void PassTwo_Assemble::ProcessCodeSegment(size_t& byteNum, ASMFramework::Workpie
 			catch (const std::out_of_range& rangeEx)
 			{
 				RED_TERMINAL
-				std::cerr << "Error: **Debug** When trying to get the address in the symbol table associated with \"" + segment.first + "\" out_of_range exception was thrown" +
+					std::cerr << "Error: **Debug** When trying to get the address in the symbol table associated with \"" + segment.first + "\" out_of_range exception was thrown" +
 					"\nThere must be something wrong with pass one's capturing of labels" << std::endl;
 				RESET_TERMINAL
 
@@ -99,13 +99,13 @@ void PassTwo_Assemble::ProcessCodeSegment(size_t& byteNum, ASMFramework::Workpie
 		{
 			try
 			{
-				byteNum += instructionItem._instruction->Implementation(segmentBin, workpiece, instructionItem._instrArgs);
+				byteNum += instructionItem._instruction->Implementation(segmentBin, workpiece, langDef, instructionItem._instrArgs);
 			}
 			//Continue processing to inform user of all errors, though operation will fail
 			catch (const std::runtime_error& rtEx)
 			{
 				RED_TERMINAL
-				std::cerr << "At line " + std::to_string(instructionItem._lineNum) + " when processing instruction with mnemonic \"" +
+					std::cerr << "At line " + std::to_string(instructionItem._lineNum) + " when processing instruction with mnemonic \"" +
 					instructionItem._instruction->_mnemonic + "\"\nError: " + rtEx.what() << std::endl;
 				RESET_TERMINAL
 				
@@ -115,11 +115,22 @@ void PassTwo_Assemble::ProcessCodeSegment(size_t& byteNum, ASMFramework::Workpie
 			catch (const ASMFramework::ASMInstruction::NotImplemented& ex)
 			{
 				RED_TERMINAL
-				std::cerr << "At line " + std::to_string(instructionItem._lineNum) + " when processing instruction with mnemonic \"" +
+					std::cerr << "At line " + std::to_string(instructionItem._lineNum) + " when processing instruction with mnemonic \"" +
 					instructionItem._instruction->_mnemonic + "\"\nError: " + ex.what() << std::endl;
 				RESET_TERMINAL
 
 				_fail = true;
+			}
+			//Continue processing and inform user of warning from assembly process. operation will NOT fail
+			catch (const ASMFramework::ASMInstruction::Warning& warning)
+			{
+				YELLOW_TERMINAL
+					std::cerr << "At line " + std::to_string(instructionItem._lineNum) + " when processing instruction with mnemonic \"" +
+					instructionItem._instruction->_mnemonic + "\"\nWarning: " + warning.what() << std::endl;
+				RESET_TERMINAL
+
+				//increment the byte count. Warnings dont make assembly process fail
+				byteNum += warning.returnVal;
 			}
 		}
 	}

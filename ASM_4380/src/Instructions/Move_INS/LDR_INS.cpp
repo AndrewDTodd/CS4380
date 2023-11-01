@@ -5,7 +5,7 @@
 LDR_INS::LDR_INS() : ASMInstruction("LDR")
 {}
 
-size_t LDR_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
+size_t LDR_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef, const std::vector<std::string>& args) const
 {
 #ifdef _DEBUG
 	if (args.size() != 2)
@@ -18,22 +18,22 @@ size_t LDR_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 		const int32_t opcode = 10;
 		const std::string& labelName = args[1];
 
-		int32_t registerID = GetRegisterID<int32_t>(args[0], 0, 15);
+		int32_t registerID = langDef->GetRegisterID<int32_t>(args[0]);
 
 		uint64_t& offset = GetLabelOffset(labelName, workpiece);
 
 		SerializeToBuffer<int32_t>(buffer, opcode, registerID, offset);
 
 		if (offset == 0)
-			AddUnresolvedLabel(labelName, buffer, workpiece);
+			AddUnresolvedLabel<int32_t>(labelName, buffer, workpiece);
 	}
 	//Register to Register verison
 	else
 	{
 		const int32_t opcode = 23;
 
-		int32_t registerOneID = GetRegisterID<int32_t>(args[0], 0, 15);
-		int32_t registerTwoID = GetRegisterID<int32_t>(args[1], 0, 15);
+		int32_t registerOneID = langDef->GetRegisterID<int32_t>(args[0]);
+		int32_t registerTwoID = langDef->GetRegisterID<int32_t>(args[1]);
 
 		SerializeToBuffer<int32_t>(buffer, opcode, registerOneID, registerTwoID);
 	}

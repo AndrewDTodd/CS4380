@@ -7,7 +7,7 @@
 TRP_INS::TRP_INS() : ASMInstruction("TRP")
 {}
 
-size_t TRP_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
+size_t TRP_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef, const std::vector<std::string>& args) const
 {
 #ifdef _DEBUG
 	if (args.size() != 1)

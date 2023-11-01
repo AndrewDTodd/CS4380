@@ -10,6 +10,6 @@ struct AND_INS : public ASMFramework::ASMInstruction
 public:
 	AND_INS();
 
-	size_t Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const override;
+	size_t Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef, const std::vector<std::string>& args) const override;
 };
 #endif // !AND_INS_H

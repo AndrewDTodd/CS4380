@@ -59,6 +59,14 @@ namespace ASMFramework
 
 		const std::string _mnemonic;
 
+		/// <summary>
+		/// Called by passes to preform the directives work on the workpiece
+		/// </summary>
+		/// <param name="workpiece">The Workpiece instance being worked on</param>
+		/// <param name="args">A vector containing the arguments that were tokenized for the directive</param>
+		/// <returns>The number of bytes written to the workpiece's directives binary container</returns>
+		/// <exception cref="std::runtime_error Thrown by the directive if the operation cannot be completed properly"/>
+		/// <exception cref="ASMDirective::NotImplemented Thrown by the directive to signify that its tooling is not implemented, and therefore the directive is unsupported at this time"/>
 		virtual size_t Implementation(Workpiece* const& workpiece, const std::vector<std::string>& args) const = 0;
 	};
 }

@@ -7,6 +7,8 @@
 
 #include "Workpiece.h"
 #include "LanguageDefinition.h"
+#include "ASMDirective.h"
+#include "ASMInstruction.h"
 
 namespace ASMFramework
 {
