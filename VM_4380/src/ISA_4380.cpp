@@ -7,7 +7,7 @@
 
 using namespace VMFramework;
 
-Instruction<int32_t, int32_t, Process_4380>* instructions[] =
+Instruction<int32_t, Process_4380>* instructions[] =
 {
 	new ADD(),
 	new DIV(),
@@ -22,6 +22,6 @@ Instruction<int32_t, int32_t, Process_4380>* instructions[] =
 	new TRP()
 };
 
-ISA_4380::ISA_4380(): ISA<int32_t, int32_t, Process_4380>(instructions, 11)
+ISA_4380::ISA_4380(): ISA<int32_t, Process_4380>(instructions, 11)
 {
 }

@@ -209,7 +209,7 @@ namespace ASMFramework
 		class Warning : public std::exception
 		{
 		private:
-			std::string message;
+			const std::string message;
 		public:
 			size_t returnVal;
 

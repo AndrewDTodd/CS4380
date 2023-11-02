@@ -137,6 +137,8 @@ target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/I
 target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Multi_Thread_INS)
 target_include_directories(ASM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/TRP_INS)
 
+install(TARGETS ASM4380 DESTINATION ASM4380)
+
 ################################################################################################################################################################
 
 #ASM_4380Tests target section
@@ -152,7 +154,12 @@ FetchContent_Declare(
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+#new format for including googletest subdirectory. To prevent googletest items being added to install
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+	FetchContent_Populate(googletest)
+	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 enable_testing()
 

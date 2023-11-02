@@ -7,7 +7,7 @@
 
 class Process_4380;
 
-struct DIV : public VMFramework::Instruction<int32_t, int32_t, Process_4380>
+struct DIV : public VMFramework::Instruction<int32_t, Process_4380>
 {
 public:
 	DIV();

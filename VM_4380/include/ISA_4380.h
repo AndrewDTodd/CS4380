@@ -7,7 +7,7 @@
 
 class Process_4380;
 
-class ISA_4380 : public VMFramework::ISA<int32_t, int32_t, Process_4380>
+class ISA_4380 : public VMFramework::ISA<int32_t, Process_4380>
 {
 public:
 	ISA_4380();

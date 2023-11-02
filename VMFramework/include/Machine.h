@@ -27,13 +27,41 @@
 
 namespace VMFramework
 {
-	template<typename Derived, typename GPRegisterType, typename RegisterType, typename ProcessType, typename ISA>
-	requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<ProcessType, GPRegisterType, RegisterType, ISA>> && std::derived_from<ISA, VMFramework::ISA<GPRegisterType, RegisterType, ProcessType>>
+	class segmentation_fault : public std::exception
+	{
+	private:
+		const std::string _msg;
+	public:
+		explicit segmentation_fault(std::string&& message) : _msg(message)
+		{}
+
+		const char* what() const noexcept override
+		{
+			return _msg.c_str();
+		}
+	};
+
+	class protection_fault : public std::exception
+	{
+	private:
+		const std::string _msg;
+	public:
+		explicit protection_fault(std::string&& message): _msg(message)
+		{}
+
+		const char* what() const noexcept override
+		{
+			return _msg.c_str();
+		}
+	};
+
+	template<typename Derived, typename RegisterType, typename ProcessType, typename ISA>
+	requires std::derived_from<ProcessType, VMFramework::Process<ProcessType, RegisterType, ISA>> && std::derived_from<ISA, VMFramework::ISA<RegisterType, ProcessType>>
 	class Machine
 	{
-		friend class Instruction<GPRegisterType, RegisterType, ProcessType>;
+		//friend class Instruction<RegisterType, ProcessType>;
 	protected:
-		using MachineType = Machine<Derived, GPRegisterType, RegisterType, ProcessType, ISA>;
+		using MachineType = Machine<Derived, RegisterType, ProcessType, ISA>;
 
 		/// <summary>
 		/// SharedMutex for concurrent read access and exclusive write access
@@ -61,12 +89,12 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to the begining (first byte) of the program's data in memory
 		/// </summary>
-		uint8_t* m_programSegment = nullptr;
+		const uint8_t* m_programSegment = nullptr;
 
 		/// <summary>
 		/// Pointer to the start of the code segment
 		/// </summary>
-		uint8_t* m_codeSegment = nullptr;
+		const uint8_t* m_codeSegment = nullptr;
 
 		/// <summary>
 		/// The total number of bytes in the programSegment
@@ -134,7 +162,7 @@ namespace VMFramework
 
 			// Read file into m_programSegment byte array
 			file.seekg(0, std::ios::beg); // Move file cursor to the beginning
-			if (!file.read(reinterpret_cast<char*>(m_programSegment), m_programSize))
+			if (!file.read(reinterpret_cast<char*>(const_cast<uint8_t*>(m_programSegment)), m_programSize))
 			{
 				// Read failed
 				file.close();
@@ -143,6 +171,13 @@ namespace VMFramework
 
 			file.close();
 		}
+
+		/// <summary>
+		/// Used to deturmine the initial PC for the first process spawned by the machine when launching a program. 
+		/// Logic for how to do this is dependent of architecture and therefore must be implemented by realizing class
+		/// </summary>
+		/// <returns>Pouinter to the byte in the program segment to start execution at</returns>
+		virtual RegisterType CalculatePrimaryThreadInitPC() = 0;
 
 		/// <summary>
 		/// Will attempt to load the binary at the specified path and run the program. Used by StartUp(char*) to launch program
@@ -189,35 +224,21 @@ namespace VMFramework
 				return;
 			}
 
-			int32_t offset;
-			if constexpr (is_little_endian)
-			{
-				offset = *reinterpret_cast<int32_t*>(m_programSegment);
-			}
-			else
-			{
-				//This is only applicable if system is big-endian
-				//Get the offset to the initial PC from the first 4 bytes in program
-				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
-				offset  = static_cast<int32_t>(m_programSegment[0]);
-				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
-				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
-			}
+			RegisterType offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = m_programSegment + offset;
 
-			if (offset < 0 || offset >= m_programSize)
-				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << binPath.string() << std::endl;
+			RESET_TERMINAL
 
-			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
-
-			SpawnProcess(m_codeSegment);
+			SpawnProcess(offset);
 		}
 
 		/// <summary>
 		/// Create a new process to execute starting at the specified program location
 		/// </summary>
-		/// <param name="startInstruction">Pointer to the location in the program where this process should begin execution</param>
-		virtual void SpawnProcess(void* initialPC) = 0;
+		/// <param name="initialPC">Pointer to the location in the program where this process should begin execution</param>
+		virtual void SpawnProcess(const RegisterType& initialPC) = 0;
 
 	public:
 		/// <summary>
@@ -359,7 +380,7 @@ namespace VMFramework
 
 			//Deallocate the memory that was retrieved to load the program binary
 			if(m_programSegment)
-				DeallocateArray<uint8_t>(m_memoryManager->m_systemAllocator, m_programSegment);
+				DeallocateArray<uint8_t>(m_memoryManager->m_systemAllocator, const_cast<uint8_t*>(m_programSegment));
 
 			this->m_memoryManager->ShutDown();
 			this->m_memoryManager = nullptr;
@@ -418,32 +439,14 @@ namespace VMFramework
 				return;
 			}
 
-			int32_t offset;
-			if constexpr (is_little_endian)
-			{
-				offset = *reinterpret_cast<int32_t*>(m_programSegment);
-			}
-			else
-			{
-				//This is only applicable if system is big-endian
-				//Get the offset to the initial PC from the first 4 bytes in program
-				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
-				offset  = static_cast<int32_t>(m_programSegment[0]);
-				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
-				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
-			}
-
-			if (offset < 0 || offset >= m_programSize)
-				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
-
-			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
+			RegisterType offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = m_programSegment + offset;
 
 			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << programBinary << std::endl;
+				std::cout << "Executing program at >> " << filePath.string() << std::endl;
 			RESET_TERMINAL
 
-			SpawnProcess(m_codeSegment);
+			SpawnProcess(offset);
 		}
 
 		/// <summary>
@@ -493,32 +496,14 @@ namespace VMFramework
 					return;
 			}
 
-			int32_t offset;
-			if constexpr (is_little_endian)
-			{
-				offset = *reinterpret_cast<int32_t*>(m_programSegment);
-			}
-			else
-			{
-				//This is only applicable if system is big-endian
-				//Get the offset to the initial PC from the first 4 bytes in program
-				//!!REMEMBER, the file is in LITTLE-ENDIAN!!!:(
-				offset  = static_cast<int32_t>(m_programSegment[0]);
-				offset |= static_cast<int32_t>(m_programSegment[1]) << 8;
-				offset |= static_cast<int32_t>(m_programSegment[2]) << 16;
-				offset |= static_cast<int32_t>(m_programSegment[3]) << 24;
-			}
-
-			if (offset < 0 || offset >= m_programSize)
-				throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
-
-			m_codeSegment = static_cast<uint8_t*>(m_programSegment) + offset;
+			RegisterType offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = m_programSegment + offset;
 
 			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << programBinary << std::endl;
+				std::cout << "Executing program at >> " << programBinary.string() << std::endl;
 			RESET_TERMINAL
 
-			SpawnProcess(m_codeSegment);
+			SpawnProcess(offset);
 		}
 
 		Machine(const Machine&) = delete;

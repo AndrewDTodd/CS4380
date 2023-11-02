@@ -59,51 +59,6 @@
     },
 
     {
-      "name": "windows-base-clang",
-      "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "installDir": "${sourceDir}/install/${presetName}",
-      "cacheVariables": {
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_CXX_FLAGS":  "-std=c++20 -fexceptions"
-      },
-      "toolset": "ClangCL",
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "intelliSenseMode": "windows-clang-x64"
-        }
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "windows-clang-x64-debug",
-      "displayName": "clang x64 Debug",
-      "inherits": "windows-base-clang",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "windows-clang-x64-release",
-      "displayName": "clang x64 Release",
-      "inherits": "windows-clang-x64-debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-
-    {
       "name": "linux-base",
       "hidden": true,
       "generator": "Unix Makefiles",

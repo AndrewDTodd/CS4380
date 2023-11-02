@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << std::endl << "Specify a path to a valid program (.bin) to assemble" << std::endl << " path << ";
+		std::cout << std::endl << "Specify a path to a valid program (.bin) to execute" << std::endl << " path << ";
 
 		char inputPath[maxPathLength];
 		std::cin.getline(inputPath, maxPathLength);

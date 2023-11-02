@@ -44,7 +44,7 @@ protected:
 
 		_stack = AllocateNewAllocator<StackAllocator>(100, this->m_memoryManager->m_systemAllocator);
 
-		_process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa);
+		_process = new Process_4380(7 * sizeof(uint8_t), _stack, _program, &_program[6], &_program[77], _mutex, &_isa);
 	}
 
 	void TearDown() override
@@ -84,7 +84,7 @@ TEST_F(InstructionsTesting, Validate_JMP_L)
 
 	_isa.operator[](1)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers.PC, reinterpret_cast<int32_t*>(_program + 0x12));
+	ASSERT_EQ(_program + _process->m_registers[16], reinterpret_cast<uint8_t*>(_program + 0x12));
 }
 
 TEST_F(InstructionsTesting, Validate_LDB_L)

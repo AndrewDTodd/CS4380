@@ -10,6 +10,7 @@ bool ASM4380::_trapZero = false;
 ASM4380::ASM4380():
 	_passOne(),
 	_passTwo(),
+	_passThree(),
 	_workpiece(),
 	_languageDef(),
 	Assembler(&_workpiece, &_languageDef, &_passOne, &_passTwo, &_passThree)

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <execution>
+#include <stdexcept>
 
 #include "Allocator.h"
 

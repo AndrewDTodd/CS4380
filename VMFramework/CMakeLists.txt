@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 1)
+set(VERSION_MAJOR 2)
 #A release that may add new features but remains backward compatible with the previous version
 set(VERSION_MINOR 2)
 #A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
@@ -40,6 +40,14 @@ add_library(VMFramework STATIC ${SOURCE_FILES})
 #include the header files in the include directory
 target_include_directories(VMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+#install the public header files
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ 
+DESTINATION VMFramework/include 
+FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+
+#install the static library
+install(TARGETS VMFramework DESTINATION VMFramework/lib)
+
 #VMFrameworkTests target section
 ################################################################################################################################################################
 #installation and setup of the gTest suite
@@ -53,7 +61,12 @@ FetchContent_Declare(
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+#new format for including googletest subdirectory. To prevent googletest items being added to install
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+	FetchContent_Populate(googletest)
+	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 enable_testing()
 

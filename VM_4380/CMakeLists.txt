@@ -32,14 +32,18 @@ set(VM_4380_SOURCE
 
 set(VM_4380_INSTRUCTIONS_ARTH
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/ADD.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/ADDI.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/DIV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/DIVI.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/MUL.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/MULI.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Arth/SUB.cpp
 
 )
 
 set(VM_4380_INSTRUCTIONS_COMP
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Comp/CMP.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Comp/CMPI.cpp
 
 )
 
@@ -49,7 +53,12 @@ set(VM_4380_INSTRUCTIONS_HEAP
 )
 
 set(VM_4380_INSTRUCTIONS_JUMP
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BGT.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BLT.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BNZ.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BRZ.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/JMP_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/JMR.cpp
 
 )
 
@@ -59,11 +68,17 @@ set(VM_4380_INSTRUCTIONS_LOGICAL
 )
 
 set(VM_4380_INSTRUCTIONS_MOVE
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDA.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDB_R.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDR_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/LDR_R.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/MOV.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/MOVI.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STB_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STB_R.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STR_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Move/STR_R.cpp
 
 )
 
@@ -105,6 +120,8 @@ target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/In
 target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/Multi_Thread)
 target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Instructions/TRP)
 
+install(TARGETS VM4380 DESTINATION VM4380)
+
 ################################################################################################################################################################
 
 #VM_4380Tests target section
@@ -120,7 +137,12 @@ FetchContent_Declare(
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+#new format for including googletest subdirectory. To prevent googletest items being added to install
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+	FetchContent_Populate(googletest)
+	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 enable_testing()
 

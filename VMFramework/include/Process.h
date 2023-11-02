@@ -16,20 +16,17 @@
 #include "MemoryManager.h"
 #include "ISA.h"
 
-constexpr size_t registerCount = 16;
+constexpr size_t registerCount = 22;
 
 namespace VMFramework
 {
-	template<typename GPRegisterType, typename RegisterType>
-	//requires std::integral<RegisterType>
+	template<typename RegisterType>
 	struct Registers
 	{
 	public:
-		GPRegisterType gpRegisters[registerCount];
+		RegisterType gpRegisters[registerCount];
 
-		RegisterType* PC = 0;
-
-		GPRegisterType& operator[](const size_t& reg)
+		RegisterType& operator[](const size_t& reg)
 		{
 #ifdef _DEBUG
 			if (reg < 0 || reg >= registerCount)
@@ -42,13 +39,12 @@ namespace VMFramework
 		}
 	};
 
-	template<typename Derived, typename GPRegisterType, typename RegisterType, typename ISAType>
-	//requires std::integral<RegisterType>
+	template<typename Derived, typename RegisterType, typename ISAType>
 	class Process
 	{
-		//friend class Instruction<GPRegisterType, RegisterType, Process>;
+		//friend class Instruction<RegisterType, Process>;
 	protected:
-		using ProcessRegisters = Registers<GPRegisterType, RegisterType>;
+		using ProcessRegisters = Registers<RegisterType>;
 
 		/// <summary>
 		/// Register state of this thread of execution
@@ -66,24 +62,19 @@ namespace VMFramework
 		const ISAType* _ISA = nullptr;
 
 		/// <summary>
-		/// Pointer to the begining of the program segment in memory
+		/// Pointer to the first byte of the program segment in memory
 		/// </summary>
-		uint8_t* _programSegment = nullptr;
+		const uint8_t* const _programStart = nullptr;
 
 		/// <summary>
-		/// Pointer to the begining of the code in the programSegment
+		/// Pointer to the first byte of the code segment in the program segment in memory
 		/// </summary>
-		uint8_t* _codeSegment = nullptr;
+		const uint8_t* const _codeSegment = nullptr;
 
 		/// <summary>
-		/// Reference to the Machines shared_mutex
+		/// Pointer to the last byte in the program segment
 		/// </summary>
-		//std::shared_mutex& _machineMutex;
-
-		/// <summary>
-		/// Concurrent read lock used to lock Process and Instruction reads of Machine. Initialized at Process creation with lock established
-		/// </summary>
-		//const std::shared_lock<std::shared_mutex> m_readLock;
+		const uint8_t* const _programEnd= nullptr;
 
 		/// <summary>
 		/// Reference to the Machine instances mutex. Used for concurrent read access and exclusive write access
@@ -99,7 +90,7 @@ namespace VMFramework
 		{
 			m_stack->ClearAllocator();
 			
-			//Free this process stack from tehe system's resources
+			//Free this process stack from the system's resources
 			DeallocateDelete<StackAllocator>(*MemoryManager::GetInstance()->m_systemAllocator, *m_stack);
 		}
 
@@ -126,53 +117,58 @@ namespace VMFramework
 		/// <summary>
 		/// Create Process specifying where in the program it will begin execution
 		/// </summary>
-		/// <param name="initialPC">The address in the program to begin execution at</param>
+		/// <param name="initialPC">The offset in the program to begin execution at</param>
 		/// <param name="processStack">Pointer to the StackAllocator for this process</param>
-		/// <param name="programStart">Pointer to the begining of the program in memory</param>
+		/// <param name="programStart">Pointer to the beginning of the program in memory</param>
+		/// <param name="codeSegmentStart">Pointer to the beginning of the code section of the program in memory</param>
+		/// <param name="programEnd">Pointer to the end of the program in memory</param>
 		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 		/// <param name="isa">Pointer to the ISA instance to use</param>
-		Process(void* initialPC, StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISAType* isa): 
-			m_stack(processStack), _programSegment(programStart), _codeSegment(codeSegmentStart), _machineMutex(machineMutex), _ISA(isa)
+		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
+		Process(const RegisterType& initialPC, StackAllocator* processStack, 
+			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
+			std::shared_mutex& machineMutex, ISAType* isa): 
+			m_stack(processStack), _programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), _machineMutex(machineMutex), _ISA(isa)
 		{
-			this->m_registers.PC = reinterpret_cast<RegisterType*>(initialPC);
+			this->m_registers[16] = initialPC;
 
-			if (initialPC == nullptr || programStart == nullptr || codeSegmentStart == nullptr)
+			if (_programStart == nullptr || _codeSegment == nullptr || _programEnd == nullptr)
 			{
-				throw std::runtime_error("Cannot spawn process without an initial PC value, or a pointer to the start of the program, or a pointer to the start of the code segment in the program");
+				throw std::runtime_error("Cannot spawn process without a pointer to the start of the program, or a pointer to the start of the code segment in the program, or a pointer to the end of the program");
 			}
 
-			if (codeSegmentStart < programStart)
+			if (_codeSegment < _programStart)
 			{
 				std::stringstream stream;
 				stream << "The instruction portion of a program must be within the program space. Code start in program indicated as less than program start. Program start address : 0x" 
 					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(programStart)
+					<< reinterpret_cast<std::uintptr_t>(_programStart)
 					<< ". Code start address: 0x"
-					<< reinterpret_cast<std::uintptr_t>(codeSegmentStart);
+					<< reinterpret_cast<std::uintptr_t>(_codeSegment);
 
 				throw std::runtime_error(stream.str());
 			}
 
-			if (static_cast<uint8_t*>(initialPC) < codeSegmentStart)
+			if (_programStart + this->m_registers[16] < _codeSegment)
 			{
 				std::stringstream stream;
 				stream << "The initial PC cannot be less than the beginning address of the code segment of the program. Initial PC: 0x"
 					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(initialPC)
+					<< reinterpret_cast<std::uintptr_t>(_programStart + this->m_registers[16])
 					<< ". Code start address: 0x"
-					<< reinterpret_cast<std::uintptr_t>(codeSegmentStart);
+					<< reinterpret_cast<std::uintptr_t>(_codeSegment);
 
 				throw std::runtime_error(stream.str());
 			}
 
-			if (static_cast<uint8_t*>(initialPC) < programStart)
+			if (_programStart + this->m_registers[16] < _programStart)
 			{
 				std::stringstream stream;
 				stream << "The initial PC cannot be less than the beginning address of the program. Initial PC: 0x"
 					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(initialPC)
+					<< reinterpret_cast<std::uintptr_t>(_programStart + this->m_registers[16])
 					<< ". Program start address: 0x"
-					<< reinterpret_cast<std::uintptr_t>(programStart);
+					<< reinterpret_cast<std::uintptr_t>(_programStart);
 
 				throw std::runtime_error(stream.str());
 			}

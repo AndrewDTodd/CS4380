@@ -2,6 +2,7 @@
 #define PROCESS_4380_H
 
 #include "Process.h"
+#include "Machine.h"
 
 #include <cstdint>
 #include <cstring>
@@ -16,28 +17,8 @@
 
 #include "rootConfig.h"
 
-class Process_4380 : public VMFramework::Process<Process_4380, int32_t, int32_t, ISA_4380>
+class Process_4380 : public VMFramework::Process<Process_4380, int32_t, ISA_4380>
 {
-	FRIEND_TEST(InstructionsTesting, Validate_ADD);
-	friend ADD;
-	FRIEND_TEST(InstructionsTesting, Validate_DIV);
-	friend DIV;
-	FRIEND_TEST(InstructionsTesting, Validate_JMP_L);
-	friend JMP_L;
-	FRIEND_TEST(InstructionsTesting, Validate_LDB_L);
-	friend LDB_L;
-	FRIEND_TEST(InstructionsTesting, Validate_LDR_L);
-	friend LDR_L;
-	FRIEND_TEST(InstructionsTesting, Validate_MOV);
-	friend MOV;
-	friend STB_L;
-	friend STR_L;
-	FRIEND_TEST(InstructionsTesting, Validate_MUL);
-	friend MUL;
-	FRIEND_TEST(InstructionsTesting, Validate_SUB);
-	friend SUB;
-	FRIEND_TEST(InstructionsTesting, Validate_TRP);
-	friend TRP;
 protected:
 	struct FetchBlock
 	{
@@ -46,17 +27,11 @@ protected:
 		int32_t operandTwo;
 	};
 
-	int32_t opcode = 0;
-	int32_t operandOne = 0;
-	int32_t operandTwo = 0;
+	int32_t opcode;
+	int32_t operandOne;
+	int32_t operandTwo;
 
-	VMFramework::Instruction<int32_t, int32_t, Process_4380>* _instruction = nullptr;
-
-	/// <summary>
-	/// Internal healper to read the 4 byte little-endian opcode, operandOne and operandTwo from the PC
-	/// </summary>
-	/// <returns></returns>
-	//inline int32_t ReadLittleEndianInt32();
+	VMFramework::Instruction<int32_t, Process_4380>* _instruction = nullptr;
 
 	/// <summary>
 	/// Used to preform the fetch step of execution cycle
@@ -64,13 +39,36 @@ protected:
 	FRIEND_TEST(Process_4380Testing, Validate_Fetch);
 	inline void Fetch() override
 	{
-		//Fetch 12 byte block from program at the PC location
-		FetchBlock block;
-		std::memcpy(&block, m_registers.PC, sizeof(FetchBlock));
+		const uint8_t* _nextInstruction = _programStart + m_registers[16];
+		if (_nextInstruction >= _codeSegment && _nextInstruction <= _programEnd - sizeof(FetchBlock))
+		{
+			FetchBlock block;
+			if constexpr (is_little_endian)
+			{
+				//Fetch 12 byte block from program at the PC location
+				std::memcpy(&block, _nextInstruction, sizeof(FetchBlock));
 
-		opcode = block.opcode;
-		operandOne = block.operandOne;
-		operandTwo = block.operandTwo;
+				opcode = block.opcode;
+				operandOne = block.operandOne;
+				operandTwo = block.operandTwo;
+			}
+			else
+			{
+				for (size_t i = 0; i < sizeof(int32_t); i++)
+				{
+					reinterpret_cast<uint8_t*>(&block.opcode)[3 - i] = _nextInstruction[i];
+					reinterpret_cast<uint8_t*>(&block.operandOne)[3 - i] = _nextInstruction[i + sizeof(int32_t)];
+					reinterpret_cast<uint8_t*>(&block.operandTwo)[3 - i] = _nextInstruction[i + 2 * sizeof(int32_t)];
+				}
+			}
+		}
+		else
+		{
+			if (_nextInstruction < _codeSegment)
+				throw VMFramework::segmentation_fault("The PC was set to fetch from the data segment");
+			else
+				throw VMFramework::segmentation_fault("The PC was set to fetch from outside the valid executable region of process memory");
+		}
 	}
 
 	/// <summary>
@@ -79,8 +77,8 @@ protected:
 	FRIEND_TEST(Process_4380Testing, Validate_Increment);
 	inline void Increment() override
 	{
-		//Increment the PC by 3 (3 * 4 bytes for int32_t, or 12 bytes)
-		m_registers.PC += 3;
+		//Increment the PC by 12 (3 * 4 bytes for int32_t, or 12 bytes)
+		m_registers[16] += sizeof(FetchBlock);
 	}
 
 	/// <summary>
@@ -127,11 +125,91 @@ public:
 	/// <summary>
 	/// Create Process specifying where in the program it will begin execution
 	/// </summary>
-	/// <param name="initialPC">The address in the program to begin execution at</param>
+	/// <param name="initialPC">The offset in the program to begin execution at</param>
 	/// <param name="processStack">Pointer to the StackAllocator for this process</param>
 	/// <param name="programStart">Pointer to the begining of the program in memory</param>
 	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 	/// <param name="isa">Pointer to the ISA instance to use</param>
-	Process_4380(void* initialPC, VMFramework::StackAllocator* processStack, uint8_t* programStart, uint8_t* codeSegmentStart, std::shared_mutex& machineMutex, ISA_4380* isa);
+	Process_4380(const int32_t& initialPC, VMFramework::StackAllocator* processStack, 
+		const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd,
+		std::shared_mutex& machineMutex, ISA_4380* isa);
+
+	//Arth ******************************************************************************
+	FRIEND_TEST(InstructionsTesting, Validate_ADD);
+	friend ADD;
+	FRIEND_TEST(InstructionsTesting, Validate_ADDI);
+	friend ADDI;
+	FRIEND_TEST(InstructionsTesting, Validate_DIV);
+	friend DIV;
+	FRIEND_TEST(InstructionsTesting, Validate_DIVI);
+	friend DIVI;
+	FRIEND_TEST(InstructionsTesting, Validate_MUL);
+	friend MUL;
+	FRIEND_TEST(InstructionsTesting, Validate_MULI);
+	friend MULI;
+	FRIEND_TEST(InstructionsTesting, Validate_SUB);
+	friend SUB;
+	//************************************************************************************
+	
+	//Comp *******************************************************************************
+	FRIEND_TEST(InstructionsTesting, Validate_CMP);
+	friend CMP;
+	FRIEND_TEST(InstructionsTesting, Validate_CMPI);
+	friend CMPI;
+	//************************************************************************************
+	
+	//Heap *******************************************************************************
+	//************************************************************************************
+	
+	//Jump *******************************************************************************
+	FRIEND_TEST(InstructionsTesting, Validate_BGT);
+	friend BGT;
+	FRIEND_TEST(InstructionsTesting, Validate_BLT);
+	friend BLT;
+	FRIEND_TEST(InstructionsTesting, Validate_BNZ);
+	friend BNZ;
+	FRIEND_TEST(InstructionsTesting, Validate_BRZ);
+	friend BRZ;
+	FRIEND_TEST(InstructionsTesting, Validate_JMP_L);
+	friend JMP_L;
+	FRIEND_TEST(InstructionTesting, Validate_JMR);
+	friend JMR;
+	//************************************************************************************
+	
+	//Logical ****************************************************************************
+	//************************************************************************************
+	
+	//Move *******************************************************************************
+	FRIEND_TEST(InstructionsTesting, Validate_LDA);
+	friend LDA;
+	FRIEND_TEST(InstructionsTesting, Validate_LDB_L);
+	friend LDB_L;
+	FRIEND_TEST(InstructionsTesting, Validate_LDB_R);
+	friend LDB_R;
+	FRIEND_TEST(InstructionsTesting, Validate_LDR_L);
+	friend LDR_L;
+	FRIEND_TEST(InstructionsTesting, Validate_LDR_R);
+	friend LDR_R;
+	FRIEND_TEST(InstructionsTesting, Validate_MOV);
+	friend MOV;
+	FRIEND_TEST(InstructionsTesting, Validate_MOVI);
+	friend MOVI;
+	FRIEND_TEST(InstructionTesting, Validate_STB_L);
+	friend STB_L;
+	FRIEND_TEST(InstructionTesting, Validate_STB_R);
+	friend STB_R;
+	FRIEND_TEST(InstructionTesting, Validate_STR_L);
+	friend STR_L;
+	FRIEND_TEST(InstructionTesting, Validate_STR_R);
+	friend STR_R;
+	//************************************************************************************
+	
+	//Multi-Thread ***********************************************************************
+	//************************************************************************************
+	
+	//TRP ********************************************************************************
+	FRIEND_TEST(InstructionsTesting, Validate_TRP);
+	friend TRP;
+	//************************************************************************************
 };
 #endif //!PROCESS_4380_H

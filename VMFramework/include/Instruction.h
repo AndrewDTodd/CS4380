@@ -7,8 +7,7 @@
 
 namespace VMFramework
 {
-	template<typename GPRegisterType, typename RegisterType, typename ProcessType>
-	//requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>>
+	template<typename RegisterType, typename ProcessType>
 	struct Instruction
 	{
 	protected:

@@ -41,6 +41,14 @@ add_library(ASMFramework STATIC ${SOURCE_FILES})
 #include the header files in the include directory
 target_include_directories(ASMFramework PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+#install the public header files
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ 
+DESTINATION ASMFramework/include 
+FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+
+#install the static library
+install(TARGETS ASMFramework DESTINATION ASMFramework/lib)
+
 #ASMFrameworkTests target section
 ################################################################################################################################################################
 #installation and setup of the gTest suite
@@ -54,7 +62,12 @@ FetchContent_Declare(
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+#new format for including googletest subdirectory. To prevent googletest items being added to install
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+	FetchContent_Populate(googletest)
+	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 enable_testing()
 

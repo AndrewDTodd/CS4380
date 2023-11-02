@@ -16,12 +16,11 @@ constexpr size_t cexp_setSize = 22;
 
 namespace VMFramework
 {
-	template<typename GPRegisterType, typename RegisterType, typename ProcessType>
-	//requires std::integral<RegisterType> && std::derived_from<ProcessType, VMFramework::Process<GPRegisterType, RegisterType>>
+	template<typename RegisterType, typename ProcessType>
 	class ISA
 	{
 	protected:
-		using InstructionType = Instruction<GPRegisterType, RegisterType, ProcessType>;
+		using InstructionType = Instruction<RegisterType, ProcessType>;
 
 		InstructionType* m_instructionSet[cexp_setSize];
 
