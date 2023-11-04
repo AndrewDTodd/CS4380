@@ -67,9 +67,8 @@ void PassTwo_Assemble::ProcessCodeSegment(size_t& byteNum, ASMFramework::Workpie
 {
 	for (const auto& segment : workpiece->_codeSegmentItems)
 	{
-		workpiece->_codeSegmentBins.emplace_back(segment.first, std::vector<uint8_t>(segment.second.size() * 3 * sizeof(int32_t)));
+		workpiece->_codeSegmentBins.emplace_back(segment.first, std::vector<uint8_t>());
 		std::vector<uint8_t>& segmentBin = workpiece->_codeSegmentBins.back().second;
-		segmentBin.clear();
 
 		if (!segment.first.empty())
 		{
@@ -140,7 +139,7 @@ void PassTwo_Assemble::ProcessUnresolvedLabels(ASMFramework::Workpiece* const& w
 {
 	for (auto& label : workpiece->_unresolvedLabels)
 	{
-		uint64_t labelOffset;
+		size_t labelOffset;
 #ifdef _DEBUG
 		try
 		{
@@ -158,7 +157,25 @@ void PassTwo_Assemble::ProcessUnresolvedLabels(ASMFramework::Workpiece* const& w
 #else
 		labelOffset = workpiece->_symbolTable.at(label.first);
 #endif // _DEBUG
-		for (auto& voidPtr : label.second)
+		for (auto& Buff_Offset : label.second)
+		{
+			int32_t* labelInBuffer;
+			if constexpr (is_little_endian)
+			{
+				labelInBuffer = reinterpret_cast<int32_t*>(Buff_Offset.first->data() + Buff_Offset.second);
+				*labelInBuffer = static_cast<int32_t>(labelOffset);
+			}
+			else
+			{
+				int32_t offset = static_cast<int32_t>(labelOffset);
+				offset = ((offset & 0xFF) << 24) | ((offset & 0xFF00) << 8) |
+					((offset & 0xFF0000) >> 8) | ((offset >> 24) & 0xFF);
+
+				labelInBuffer = reinterpret_cast<int32_t*>(Buff_Offset.first->data() + Buff_Offset.second);
+				*labelInBuffer = offset;
+			}
+		}
+		/*for (auto& voidPtr : label.second)
 		{
 			int32_t* labelInBuffer;
 			if constexpr (is_little_endian)
@@ -175,7 +192,7 @@ void PassTwo_Assemble::ProcessUnresolvedLabels(ASMFramework::Workpiece* const& w
 				labelInBuffer = reinterpret_cast<int32_t*>(voidPtr);
 				*labelInBuffer = offset;
 			}
-		}
+		}*/
 	}
 }
 

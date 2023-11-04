@@ -49,56 +49,56 @@ TEST_F(Process_4380Testing, Validate_ConstructorValidInput)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa); });
-}
-
-TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullPC)
-{
-	Process_4380* _process;
-
-	ASSERT_THROW({ _process = new Process_4380(nullptr, _stack, _program, &_program[6], _mutex, &_isa);}, std::runtime_error);
+	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _stack, nullptr, &_program[6], _mutex, &_isa);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(6, _stack, nullptr, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullCodeSegmentPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _stack, _program, nullptr, _mutex, &_isa);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, nullptr, &_program[77], _mutex, &_isa); }, std::runtime_error);
+}
+
+TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramEndPointer)
+{
+	Process_4380* _process;
+
+	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], nullptr, _mutex, &_isa); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidCodeStart)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _stack, _program, _program - 1, _mutex, &_isa);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, _program - 1, &_program[77], _mutex, &_isa); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnPCInDataSegment)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(_program, _stack, _program, &_program[6], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(5, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidPC)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(_program - 1, _stack, _program, &_program[6], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(-1, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_Fetch)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
 
 	_process->Fetch();
 
@@ -116,18 +116,18 @@ TEST_F(Process_4380Testing, Validate_Increment)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
 
 	_process->Increment();
 
-	ASSERT_EQ(_process->m_registers.PC, reinterpret_cast<int32_t*>(_program + 18));
+	ASSERT_EQ(_program + _process->m_registers[16], _program + 0x12);
 }
 
 TEST_F(Process_4380Testing, Validate_Decode)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
 
 	_process->opcode = 1;
 
@@ -146,7 +146,7 @@ TEST_F(Process_4380Testing, Validate_Execute)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _stack, _program, &_program[6], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
 
 	_process->Fetch();
 
@@ -158,5 +158,5 @@ TEST_F(Process_4380Testing, Validate_Execute)
 
 	_process->Execute();
 
-	ASSERT_EQ(_process->m_registers.PC, reinterpret_cast<int32_t*>(_program + 0x12));
+	ASSERT_EQ(_program + _process->m_registers[16], _program + 0x12);
 }

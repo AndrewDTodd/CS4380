@@ -32,7 +32,7 @@ namespace ASMFramework
 		/// <param name="labelName">The name of the label to get the offset of</param>
 		/// <param name="workpiece">The Workpiece instance being worked upon. Containes the relevent symbol table with the lebel in it</param>
 		/// <returns>The offset for the label as contained in the symbol table. Will be 0 for a label whos offset has not yet been determined</returns>
-		static inline uint64_t& GetLabelOffset(const std::string& labelName, Workpiece* const& workpiece)
+		static inline size_t& GetLabelOffset(const std::string& labelName, Workpiece* const& workpiece)
 		{
 			try
 			{
@@ -57,7 +57,8 @@ namespace ASMFramework
 		{
 			size_t buffOffset = buffer.size() - sizeof(TargetType);
 
-			workpiece->_unresolvedLabels[labelName].push_back(reinterpret_cast<void*>(buffer.data() + buffOffset));
+			workpiece->_unresolvedLabels[labelName].push_back({ &buffer, buffOffset });
+			//workpiece->_unresolvedLabels[labelName].push_back(reinterpret_cast<void*>(buffer.data() + buffOffset));
 		}
 
 		/// <summary>
@@ -127,17 +128,13 @@ namespace ASMFramework
 				try
 				{
 					int64_t value = std::stoll(immediate.substr(1));
+					
 					if (value < std::numeric_limits<TargetType>::min() || value > std::numeric_limits<TargetType>::max())
 						throw std::runtime_error("The immediate exceeds the limits of the target word type. Value should be in range of " + 
 							std::to_string(std::numeric_limits<TargetType>::min()) + " - " +
 							std::to_string(std::numeric_limits<TargetType>::max()) + " inclusive. Argument was \"" + immediate.substr(1) + "\"");
 
 					return static_cast<TargetType>(value);
-				}
-				catch (const std::invalid_argument& argEx)
-				{
-					throw std::runtime_error("invlaid_argument thrown when trying to convert immediate to base ten int \"" + immediate +
-						"\"\n>>>" + argEx.what());
 				}
 				catch (const std::out_of_range& rngEx)
 				{
@@ -150,23 +147,32 @@ namespace ASMFramework
 			{
 				try
 				{
-					int64_t value = std::stoll(immediate.substr(2), nullptr, 16);
-					if (value < std::numeric_limits<TargetType>::min() || value > std::numeric_limits<TargetType>::max())
-						throw std::runtime_error("The immediate exceeds the limits of the target word type. Value should be in range of " +
-						std::to_string(std::numeric_limits<TargetType>::min()) + " - " +
-						std::to_string(std::numeric_limits<TargetType>::max()) + " inclusive. Argument was \"" + immediate + "\" (" + std::to_string(value) + ")");
+					if (immediate[0] == '-')
+					{
+						long long value = std::stoll(immediate, nullptr, 16);
 
-					return static_cast<TargetType>(value);
-				}
-				catch (const std::invalid_argument& argEx)
-				{
-					throw std::runtime_error("invlaid_argument thrown when trying to convert immediate to base ten int \"" + immediate +
-						"\"\n>>>" + argEx.what());
+						if (value < std::numeric_limits<TargetType>::min() || value > std::numeric_limits<TargetType>::max())
+							throw std::runtime_error("The immediate exceeds the limits of the target word type. Value should be in range of " +
+								std::to_string(std::numeric_limits<TargetType>::min()) + " - " +
+								std::to_string(std::numeric_limits<TargetType>::max()) + " inclusive. Argument was \"" + immediate + "\" (" + std::to_string(value) + ")");
+
+						return static_cast<TargetType>(value);
+					}
+					else
+					{
+						using UnsignedTargetType = typename std::make_unsigned<TargetType>::type;
+						unsigned long long unsignedValue = std::stoull(immediate, nullptr, 16);
+
+						if (unsignedValue > std::numeric_limits<UnsignedTargetType>::max())
+							throw std::out_of_range("");
+
+						return static_cast<TargetType>(unsignedValue);
+					}
 				}
 				catch (const std::out_of_range& rngEx)
 				{
 					throw std::runtime_error("out_of_range thrown when trying to convert immediate to base ten int \"" + immediate +
-						"\". Your argument is way too big\n>>>" + rngEx.what());
+						"\"\n>>>" + rngEx.what());
 				}
 			}
 			//Match '*' with character enclosed in single quotes

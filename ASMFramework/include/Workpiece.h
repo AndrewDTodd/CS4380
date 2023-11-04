@@ -35,8 +35,10 @@ namespace ASMFramework
 	{
 		std::shared_mutex _sharedMutex;
 
-		std::unordered_map<std::string, uint64_t> _symbolTable;
-		std::unordered_map<std::string, std::vector<void*>> _unresolvedLabels;
+		std::unordered_map<std::string, size_t> _symbolTable;
+		//std::unordered_map<std::string, uint64_t> _symbolTable;
+		std::unordered_map<std::string, std::vector<std::pair<std::vector<uint8_t>*, size_t>>> _unresolvedLabels;
+		//std::unordered_map<std::string, std::vector<void*>> _unresolvedLabels;
 
 		//key is directive label, which can be "" for unlabled directive
 		std::vector<std::pair<std::string, DataSegmentItem>> _dataSegmentItems;

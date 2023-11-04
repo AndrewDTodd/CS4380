@@ -25,7 +25,7 @@ protected:
 	}
 };
 
-struct PassIns : public VMFramework::Instruction<int32_t, int32_t, Process_4380>
+struct PassIns : public VMFramework::Instruction<int32_t, Process_4380>
 {
 public:
 	PassIns(): Instruction(0)
@@ -39,18 +39,18 @@ public:
 	}
 };
 
-VMFramework::Instruction<int32_t, int32_t, Process_4380>* _passInstructions[] = { new PassIns() };
+VMFramework::Instruction<int32_t, Process_4380>* _passInstructions[] = { new PassIns() };
 
-class PassISA : public VMFramework::ISA<int32_t, int32_t, Process_4380>
+class PassISA : public VMFramework::ISA<int32_t, Process_4380>
 {
 public:
-	PassISA() : ISA<int32_t, int32_t, Process_4380>(_passInstructions, 1)
+	PassISA() : ISA<int32_t, Process_4380>(_passInstructions, 1)
 	{
 
 	}
 };
 
-struct FailIns : public VMFramework::Instruction<int32_t, int32_t, Process_4380>
+struct FailIns : public VMFramework::Instruction<int32_t, Process_4380>
 {
 public:
 	FailIns() : Instruction(-1)
@@ -64,12 +64,12 @@ public:
 	}
 };
 
-VMFramework::Instruction<int32_t, int32_t, Process_4380>* _failInstructions[] = { new FailIns() };
+VMFramework::Instruction<int32_t, Process_4380>* _failInstructions[] = { new FailIns() };
 
-class FailISA : public VMFramework::ISA<int32_t, int32_t, Process_4380>
+class FailISA : public VMFramework::ISA<int32_t, Process_4380>
 {
 public:
-	FailISA() : ISA<int32_t, int32_t, Process_4380>(_failInstructions, 1)
+	FailISA() : ISA<int32_t, Process_4380>(_failInstructions, 1)
 	{
 
 	}

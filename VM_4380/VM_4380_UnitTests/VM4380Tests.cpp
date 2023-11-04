@@ -92,6 +92,7 @@ TEST_F(VM4380Testing, Validate_SpawnProcess)
 
 	_instance->m_programSegment = _program;
 	_instance->m_codeSegment = _program + 0x06;
+	_instance->m_programSize = 78;
 
 	std::streambuf* originalBuffer = std::cout.rdbuf();
 
@@ -99,7 +100,7 @@ TEST_F(VM4380Testing, Validate_SpawnProcess)
 
 	std::cout.rdbuf(capturedOutput.rdbuf());
 
-	ASSERT_NO_THROW({ _instance->SpawnProcess(_program + 0x06); });
+	ASSERT_NO_THROW({ _instance->SpawnProcess(0x06); });
 
 	ASSERT_EQ(_instance->m_processes.size(), 1);
 	ASSERT_EQ(_instance->m_processThreads.size(), 1);

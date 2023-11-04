@@ -12,7 +12,7 @@
 #include "Instruction.h"
 //#include "Process.h"
 
-constexpr size_t cexp_setSize = 22;
+constexpr size_t cexp_setSize = 40;
 
 namespace VMFramework
 {

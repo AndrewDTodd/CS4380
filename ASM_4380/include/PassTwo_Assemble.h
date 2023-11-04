@@ -27,5 +27,6 @@ public:
 	void Execute(ASMFramework::Workpiece* const& workpiece, const std::filesystem::path& filePath, const ASMFramework::LanguageDefinition* const& langDef) const override;
 
 	FRIEND_TEST(PassTwoTesting, Validate_Execute);
+	FRIEND_TEST(PassTwoTesting, Validate_ProcessUnresolvedLabels);
 };
 #endif // !PASS_TWO_ASSEMBLE_H

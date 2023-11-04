@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 1)
+set(VERSION_MAJOR 2)
 #A release that may add new features but remains backward compatible with the previous version
 set(VERSION_MINOR 1)
 #A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version

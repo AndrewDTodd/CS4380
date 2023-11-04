@@ -135,26 +135,26 @@ public:
 		std::shared_mutex& machineMutex, ISA_4380* isa);
 
 	//Arth ******************************************************************************
-	FRIEND_TEST(InstructionsTesting, Validate_ADD);
+	FRIEND_TEST(VMInstructionsTesting, Validate_ADD);
 	friend ADD;
-	FRIEND_TEST(InstructionsTesting, Validate_ADDI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_ADDI);
 	friend ADDI;
-	FRIEND_TEST(InstructionsTesting, Validate_DIV);
+	FRIEND_TEST(VMInstructionsTesting, Validate_DIV);
 	friend DIV;
-	FRIEND_TEST(InstructionsTesting, Validate_DIVI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_DIVI);
 	friend DIVI;
-	FRIEND_TEST(InstructionsTesting, Validate_MUL);
+	FRIEND_TEST(VMInstructionsTesting, Validate_MUL);
 	friend MUL;
-	FRIEND_TEST(InstructionsTesting, Validate_MULI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_MULI);
 	friend MULI;
-	FRIEND_TEST(InstructionsTesting, Validate_SUB);
+	FRIEND_TEST(VMInstructionsTesting, Validate_SUB);
 	friend SUB;
 	//************************************************************************************
 	
 	//Comp *******************************************************************************
-	FRIEND_TEST(InstructionsTesting, Validate_CMP);
+	FRIEND_TEST(VMInstructionsTesting, Validate_CMP);
 	friend CMP;
-	FRIEND_TEST(InstructionsTesting, Validate_CMPI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_CMPI);
 	friend CMPI;
 	//************************************************************************************
 	
@@ -162,17 +162,17 @@ public:
 	//************************************************************************************
 	
 	//Jump *******************************************************************************
-	FRIEND_TEST(InstructionsTesting, Validate_BGT);
+	FRIEND_TEST(VMInstructionsTesting, Validate_BGT);
 	friend BGT;
-	FRIEND_TEST(InstructionsTesting, Validate_BLT);
+	FRIEND_TEST(VMInstructionsTesting, Validate_BLT);
 	friend BLT;
-	FRIEND_TEST(InstructionsTesting, Validate_BNZ);
+	FRIEND_TEST(VMInstructionsTesting, Validate_BNZ);
 	friend BNZ;
-	FRIEND_TEST(InstructionsTesting, Validate_BRZ);
+	FRIEND_TEST(VMInstructionsTesting, Validate_BRZ);
 	friend BRZ;
-	FRIEND_TEST(InstructionsTesting, Validate_JMP_L);
+	FRIEND_TEST(VMInstructionsTesting, Validate_JMP_L);
 	friend JMP_L;
-	FRIEND_TEST(InstructionTesting, Validate_JMR);
+	FRIEND_TEST(VMInstructionsTesting, Validate_JMR);
 	friend JMR;
 	//************************************************************************************
 	
@@ -180,27 +180,27 @@ public:
 	//************************************************************************************
 	
 	//Move *******************************************************************************
-	FRIEND_TEST(InstructionsTesting, Validate_LDA);
+	FRIEND_TEST(VMInstructionsTesting, Validate_LDA);
 	friend LDA;
-	FRIEND_TEST(InstructionsTesting, Validate_LDB_L);
+	FRIEND_TEST(VMInstructionsTesting, Validate_LDB_L);
 	friend LDB_L;
-	FRIEND_TEST(InstructionsTesting, Validate_LDB_R);
+	FRIEND_TEST(VMInstructionsTesting, Validate_LDB_R);
 	friend LDB_R;
-	FRIEND_TEST(InstructionsTesting, Validate_LDR_L);
+	FRIEND_TEST(VMInstructionsTesting, Validate_LDR_L);
 	friend LDR_L;
-	FRIEND_TEST(InstructionsTesting, Validate_LDR_R);
+	FRIEND_TEST(VMInstructionsTesting, Validate_LDR_R);
 	friend LDR_R;
-	FRIEND_TEST(InstructionsTesting, Validate_MOV);
+	FRIEND_TEST(VMInstructionsTesting, Validate_MOV);
 	friend MOV;
-	FRIEND_TEST(InstructionsTesting, Validate_MOVI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_MOVI);
 	friend MOVI;
-	FRIEND_TEST(InstructionTesting, Validate_STB_L);
+	FRIEND_TEST(VMInstructionsTesting, Validate_STB_L);
 	friend STB_L;
-	FRIEND_TEST(InstructionTesting, Validate_STB_R);
+	FRIEND_TEST(VMInstructionsTesting, Validate_STB_R);
 	friend STB_R;
-	FRIEND_TEST(InstructionTesting, Validate_STR_L);
+	FRIEND_TEST(VMInstructionsTesting, Validate_STR_L);
 	friend STR_L;
-	FRIEND_TEST(InstructionTesting, Validate_STR_R);
+	FRIEND_TEST(VMInstructionsTesting, Validate_STR_R);
 	friend STR_R;
 	//************************************************************************************
 	
@@ -208,7 +208,7 @@ public:
 	//************************************************************************************
 	
 	//TRP ********************************************************************************
-	FRIEND_TEST(InstructionsTesting, Validate_TRP);
+	FRIEND_TEST(VMInstructionsTesting, Validate_TRP);
 	friend TRP;
 	//************************************************************************************
 };

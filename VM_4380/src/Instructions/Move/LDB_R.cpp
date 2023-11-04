@@ -9,7 +9,7 @@ void LDB_R::Op(Process_4380* executingProcess)
 {
 	if (!(executingProcess->operandOne > 15 && executingProcess->operandOne < 22))
 	{
-		const uint8_t* _source = executingProcess->_programStart + executingProcess->m_registers[executingProcess->operandTwo];
+		const uint8_t* _source = const_cast<const uint8_t*>(executingProcess->_programStart) + executingProcess->m_registers[executingProcess->operandTwo];
 		if (_source < executingProcess->_programEnd)
 		{
 			std::memcpy(reinterpret_cast<uint8_t*>(&executingProcess->m_registers[executingProcess->operandOne]), _source, sizeof(uint8_t));

@@ -166,6 +166,8 @@ enable_testing()
 #set source for "runTests" unit testing executable
 set(ASM_4380_UNIT_TESTS
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/ASM4380Tests.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/DirectivesTesting.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/InstructionsTesting.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/PassOneTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/PassTwoTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASM_4380_UnitTests/PassThreeTests.cpp

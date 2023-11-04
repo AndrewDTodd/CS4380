@@ -24,7 +24,7 @@ namespace VMFramework
 	struct Registers
 	{
 	public:
-		RegisterType gpRegisters[registerCount];
+		RegisterType registers[registerCount];
 
 		RegisterType& operator[](const size_t& reg)
 		{
@@ -35,7 +35,7 @@ namespace VMFramework
 			}
 #endif // _DEBUG
 
-			return gpRegisters[reg];
+			return registers[reg];
 		}
 	};
 
