@@ -28,25 +28,37 @@ std::pair<std::vector<std::string>, std::string> PassOne_Tokenization::TokenizeL
         {
             // Semicolon is not within single quotes
             comment = line.substr(semicolonPos);
-            //Extract the stuff before the comment
-            withoutComment = line.substr(0, semicolonPos);
             break;
         }
 
         semicolonPos = line.find_first_of(';', semicolonPos + 1);
     }
+    //Extract the stuff before the comment
+    withoutComment = line.substr(0, semicolonPos);
 
     if (!withoutComment.empty())
     {
         //Process withoutComment to extract the tokens
         //Old regex string (\.\w+)|('.')|('\\[tnr]')|(\#\d+)
-        std::regex rgx(R"delim((\.?\w+(?=\,*\s+|$))|('.'(?=\s+|$))|('\\[tnr]'(?=\s+|$))|(\#\d+(?=\s+|$))|(".*?"(?=\s+|$)))delim", std::regex_constants::ECMAScript);
+        //(\.+?\w+(?=\,*\s+|$))|('.'(?=\s+|$))|('\\[tnr]'(?=\s+|$))|(\#-?\d+(?=\s+|$))|(".*?"(?=\s+|$))
+        std::regex rgx(R"delim(([a-zA-Z]\w*(?=\s+|$))|(\.[A-Z]+(?=\,*\s+|$))|(R\d+)|(('.'(?=\s+|$))|('\\[tnr]'(?=\s+|$))|(\#-?\d+(?=\s+|$))|(-?0x[a-fA-F0-9]+(?=\s+|$))|(".*?"(?=\s+|$))))delim", std::regex_constants::ECMAScript);
             std::sregex_iterator iter(withoutComment.begin(), withoutComment.end(), rgx);
             std::sregex_iterator end;
 
             for (; iter != end; ++iter)
             {
                 std::smatch match = *iter;
+
+                std::string::iterator start_of_match = withoutComment.begin() + match.position();
+
+                if (start_of_match != withoutComment.begin() && !::isspace(*(start_of_match - 1)))
+                {
+                    std::string::iterator start_of_invalid = std::find_if(start_of_match, withoutComment.begin(), ::isspace);
+                    std::string invalid_substring = std::string(start_of_invalid, start_of_match + match.length());
+
+                    throw std::runtime_error(invalid_substring);
+                }
+
                 tokens.push_back(match.str());
             }
     }
@@ -83,7 +95,15 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
     while (std::getline(fileStream, line))
     {
         lineNum++;
-        auto tokenAndComment = TokenizeLine(line);
+        std::pair<std::vector<std::string>, std::string> tokenAndComment;
+        try
+        {
+            tokenAndComment = TokenizeLine(line);
+        }
+        catch (const std::runtime_error& rntEx)
+        {
+            throw std::runtime_error("Invalid token detected at line number " + std::to_string(lineNum) + " \"" + rntEx.what() + "\"");
+        }
         auto& tokens = tokenAndComment.first;
         auto& comment = tokenAndComment.second;
 
@@ -93,7 +113,7 @@ void PassOne_Tokenization::ProcessDataSegment(size_t& lineNum, ASMFramework::Wor
             tokens.erase(tokens.begin());
 
             if (langDef->ContainsKeyword(firstToken))
-                throw std::runtime_error("First token at line number" + std::to_string(lineNum) + " is a reserved keyword \"" + firstToken + 
+                throw std::runtime_error("First token at line number " + std::to_string(lineNum) + " is a reserved keyword \"" + firstToken + 
                     "\" and is not valid in this context. Expected either a Label or Directive/Instruction mnemonic");
 
             if (langDef->ContainsInstruction(firstToken))

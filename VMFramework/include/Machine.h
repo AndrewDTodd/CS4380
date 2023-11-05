@@ -187,6 +187,10 @@ namespace VMFramework
 		virtual inline void LaunchProgram_INTERNAL(const std::filesystem::path& binPath)
 		{
 			//Lock has already been obtained by the calling StartUp(char*) method
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << binPath.string() << std::endl;
+			RESET_TERMINAL
+
 			try
 			{
 				LoadProgram(binPath);
@@ -226,10 +230,6 @@ namespace VMFramework
 
 			RegisterType offset = CalculatePrimaryThreadInitPC();
 			m_codeSegment = m_programSegment + offset;
-
-			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << binPath.string() << std::endl;
-			RESET_TERMINAL
 
 			SpawnProcess(offset);
 		}
@@ -402,6 +402,10 @@ namespace VMFramework
 
 			std::filesystem::path filePath(programBinary);
 
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << filePath.string() << std::endl;
+			RESET_TERMINAL
+
 			try
 			{
 				LoadProgram(programBinary);
@@ -441,10 +445,6 @@ namespace VMFramework
 
 			RegisterType offset = CalculatePrimaryThreadInitPC();
 			m_codeSegment = m_programSegment + offset;
-
-			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << filePath.string() << std::endl;
-			RESET_TERMINAL
 
 			SpawnProcess(offset);
 		}
@@ -459,6 +459,10 @@ namespace VMFramework
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
 
+			BLUE_TERMINAL
+				std::cout << "Executing program at >> " << programBinary.string() << std::endl;
+			RESET_TERMINAL
+
 			try
 			{
 				LoadProgram(programBinary);
@@ -498,10 +502,6 @@ namespace VMFramework
 
 			RegisterType offset = CalculatePrimaryThreadInitPC();
 			m_codeSegment = m_programSegment + offset;
-
-			BLUE_TERMINAL
-				std::cout << "Executing program at >> " << programBinary.string() << std::endl;
-			RESET_TERMINAL
 
 			SpawnProcess(offset);
 		}

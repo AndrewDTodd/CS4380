@@ -179,12 +179,14 @@ namespace VMFramework
 		/// </summary>
 		void Run()
 		{
+			int i = 0;
 			while (_run)
 			{
 				Fetch();
 				Increment();
 				Decode();
 				Execute();
+				i++;
 			}
 		}
 

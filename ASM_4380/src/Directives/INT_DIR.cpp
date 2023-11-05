@@ -8,9 +8,16 @@ INT_DIR::INT_DIR(): ASMDirective(".INT")
 size_t INT_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 #ifdef _DEBUG
-	if (args.size() != 1)
-		throw std::runtime_error("The .INT directive expects one argument, " + std::to_string(args.size()) + " given");
+	if (args.size() > 1)
+		throw std::runtime_error("The .INT directive expects one or no argument, " + std::to_string(args.size()) + " given");
 #endif // _DEBUG
+
+	if (args.size() == 0)
+	{
+		SerializeToBuffer<int32_t, int32_t>(0, workpiece);
+		
+		return sizeof(int32_t);
+	}
 
 	const std::string& argument = args[0];
 

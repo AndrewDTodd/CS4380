@@ -36,6 +36,10 @@ TEST_F(ASMDirectivesTesting, Validate_BYT)
 {
 	BYT_DIR _byt;
 
+	ASSERT_NO_THROW(_byt.Implementation(&_workpiece, std::vector<std::string>()));
+
+	EXPECT_EQ(_workpiece._dataSegmentBin.back(), 0);
+
 	EXPECT_THROW(_byt.Implementation(&_workpiece, std::vector<std::string>{"ARG1", "ARG2"}), std::runtime_error);
 	
 	EXPECT_THROW(_byt.Implementation(&_workpiece, std::vector<std::string>{"#-122"}), std::runtime_error);
@@ -82,6 +86,15 @@ TEST_F(ASMDirectivesTesting, Validate_INT)
 {
 	INT_DIR _int;
 
+	ASSERT_NO_THROW(_int.Implementation(&_workpiece, std::vector<std::string>()));
+
+	uint8_t* _bytePtr = _workpiece._dataSegmentBin.data() + _workpiece._dataSegmentBin.size() - 4;
+
+	EXPECT_EQ(_bytePtr[0], 0x00);
+	EXPECT_EQ(_bytePtr[1], 0x00);
+	EXPECT_EQ(_bytePtr[2], 0x00);
+	EXPECT_EQ(_bytePtr[3], 0x00);
+
 	EXPECT_THROW(_int.Implementation(&_workpiece, std::vector<std::string>{"ARG1", "ARG2"}), std::runtime_error);
 
 	EXPECT_THROW(_int.Implementation(&_workpiece, std::vector<std::string>{"#-2147483649"}), std::runtime_error);
@@ -91,12 +104,21 @@ TEST_F(ASMDirectivesTesting, Validate_INT)
 
 	ASSERT_NO_THROW(_int.Implementation(&_workpiece, std::vector<std::string>{"#-2147483648"}));
 
-	uint8_t* _bytePtr = _workpiece._dataSegmentBin.data() + _workpiece._dataSegmentBin.size() - 4;
+	_bytePtr = _workpiece._dataSegmentBin.data() + _workpiece._dataSegmentBin.size() - 4;
 
 	EXPECT_EQ(_bytePtr[0], 0x00);
 	EXPECT_EQ(_bytePtr[1], 0x00);
 	EXPECT_EQ(_bytePtr[2], 0x00);
 	EXPECT_EQ(_bytePtr[3], 0x80);
+
+	ASSERT_NO_THROW(_int.Implementation(&_workpiece, std::vector<std::string>{"#-6"}));
+
+	_bytePtr = _workpiece._dataSegmentBin.data() + _workpiece._dataSegmentBin.size() - 4;
+
+	EXPECT_EQ(_bytePtr[0], 0xFA);
+	EXPECT_EQ(_bytePtr[1], 0xFF);
+	EXPECT_EQ(_bytePtr[2], 0xFF);
+	EXPECT_EQ(_bytePtr[3], 0xFF);
 
 	ASSERT_NO_THROW(_int.Implementation(&_workpiece, std::vector<std::string>{"#2147483647"}));
 

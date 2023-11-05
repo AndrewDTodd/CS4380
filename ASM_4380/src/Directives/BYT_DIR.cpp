@@ -11,9 +11,16 @@ BYT_DIR::BYT_DIR(): ASMDirective(".BYT")
 size_t BYT_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const std::vector<std::string>& args) const
 {
 #ifdef _DEBUG
-	if (args.size() != 1)
-		throw std::runtime_error("The .BYT directive expects one argument, " + std::to_string(args.size()) + " given");
+	if (args.size() > 1)
+		throw std::runtime_error("The .BYT directive expects one or no argument, " + std::to_string(args.size()) + " given");
 #endif // _DEBUG
+
+	if (args.size() == 0)
+	{
+		workpiece->_dataSegmentBin.push_back(0);
+
+		return sizeof(uint8_t);
+	}
 
 	const std::string& argument = args[0];
 
