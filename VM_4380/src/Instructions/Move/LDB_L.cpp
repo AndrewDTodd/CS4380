@@ -12,6 +12,7 @@ void LDB_L::Op(Process_4380* executingProcess)
 		const uint8_t* _source = executingProcess->_programStart + executingProcess->operandTwo;
 		if (_source < executingProcess->_programEnd)
 		{
+			executingProcess->m_registers[executingProcess->operandOne] = 0;
 			std::memcpy(reinterpret_cast<uint8_t*>(&executingProcess->m_registers[executingProcess->operandOne]), _source, sizeof(uint8_t));
 		}
 		else
