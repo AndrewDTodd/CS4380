@@ -1,4 +1,4 @@
-# Project2_ASMv1.0.0  
+# Project3  
 
 ###### **NOTE: all steps assume user is on Ubuntu 22.04 or compatible Debian system**  
 #### Steps to build  
@@ -41,6 +41,11 @@ To run the monolithic test suite enter the following
 
 To run the project programs we need to navigate into their directories or include the path in the execute command. You can enter the following
 
+To run the monolithic Assembler/Virtual Machine launch pad program  
+(**note any file with a different extension that those explicitly supported will default to running on the Assembler. Both programs will run any file that is properly formatted regardless of the extension)  
+
+    ./monoSystem <optional path to .asm or .bin>
+
 To run the VM  
 
     ./VM_4380/VM4380 <optional path to bin>
@@ -52,3 +57,13 @@ To run the Assember
 To run any target's unit tests  
 
     ./(target directory)/(target name)Tests
+
+###### Note about project assembly programs/examples
+All the .asm files made for the project from previouse iterations to this iteration are contained in the ProjASMs directory  
+  You can assemble any of them by running either  
+
+    ./monoSystem ../../ProjASMs/(name of assembly).asm  
+  
+  or  
+  
+    ./ASM_4380/ASM4380 ../../../ProjASMs/(name of assembly).asm  
