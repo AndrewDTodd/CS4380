@@ -67,3 +67,11 @@ All the .asm files made for the project from previouse iterations to this iterat
   or  
   
     ./ASM_4380/ASM4380 ../../../ProjASMs/(name of assembly).asm  
+
+  You can then execute the assembled binary by running either  
+
+    ./monoSystem ../../ProjASMs/(name of assembly).bin  
+
+  or  
+
+    ./ASM_4380/ASM4380 ../../../ProjASMs/(name of assembly).bin  
