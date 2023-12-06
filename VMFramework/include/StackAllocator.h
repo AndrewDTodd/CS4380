@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <execution>
+//#include <execution>
 #include <stdexcept>
 
 #include "Allocator.h"
@@ -59,6 +59,8 @@ namespace VMFramework
 
 		StackAllocator(const StackAllocator&) = delete;
 		StackAllocator& operator=(const StackAllocator&) = delete;
+		StackAllocator(StackAllocator&&) = delete;
+		StackAllocator& operator=(StackAllocator&&) = delete;
 	};
 }
 #endif //!STACK_ALLOCATOR_H

@@ -15,19 +15,16 @@ namespace ASMFramework
 {
 	struct ASMDirective;
 	struct ASMInstruction;
-}
 
-template<typename T>
-concept DerivedFromDirective = std::derived_from<T, ASMFramework::ASMDirective>;
+	template<typename T>
+	concept DerivedFromDirective = std::derived_from<T, ASMFramework::ASMDirective>;
 
-template<typename T>
-concept DerivedFromInstruction = std::derived_from<T, ASMFramework::ASMInstruction>;
+	template<typename T>
+	concept DerivedFromInstruction = std::derived_from<T, ASMFramework::ASMInstruction>;
 
-template<typename T>
-concept StringType = std::is_same_v<T, std::string>;
+	template<typename T>
+	concept StringType = std::is_same_v<T, std::string>;
 
-namespace ASMFramework
-{
 	class LanguageDefinition
 	{
 	protected:
@@ -199,7 +196,7 @@ namespace ASMFramework
 		}
 
 		/// <summary>
-		/// Returns the ID of the register represented byt the supplied mnemonic
+		/// Returns the ID of the register represented by the supplied mnemonic
 		/// </summary>
 		/// <typeparam name="TargetType">The integral type to return the ID casted too</typeparam>
 		/// <param name="mnemonic">The key to search for the ID under</param>

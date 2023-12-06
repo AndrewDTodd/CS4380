@@ -14,9 +14,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #A significant release that likely includes new features, changes, and enhancements that may not be backward compatible with the previous version
-set(VERSION_MAJOR 2)
+set(VERSION_MAJOR 3)
 #A release that may add new features but remains backward compatible with the previous version
-set(VERSION_MINOR 2)
+set(VERSION_MINOR 0)
 #A release that includes minor changes, bug fixes, and patches without adding new features. It is typically backward and forward compatible with the corresponding minor version
 set(VERSION_PATCH 0)
 #A version that is often used to denote a specific build of the software, including revisions, builds, or other metadata
@@ -30,7 +30,10 @@ add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
 
 set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/DWORDMemoryMap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryMap.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/PageAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/VMFramework_GetVersion.cpp
 

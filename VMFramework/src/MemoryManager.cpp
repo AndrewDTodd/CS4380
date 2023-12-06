@@ -45,7 +45,7 @@ namespace VMFramework
 			return MemoryManager::s_instance;
 	}
 
-	void MemoryManager::StartUp()
+	void MemoryManager::StartUp(const size_t& systemBytes, const MemoryMap& memoryMap)
 	{
 		//Acquire exclusive lock for write
 		std::unique_lock<std::shared_mutex> writeLock(MemoryManager::_sharedMutex);
@@ -55,9 +55,9 @@ namespace VMFramework
 			throw std::runtime_error("Calling StartUp on an already active MemoryManager is invalid");
 #endif // _DEBUG
 
-		this->m_ApplicationMemory = malloc(MUL(GibiByte, TOTAL_GIBIGYTES_FOR_SYSTEM));
+		this->m_ApplicationMemory = malloc(systemBytes);
 
-		this->m_systemAllocator = new (this->m_ApplicationMemory) StackAllocator(MUL(GibiByte, TOTAL_GIBIGYTES_FOR_SYSTEM) - sizeof(StackAllocator), PointerMath::Add(this->m_ApplicationMemory, sizeof(StackAllocator)));
+		this->m_systemAllocator = new (this->m_ApplicationMemory) StackAllocator(systemBytes - sizeof(StackAllocator), PointerMath::Add(this->m_ApplicationMemory, sizeof(StackAllocator)));
 	}
 
 	void MemoryManager::ShutDown()

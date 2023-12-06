@@ -4,10 +4,12 @@
 #include <cstdint>
 #include <thread>
 #include <shared_mutex>
+#include <concepts>
 
 #include "StackAllocator.h"
+#include "MemoryMap.h"
 
-#define TOTAL_GIBIGYTES_FOR_SYSTEM 1
+//#define TOTAL_GIBIGYTES_FOR_SYSTEM 1
 
 namespace VMFramework
 {
@@ -26,12 +28,17 @@ namespace VMFramework
 		/// <summary>
 		/// A pool of memory that is created at initialization of this class, relied upon by other subsystems for dynamic memory allocation through this manager
 		/// </summary>
-		void* m_ApplicationMemory = nullptr;
+		void* m_systemMemory = nullptr;
 
 		/// <summary>
 		/// Pointer the the instance of this singleton that is created when GetInstance is called
 		/// </summary>
 		static MemoryManager* s_instance;
+
+		/// <summary>
+		/// A reference to a MemoryMap instance that will be used by the MemoryManager for paging and address translation
+		/// </summary>
+		const MemoryMap& m_memoryMap;
 
 		/// <summary>
 		/// Default constructor is private, MemoryManager is a singleton. Internal use only
@@ -48,8 +55,22 @@ namespace VMFramework
 
 		static MemoryManager* GetInstance();
 
-		void StartUp();
+		void StartUp(const size_t& systemBytes, const MemoryMap& memoryMap);
 		void ShutDown();
+
+		void* AllocatePage(const uint8_t& pageType);
+
+		template<std::unsigned_integral SystemPtr>
+		void* Virtual_To_Physical(const SystemPtr& virtualAddress)
+		{
+			return m_memoryMap.Virtual_To_Physical(virtualAddress);
+		}
+
+		template<std::unsigned_integral SystemPtr>
+		SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
+		{
+			return m_memoryMap.Physical_To_Virtual(physicalAddress);
+		}
 
 		//Do not attempt to copy, manager is a singleton
 		MemoryManager(const MemoryManager&) = delete;

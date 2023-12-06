@@ -20,6 +20,7 @@
 #include "Heap_INS/FREE_INS.h"
 
 //Jump
+#include "Jump_INS/BAL_INS.h"
 #include "Jump_INS/BGT_INS.h"
 #include "Jump_INS/BLT_INS.h"
 #include "Jump_INS/BNZ_INS.h"
@@ -47,6 +48,10 @@
 #include "Multi_Thread_INS/LCK_INS.h"
 #include "Multi_Thread_INS/RUN_INS.h"
 #include "Multi_Thread_INS/ULK_INS.h"
+
+//Stack
+#include "Stack_INS/POP_INS.h"
+#include "Stack_INS/PUSH_INS.h"
 
 //TRP
 #include "TRP_INS/TRP_INS.h"

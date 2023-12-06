@@ -1,15 +1,15 @@
-#ifndef POP_INS_H
-#define POP_INS_H
+#ifndef BAL_INS_H
+#define BAL_INS_H
 
 #include <ASMInstruction.h>
 
 
 
-struct POP_INS : public ASMFramework::ASMInstruction
+struct BAL_INS : public ASMFramework::ASMInstruction
 {
 public:
-	POP_INS();
+	BAL_INS();
 
 	size_t Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workpiece* const& workpiece, const ASMFramework::LanguageDefinition* const& langDef, const std::vector<std::string>& args) const override;
 };
-#endif // !POP_INS_H
+#endif // !BAL_INS_H

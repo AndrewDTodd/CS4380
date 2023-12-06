@@ -65,12 +65,11 @@ set(ASM_4380_INSTRUCTIONS_HEAP
 )
 
 set(ASM_4380_INSTRUCTIONS_JUMP
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BAL_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BGT_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BLT_INS.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BL_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BNZ_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BRZ_INS.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/BX_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/JMP_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump_INS/JMR_INS.cpp
 
@@ -104,6 +103,7 @@ set(ASM_4380_INSTRUCTIONS_MULTI_THREAD
 )
 
 set(ASM_4380_INSTRUCTIONS_STACK
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack_INS/PEEK_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack_INS/POP_INS.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack_INS/PUSH_INS.cpp
 
