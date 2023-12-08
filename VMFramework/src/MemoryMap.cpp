@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 namespace VMFramework
 {
@@ -10,13 +11,16 @@ namespace VMFramework
 		delete[] m_pageAllocators;
 	}
 
-	void* MemoryMap::AllocatePage(const uint8_t& pageType)
+	MemoryMap::~MemoryMap()
 	{
-#ifdef _DEBUG
-		if (pageType > m_numPageAllocators - 1)
-			throw std::invalid_argument("There is no page type with id: " + std::to_string(pageType));
-#endif // _DEBUG
+		delete[] m_pageAllocators;
+	}
 
-		m_pageAllocators[pageType]->Allocate();
+	void MemoryMap::SetPageAllocators(const PageAllocator* pageAllocators...)
+	{
+		constexpr size_t numAllocators = sizeof...(pageAllocators);
+		const_cast<size_t>&(m_numPageAllocators) = numAllocators;
+
+		const_cast<PageAllocator**>&(m_pageAllocators) = new PageAllocator* [](numAllocators) {pageAllocators...};
 	}
 }

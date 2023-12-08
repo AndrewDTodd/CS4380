@@ -12,7 +12,7 @@ namespace VMFramework
 	private:
 		struct PageTableEntry
 		{
-			//frame present in memory, 1, or in swap space, 0
+			//frame present in memory, 1, or frame space free, 0
 			uint32_t present : 1 = 0;
 
 			//read only frame, 0, or read-write frame, 1
@@ -56,15 +56,37 @@ namespace VMFramework
 			uint32_t frame_number : 20 = 0;
 		};
 
-		uint32_t* _pageGlobalDirectory[1024];
-
-		const char* machineWorkingDir = ".machine_runtime/.paging_swap_space";
+		//uint32_t* m_pageGlobalDirectory[512];
+		uint32_t** m_pageGlobalDirectory;
+		const uint16_t m_pageGlobalDirectoryCount;
+		uint16_t m_currentPageTable = 0;
+		uint16_t m_pageTableNextIndex = 0;
+		uint16_t m_normalPageCount = 0;
+ 
+		const uint8_t* const& m_extendedPagesPhysicalAddressOrdinal;
+		//uint32_t* m_extendedPageGlobalDirectory[512];
+		uint32_t* m_extendedPageGlobalDirectory;
+		const uint16_t m_extendedPageGlobalDirectoryCount;
+		uint16_t m_nextExtendedPage = 0;
+		uint16_t m_extendedPageCount = 0;
 
 	public:
 		DWORDMemoryMap() = default;
 		~DWORDMemoryMap() = default;
 
-		
+		void Initialize(const size_t& systemBytes, Allocator* const& systemAllocator) override;
+
+		void* AllocatePage(const uint8_t& pageType) override;
+
+		inline void* Virtual_To_Physical(const uint32_t& virtualAddress)
+		{
+
+		}
+
+		inline uint32_t Physical_To_Virtual(const void* const& physicalAddress)
+		{
+
+		}
 	};
 }
 #endif // !DWORD_MEMORY_MAP_H
