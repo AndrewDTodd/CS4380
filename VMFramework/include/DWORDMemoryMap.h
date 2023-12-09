@@ -7,16 +7,16 @@
 
 namespace VMFramework
 {
-	static constexpr uint64_t MebiByte = 1048576;
-	static constexpr size_t SIZE_OF_NORMAL_PAGE = 4096;
-	static constexpr size_t NUM_OF_ENTRIES_PER_PAGE_TABLE = 1024;
-	static constexpr size_t NUM_OF_ENTRIES_IN_GLOBAL_DIR = 512;
-	static constexpr size_t BYTES_IN_NORMAL_PAGE_SPACE = NUM_OF_ENTRIES_IN_GLOBAL_DIR * NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
-	static constexpr size_t BYTES_PER_PAGE_TABLE = NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
-
-	class DWORDMemoryMap : MemoryMap
+	class DWORDMemoryMap : public MemoryMap
 	{
 	private:
+		static constexpr size_t MebiByte = 1048576;
+		static constexpr size_t SIZE_OF_NORMAL_PAGE = 4096;
+		static constexpr size_t NUM_OF_ENTRIES_PER_PAGE_TABLE = 1024;
+		static constexpr size_t NUM_OF_ENTRIES_IN_GLOBAL_DIR = 512;
+		static constexpr size_t BYTES_IN_NORMAL_PAGE_SPACE = NUM_OF_ENTRIES_IN_GLOBAL_DIR * NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
+		static constexpr size_t BYTES_PER_PAGE_TABLE = NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
+
 		struct FourKiBPage
 		{
 			uint8_t bytes[4096];
@@ -100,9 +100,11 @@ namespace VMFramework
 		uint16_t m_nextExtendedPage = 0;
 		uint16_t m_extendedPageCount = 0;
 
+		
+
 	public:
-		DWORDMemoryMap() = default;
-		~DWORDMemoryMap() = default;
+		DWORDMemoryMap();
+		~DWORDMemoryMap();
 
 		///<inheritdoc/>
 		void Initialize(const size_t& systemBytes, Allocator* const& systemAllocator) override;

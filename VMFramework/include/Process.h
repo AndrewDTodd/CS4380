@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 
-#include "StackAllocator.h"
+#include "Allocator.h"
 #include "MemoryManager.h"
 #include "ISA.h"
 
@@ -20,6 +20,15 @@ constexpr size_t registerCount = 22;
 
 namespace VMFramework
 {
+	class stack_overflow : public std::exception
+	{
+	public:
+		const char* what() const noexcept override
+		{
+			return "Stack Overflow detected: Not enough memory remaining for requested allocation";
+		}
+	};
+
 	template<typename RegisterType>
 	struct Registers
 	{
@@ -40,7 +49,7 @@ namespace VMFramework
 	};
 
 	template<typename Derived, typename RegisterType, typename ISAType>
-	class Process
+	class Process : public Allocator
 	{
 		//friend class Instruction<RegisterType, Process>;
 	protected:
@@ -54,7 +63,7 @@ namespace VMFramework
 		/// <summary>
 		/// Stack for this thread of execution
 		/// </summary>
-		StackAllocator* m_stack = nullptr;
+		//StackAllocator* m_stack = nullptr;
 
 		/// <summary>
 		/// Pointer to ISA to use
@@ -74,12 +83,17 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to the last byte in the program segment
 		/// </summary>
-		const uint8_t* const _programEnd= nullptr;
+		const uint8_t* const _programEnd = nullptr;
 
 		/// <summary>
 		/// Reference to the Machine instances mutex. Used for concurrent read access and exclusive write access
 		/// </summary>
 		const std::shared_mutex& _machineMutex;
+
+		/// <summary>
+		/// Pointer to the machines MemoryManager sub-system
+		/// </summary>
+		MemoryManager* _memoryManager;
 
 		bool _run = true;
 
@@ -88,10 +102,7 @@ namespace VMFramework
 		/// </summary>
 		~Process()
 		{
-			m_stack->ClearAllocator();
-			
-			//Free this process stack from the system's resources
-			DeallocateDelete<StackAllocator>(*MemoryManager::GetInstance()->m_systemAllocator, *m_stack);
+
 		}
 
 		/// <summary>
@@ -113,22 +124,66 @@ namespace VMFramework
 		/// Used to preform the execute step of the execution cycle
 		/// </summary>
 		inline virtual void Execute() = 0;
+
+		//****************************************************************
+		//Process's Stack
+
+#ifdef _DEBUG
+		void* m_prev_stack_pointer = nullptr;
+		void* m_previouse_frame_pointer = nullptr;
+#endif // _DEBUG
+
+		void* Allocate(const size_t& size, const uint8_t& alignment) override
+		{
+			assert(size != 0);
+
+			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignment);
+
+			if (m_usedMemory + adjustment + size > m_size)
+				throw stack_overflow();
+
+			void* aligned_address = PointerMath::Add(currentPos, adjustment);
+
+#ifdef _DEBUG
+			m_prev_stack_pointer = currentPos;
+#endif // _DEBUG
+
+			currentPos = PointerMath::Add(aligned_address, size);
+			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(currentPos);
+
+			m_usedMemory += size + adjustment;
+
+			m_numOfAllocations++;
+
+			return aligned_address;
+		}
+
+		void Deallocate(void* p) override
+		{
+		}
+		//****************************************************************
 	public:
 		/// <summary>
 		/// Create Process specifying where in the program it will begin execution
 		/// </summary>
-		/// <param name="initialPC">The offset in the program to begin execution at</param>
-		/// <param name="processStack">Pointer to the StackAllocator for this process</param>
+		/// <param name="initialPC">Virtual address to the offset in the program to begin execution at</param>
 		/// <param name="programStart">Pointer to the beginning of the program in memory</param>
 		/// <param name="codeSegmentStart">Pointer to the beginning of the code section of the program in memory</param>
 		/// <param name="programEnd">Pointer to the end of the program in memory</param>
-		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 		/// <param name="isa">Pointer to the ISA instance to use</param>
+		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
+		/// <param name="memoryManager">Pointer to the machines MemoryManger sub-system</param>
+		/// <param name="stackBytes">The number of bytes alloted to this process's stack</param>
+		/// <param name="stackStart">The address where the stack begins in memory</param>
 		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
-		Process(const RegisterType& initialPC, StackAllocator* processStack, 
+		Process(const RegisterType& initialPC, 
 			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
-			std::shared_mutex& machineMutex, ISAType* isa): 
-			m_stack(processStack), _programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), _machineMutex(machineMutex), _ISA(isa)
+			ISAType* isa, std::shared_mutex& machineMutex, MemoryManager* memoryManager,
+			const size_t& stackBytes, void* stackStart): Allocator(stackBytes, stackStart),
+			_programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), 
+			_ISA(isa), _machineMutex(machineMutex), _memoryManager(memoryManager)
 		{
 			this->m_registers[16] = initialPC;
 
@@ -172,6 +227,12 @@ namespace VMFramework
 
 				throw std::runtime_error(stream.str());
 			}
+
+			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
+			stackBegin += m_size;
+
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual<RegisterType>(stackBegin);
+			m_registers[17] = _memoryManager->Physical_To_Virtual<RegisterType>(m_start);
 		}
 
 		/// <summary>
@@ -199,6 +260,71 @@ namespace VMFramework
 
 				delete this;
 			}
+		}
+
+		void ClearAllocator() override
+		{
+			Allocator::ClearAllocator();
+
+			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
+			stackBegin += m_size;
+
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual<RegisterType>(stackBegin);
+			m_registers[17] = _memoryManager->Physical_To_Virtual<RegisterType>(m_start);
+
+#ifdef _DEBUG
+			m_prev_stack_pointer = nullptr;
+			m_previouse_frame_pointer = nullptr;
+#endif // _DEBUG
+		}
+
+		template<typename TypeToPush>
+		void* Push(const TypeToPush& itemToPush)
+		{
+			TypeToPush* stackInstance = static_cast<TypeToPush*>(Allocate(sizeof(TypeToPush), alignof(TypeToPush)));
+			*stackInstance = itemToPush;
+
+			return stackInstance;
+		}
+
+		template<typename TypeToPop>
+		void Pop(TypeToPop& receiver)
+		{
+			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+
+			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignof(TypeToPop));
+
+			void* prevPos = PointerMath::Subtract(currentPos, adjustment);
+
+			m_numOfAllocations--;
+
+			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
+
+			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(prevPos);
+		}
+
+		template<template TypeToPeek>
+		void Peek(TypeToPeek& receiver)
+		{
+			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+
+			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignof(TypeToPop));
+
+			void* prevPos = PointerMath::Subtract(currentPos, adjustment);
+
+			m_numOfAllocations--;
+
+			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
+		}
+
+		void* AdvanceFrame()
+		{
+#ifdef _DEBUG
+			void* currentFramePointer = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[20]);
+			m_previouse_frame_pointer = currentFramePointer;
+#endif // _DEBUG
+
+			m_registers[20] = m_registers[19];
 		}
 	};
 }

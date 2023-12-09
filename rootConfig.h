@@ -3,7 +3,7 @@
 #ifndef ROOT_CONFIG_H
 #define ROOT_CONFIG_H
 
-#include <type_traits>
+#include <bit>
 constexpr bool is_little_endian = std::endian::native == std::endian::little;
 
 #include <iostream>

@@ -34,7 +34,6 @@ set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryMap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PageAllocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/StackAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/VMFramework_GetVersion.cpp
 
 )

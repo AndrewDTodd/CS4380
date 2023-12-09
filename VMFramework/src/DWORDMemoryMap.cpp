@@ -48,10 +48,12 @@ namespace VMFramework
 #ifdef _DEBUG
 		assert(pageType < m_numPageAllocators - 1);
 #endif // _DEBUG
-
+		
+		void* userPageAddress;
 		if (pageType == 0)
 		{
-			if (m_pageAllocators[0]->Allocate<FourKiBPage>() == nullptr)
+			userPageAddress = m_pageAllocators[0]->Allocate<FourKiBPage>();
+			if (userPageAddress == nullptr)
 				throw out_of_memory();
 
 			m_normalPageCount++;
@@ -76,7 +78,8 @@ namespace VMFramework
 		}
 		else
 		{
-			if (m_pageAllocators[1]->Allocate<FourMiBPage>() == nullptr)
+			userPageAddress = m_pageAllocators[1]->Allocate<FourMiBPage>();
+			if (userPageAddress == nullptr)
 				throw out_of_memory();
 
 			m_extendedPageCount++;
@@ -91,6 +94,8 @@ namespace VMFramework
 
 			m_nextExtendedPage++;
 		}
+
+		return userPageAddress;
 	}
 
 	void* DWORDMemoryMap::AllocateKernelPage(const uint8_t& pageType)
@@ -99,9 +104,11 @@ namespace VMFramework
 		assert(pageType < m_numPageAllocators - 1);
 #endif // _DEBUG
 
+		void* kernelPageAddress;
 		if (pageType == 0)
 		{
-			if (m_pageAllocators[0]->Allocate<FourKiBPage>() == nullptr)
+			kernelPageAddress = m_pageAllocators[0]->Allocate<FourKiBPage>();
+			if (kernelPageAddress == nullptr)
 				throw out_of_memory();
 
 			m_normalPageCount++;
@@ -126,7 +133,8 @@ namespace VMFramework
 		}
 		else
 		{
-			if (m_pageAllocators[1]->Allocate<FourMiBPage>() == nullptr)
+			kernelPageAddress = m_pageAllocators[1]->Allocate<FourMiBPage>();
+			if (kernelPageAddress == nullptr)
 				throw out_of_memory();
 
 			m_extendedPageCount++;
@@ -141,5 +149,7 @@ namespace VMFramework
 
 			m_nextExtendedPage++;
 		}
+
+		return kernelPageAddress;
 	}
 }

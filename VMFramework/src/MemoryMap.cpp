@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <cassert>
 
 namespace VMFramework
 {
@@ -11,16 +12,16 @@ namespace VMFramework
 		delete[] m_pageAllocators;
 	}
 
-	MemoryMap::~MemoryMap()
+	template<PageAllocatorType... Page_Allocators>
+	void MemoryMap::SetPageAllocators(Page_Allocators*... pageAllocators)
 	{
-		delete[] m_pageAllocators;
-	}
+#ifdef _DEBUG
+		assert(m_pageAllocators == nullptr);
+#endif // _DEBUG
 
-	void MemoryMap::SetPageAllocators(const PageAllocator* pageAllocators...)
-	{
 		constexpr size_t numAllocators = sizeof...(pageAllocators);
-		const_cast<size_t>&(m_numPageAllocators) = numAllocators;
+		const_cast<size_t>(m_numPageAllocators) = numAllocators;
 
-		const_cast<PageAllocator**>&(m_pageAllocators) = new PageAllocator* [](numAllocators) {pageAllocators...};
+		m_pageAllocators = new PageAllocator* [numAllocators]{pageAllocators...};
 	}
 }

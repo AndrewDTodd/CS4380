@@ -17,8 +17,8 @@ namespace VMFramework
 		}
 	};
 
-	/*template<typename T>
-	concept DerivedFromPageAllocator = std::derived_from<T, PageAllocator>;*/
+	template<typename T>
+	concept PageAllocatorType = std::is_same_v<T, PageAllocator>;
 
 	class MemoryMap
 	{
@@ -28,14 +28,15 @@ namespace VMFramework
 		PageAllocator** m_pageAllocators = nullptr;
 		const size_t m_numPageAllocators;
 
-		MemoryMap() = default;
+		MemoryMap();
 		~MemoryMap();
 
 		/// <summary>
 		/// Used internally by deriving types to set the m_pageAllocators collection
 		/// </summary>
 		/// <param name="pageAllocators...">Variadic parameter containing the collection of PageAllocators that the derived Memory Map uses internally/supports</param>
-		void SetPageAllocators(const PageAllocator* pageAllocators...);
+		template<PageAllocatorType... Page_Allocators>
+		void SetPageAllocators(Page_Allocators*... pageAllocators);
 
 	public:
 		/// <summary>
@@ -84,7 +85,10 @@ namespace VMFramework
 		/// <param name="virtualAddress">The virtual address to be translated to its associated physical address</param>
 		/// <returns>A system address/pointer that is mapped to the provided virtual address</returns>
 		template<std::unsigned_integral SystemPtr>
-		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress) {};
+		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress)
+		{
+			return nullptr;
+		};
 
 		/// <summary>
 		/// Used to translate a physical system address into the mapped virtual address in the proecess's virtual address space
@@ -93,7 +97,10 @@ namespace VMFramework
 		/// <param name="physicalAddress">The the system address to be translated to a virtual address</param>
 		/// <returns>A virtual address mapped to the provided physical address</returns>
 		template<std::unsigned_integral SystemPtr>
-		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress) {};
+		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
+		{
+			return nullptr;
+		};
 	};
 }
 #endif // !MEMORY_MAP_H

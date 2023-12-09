@@ -109,9 +109,10 @@ add_subdirectory(ASM_4380)
 #ASMFramework Source
 ############################################################################
 set(ASM_FRAMEWORK_SOURCE
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/ASMDirective.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/ASMFramework_GetVersion.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/ASMInstruction.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Assembler.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Directive.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/Instruction.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ASMFramework/src/LanguageDefinition.cpp
 	
 )
@@ -219,7 +220,7 @@ set(VM_FRAMEWORK_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/MemoryMap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/PageAllocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/StackAllocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/VMFramework_GetVersion.cpp
 
 )
 ############################################################################

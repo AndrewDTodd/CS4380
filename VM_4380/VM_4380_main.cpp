@@ -5,6 +5,8 @@
 
 #include <VMFramework_GetVersion.h>
 
+#include <DWORDMemoryMap.h>
+
 #include "rootConfig.h"
 
 constexpr size_t maxPathLength = 256;
@@ -27,7 +29,9 @@ int main(int argc, char* argv[])
 
 	VM = VM4380::GetInstance();
 
-	VM->StartUp();
+	VMFramework::DWORDMemoryMap memoryMap;
+
+	VM->StartUp(VMFramework::SYSTEM_MEMORY, memoryMap);
 
 	std::filesystem::path filePath;
 	if (argc > 1)

@@ -13,9 +13,9 @@
 
 namespace VMFramework
 {
-	constexpr uint64_t GibiByte = 1073741824;
-	constexpr uint64_t MebiByte = 1048576;
-	constexpr uint64_t KibiByte = 1024;
+	constexpr size_t GibiByte = 1073741824;
+	constexpr size_t MebiByte = 1048576;
+	constexpr size_t KibiByte = 1024;
 
 	class MemoryManager
 	{
@@ -81,7 +81,7 @@ namespace VMFramework
 		/// <returns>Pointer to the page allocated in system memory</returns>
 		inline void* AllocateUserPage(const uint8_t& pageType)
 		{
-			m_memoryMap->AllocateUserPage(pageType);
+			return m_memoryMap->AllocateUserPage(pageType);
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace VMFramework
 		/// <returns>Pointer to the page allocated in system memory</returns>
 		inline void* AllocateKernelPage(const uint8_t& pageType)
 		{
-			m_memoryMap->AllocateUserPage(pageType);
+			return m_memoryMap->AllocateUserPage(pageType);
 		}
 
 		/// <summary>
@@ -101,7 +101,7 @@ namespace VMFramework
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
 		inline void* AllocateUserPagesFor(const size_t& bytesNeeded)
 		{
-			m_memoryMap->AllocateUserPagesFor(bytesNeeded);
+			return m_memoryMap->AllocateUserPagesFor(bytesNeeded);
 		}
 
 		/// <summary>
@@ -111,7 +111,7 @@ namespace VMFramework
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
 		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded)
 		{
-			m_memoryMap->AllocateKernelPagesFor(bytesNeeded);
+			return m_memoryMap->AllocateKernelPagesFor(bytesNeeded);
 		}
 
 		/// <summary>

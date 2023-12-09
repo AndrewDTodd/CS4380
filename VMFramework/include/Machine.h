@@ -10,11 +10,12 @@
 #include <new>
 #include <thread>
 #include <shared_mutex>
-#include <mutex>
+//#include <mutex>
 #include <stdexcept>
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <vector>
 
 #include "MemoryManager.h"
 #include "Process.h"
@@ -22,11 +23,12 @@
 
 #include "rootConfig.h"
 
-#define PROCESS_STACK_MiB 8
-#define PROCESS_STACK_BYTES (MebiByte * PROCESS_STACK_MiB)
-
 namespace VMFramework
 {
+	constexpr size_t PROCESS_STACK_MiB = 8;
+	constexpr size_t PROCESS_STACK_BYTES = (MebiByte * PROCESS_STACK_MiB);
+	constexpr size_t SYSTEM_MEMORY = (GibiByte);
+
 	class segmentation_fault : public std::exception
 	{
 	private:
@@ -269,7 +271,7 @@ namespace VMFramework
 		/// <summary>
 		/// Will launch the machine and initialize the system
 		/// </summary>
-		void StartUp()
+		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -280,14 +282,14 @@ namespace VMFramework
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager::GetInstance();
-			this->m_memoryManager->StartUp();
+			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 		}
 
 		/// <summary>
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const char* programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap, const char* programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -299,7 +301,7 @@ namespace VMFramework
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager::GetInstance();
-			this->m_memoryManager->StartUp();
+			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 
 			std::filesystem::path filePath(programBinary);
 
@@ -320,7 +322,7 @@ namespace VMFramework
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const std::filesystem::path& programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap, const std::filesystem::path& programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -332,7 +334,7 @@ namespace VMFramework
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager::GetInstance();
-			this->m_memoryManager->StartUp();
+			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 
 			//lauch the provided program
 			try
@@ -378,10 +380,6 @@ namespace VMFramework
 			{
 				process->Stop();
 			}
-
-			//Deallocate the memory that was retrieved to load the program binary
-			if(m_programSegment)
-				DeallocateArray<uint8_t>(m_memoryManager->m_systemAllocator, const_cast<uint8_t*>(m_programSegment));
 
 			this->m_memoryManager->ShutDown();
 			this->m_memoryManager = nullptr;
