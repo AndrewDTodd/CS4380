@@ -9,7 +9,7 @@
 
 namespace VMFramework
 {
-	class PageAllocator : Allocator
+	class PageAllocator : public Allocator
 	{
 	private:
 		void* m_currentPosition;

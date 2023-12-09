@@ -56,23 +56,86 @@ namespace VMFramework
 		~MemoryManager();
 
 	public:
+		/// <summary>
+		/// Get a pointer to the singletons active instance, or makes an instance if there isn't one already
+		/// </summary>
+		/// <returns>Pointer to the MemoryManager instance</returns>
 		static MemoryManager* GetInstance();
 
+		/// <summary>
+		/// Launch the MemoryManager sub-system and configure with provided parameters
+		/// </summary>
+		/// <param name="systemBytes"></param>
+		/// <param name="memoryMap"></param>
 		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap);
+		
+		/// <summary>
+		/// Release the sub-systems resources and safely destroy it
+		/// </summary>
 		void ShutDown();
 
-		void* AllocatePage(const uint8_t& pageType);
+		/// <summary>
+		/// Used to create a new page worth of memory in the callers address space
+		/// </summary>
+		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configured MemoryMap implementation</param>
+		/// <returns>Pointer to the page allocated in system memory</returns>
+		inline void* AllocateUserPage(const uint8_t& pageType)
+		{
+			m_memoryMap->AllocateUserPage(pageType);
+		}
 
+		/// <summary>
+		/// Used to create a new page worth of memory in the systems/kernels address space
+		/// </summary>
+		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configuration of MemoryMap implementation</param>
+		/// <returns>Pointer to the page allocated in system memory</returns>
+		inline void* AllocateKernelPage(const uint8_t& pageType)
+		{
+			m_memoryMap->AllocateUserPage(pageType);
+		}
+
+		/// <summary>
+		/// Used to create the pages needed to satisfy the requested memory amount in the callers address space
+		/// </summary>
+		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
+		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
+		inline void* AllocateUserPagesFor(const size_t& bytesNeeded)
+		{
+			m_memoryMap->AllocateUserPagesFor(bytesNeeded);
+		}
+
+		/// <summary>
+		/// Used to create the pages needed to satisfy the requested memory amount in the systems/kernels address space
+		/// </summary>
+		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
+		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
+		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded)
+		{
+			m_memoryMap->AllocateKernelPagesFor(bytesNeeded);
+		}
+
+		/// <summary>
+		/// Used to translate a virtual address/pointer in a callers address space into the systems/physical memory address space
+		/// </summary>
+		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses</typeparam>
+		/// <param name="virtualAddress">The virtual address to be translated/mapped into its associated physical address in system memory</param>
+		/// <returns>Pointer to the location in memory the provided virtual address maps to</returns>
 		template<std::unsigned_integral SystemPtr>
 		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress)
 		{
-			return m_memoryMap.Virtual_To_Physical<SystemPtr>(virtualAddress);
+			return m_memoryMap->Virtual_To_Physical<SystemPtr>(virtualAddress);
 		}
 
+		/// <summary>
+		/// Used to translate an address/pointer in system/physical address space into the virtual address space of the caller
+		/// </summary>
+		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses</typeparam>
+		/// <param name="physicalAddress">The system/physical address to be translated/mapped into its associated virtual address in the caller's address space</param>
+		/// <returns>Virtual address in the callers address sapace associated with the provided system pointer</returns>
 		template<std::unsigned_integral SystemPtr>
 		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
 		{
-			return m_memoryMap.Physical_To_Virtual<SystemPtr>(physicalAddress);
+			return m_memoryMap->Physical_To_Virtual<SystemPtr>(physicalAddress);
 		}
 
 		//Do not attempt to copy, manager is a singleton

@@ -151,7 +151,8 @@ namespace VMFramework
 
 			// Allocate memory
 			m_programSize = static_cast<size_t>(size);
-			m_programSegment = AllocateArray<uint8_t>(m_memoryManager->m_systemAllocator, m_programSize);
+			
+			m_programSegment = static_cast<uint8_t*>(m_memoryManager->AllocateUserPagesFor(m_programSize));
 
 			if (!m_programSegment)
 			{
@@ -183,7 +184,7 @@ namespace VMFramework
 		/// Will attempt to load the binary at the specified path and run the program. Used by StartUp(char*) to launch program
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
+		/// <exception cref="rumtime_error Thrown if initial PC specified in loaded binary is invalid"/>
 		virtual inline void LaunchProgram_INTERNAL(const std::filesystem::path& binPath)
 		{
 			//Lock has already been obtained by the calling StartUp(char*) method

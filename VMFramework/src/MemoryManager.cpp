@@ -81,9 +81,4 @@ namespace VMFramework
 
 		this->~MemoryManager();
 	}
-
-	void* MemoryManager::AllocatePage(const uint8_t& pageType)
-	{
-		m_memoryMap->AllocatePage(pageType);
-	}
 }
