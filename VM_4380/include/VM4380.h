@@ -13,17 +13,19 @@
 class VM4380 : public VMFramework::Machine<VM4380, int32_t, Process_4380, ISA_4380>
 {
 private:
+	static constexpr size_t PROCESS_STACK_SIZE = VMFramework::MebiByte * 8;
+
 	/// <summary>
 	/// Create a new process to execute starting at the specified program location
 	/// </summary>
 	/// <param name="startInstruction">Pointer to the location in the program where this process should begin execution</param>
-	void SpawnProcess(const int32_t& initialPC) override;
+	void SpawnProcess(const void* initialPC) override;
 
 	/// <summary>
 	/// Defines the logic for determining the entry point of a program in the ISA4380 architecture
 	/// </summary>
 	/// <returns>Pointer to the byte in the program segment to start executing at</returns>
-	int32_t CalculatePrimaryThreadInitPC() override;
+	const void* CalculatePrimaryThreadInitPC() override;
 
 	FRIEND_TEST(VM4380Testing, Validate_StartUp);
 	FRIEND_TEST(VM4380Testing, Validate_ShutDown);

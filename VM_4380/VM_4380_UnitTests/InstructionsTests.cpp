@@ -8,10 +8,11 @@
 
 #include <iostream>
 #include <sstream>
+#include <cstring>
 
 #include "../include/Process_4380.h"
 #include "../include/ISA_4380.h"
-#include <StackAllocator.h>
+#include "../include/DWORDMemoryMap.h"
 
 using namespace VMFramework;
 
@@ -22,7 +23,8 @@ protected:
 
 	ISA_4380 _isa;
 
-	uint8_t _program[78] =
+	uint8_t* _program; 
+	uint8_t programCode[78] =
 	{
 		0x06, 0x00, 0x00, 0x00, 0x57, 0x65, 0x01, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x15, 0x00,
@@ -32,19 +34,22 @@ protected:
 	};
 
 	MemoryManager* m_memoryManager;
-
-	StackAllocator* _stack;
+	DWORDMemoryMap m_memoryMap;
 
 	Process_4380* _process;
 
 	void SetUp() override
 	{
 		m_memoryManager = MemoryManager::GetInstance();
-		m_memoryManager->StartUp();
+		m_memoryManager->StartUp(VMFramework::MebiByte * 400, m_memoryMap);
 
-		_stack = AllocateNewAllocator<StackAllocator>(100, this->m_memoryManager->m_systemAllocator);
+		_program = static_cast<uint8_t*>(m_memoryManager->AllocateUserPage(DWORDMemoryMap::PageTypes::normal));
 
-		_process = new Process_4380(7 * sizeof(uint8_t), _stack, _program, &_program[6], &_program[77], _mutex, &_isa);
+		std::memcpy(_program, programCode, 78);
+
+		void* stackMemory = m_memoryManager->AllocateUserPagesFor(VMFramework::MebiByte * 8);
+
+		_process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, m_memoryManager, VMFramework::MebiByte * 8, stackMemory);
 	}
 
 	void TearDown() override

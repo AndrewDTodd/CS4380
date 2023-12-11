@@ -8,7 +8,7 @@
 
 #include "../include/Process_4380.h"
 #include "../include/ISA_4380.h"
-#include <StackAllocator.h>
+#include "../include/DWORDMemoryMap.h"
 
 using namespace VMFramework;
 
@@ -17,9 +17,15 @@ class Process_4380Testing : public ::testing::Test
 protected:
 	std::shared_mutex _mutex;
 
+	MemoryManager* _memoryManager;
+	DWORDMemoryMap _memoryMap;
+
+	void* stackMemory;
+
 	ISA_4380 _isa;
 
-	uint8_t _program[78] =
+	uint8_t* _program;
+	uint8_t programCode[78] =
 	{
 		0x06, 0x00, 0x00, 0x00, 0x57, 0x65, 0x01, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x15, 0x00,
@@ -28,19 +34,21 @@ protected:
 		0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
 
-	void* _memory = malloc(100);
-
-	StackAllocator* _stack = new (_memory) StackAllocator(100, VMFramework::PointerMath::Add(_memory, sizeof(StackAllocator)));
-
 	void SetUp() override
 	{
+		_memoryManager = MemoryManager::GetInstance();
+		_memoryManager->StartUp(VMFramework::MebiByte, _memoryMap);
 
+		_program = static_cast<uint8_t*>(_memoryManager->AllocateUserPage(DWORDMemoryMap::PageTypes::normal));
+
+		std::memcpy(_program, programCode, 78);
+
+		stackMemory = _memoryManager->AllocateUserPagesFor(100);
 	}
 
 	void TearDown() override
 	{
-		_stack->~StackAllocator();
-		free(_memory);
+		_memoryManager->ShutDown();
 	}
 };
 
@@ -49,56 +57,57 @@ TEST_F(Process_4380Testing, Validate_ConstructorValidInput)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(6, _stack, nullptr, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], nullptr, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullCodeSegmentPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, nullptr, &_program[77], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, nullptr, &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramEndPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], nullptr, _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], nullptr, &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidCodeStart)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(6, _stack, _program, _program - 1, &_program[77], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, _program - 1, &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnPCInDataSegment)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(5, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[5], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidPC)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(-1, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(nullptr, _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(_program - 1, _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_Fetch)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
 
 	_process->Fetch();
 
@@ -116,18 +125,18 @@ TEST_F(Process_4380Testing, Validate_Increment)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
 
 	_process->Increment();
 
-	ASSERT_EQ(_program + _process->m_registers[16], _program + 0x12);
+	ASSERT_EQ(_memoryManager->Virtual_To_Physical<uint32_t>(_process->m_registers[16]), _program + 0x12);
 }
 
 TEST_F(Process_4380Testing, Validate_Decode)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
 
 	_process->opcode = 1;
 
@@ -146,7 +155,7 @@ TEST_F(Process_4380Testing, Validate_Execute)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(6, _stack, _program, &_program[6], &_program[77], _mutex, &_isa); });
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
 
 	_process->Fetch();
 

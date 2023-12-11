@@ -87,6 +87,11 @@ target_link_libraries(ASMFrameworkTests PRIVATE GTest::gtest_main)
 #include the AssemblerFramework library
 target_link_libraries(ASMFrameworkTests PRIVATE ASMFramework)
 
+target_include_directories(ASMFrameworkTests PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
+target_include_directories(ASMFramework PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
+
 include(GoogleTest)
 gtest_discover_tests(ASMFrameworkTests)
 ################################################################################################################################################################

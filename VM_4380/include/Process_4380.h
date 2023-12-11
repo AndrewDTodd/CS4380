@@ -130,7 +130,7 @@ public:
 	/// <param name="programStart">Pointer to the begining of the program in memory</param>
 	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 	/// <param name="isa">Pointer to the ISA instance to use</param>
-	Process_4380(const int32_t& initialPC, 
+	Process_4380(const void* initialPC, 
 		const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd,
 		ISA_4380* isa, std::shared_mutex& machineMutex, VMFramework::MemoryManager* memoryManager,
 		const size_t& stackBytes, void* stackStart);

@@ -17,11 +17,11 @@ namespace VMFramework
 		void* Allocate(const size_t&, const uint8_t&) override { return nullptr; };
 		void Deallocate(void*) override {};
 	public:
-		enum PageSize
+		/*enum PageSize
 		{
 			normal,
 			extended
-		};
+		};*/
 
 		PageAllocator(const size_t& size, void* start);
 		~PageAllocator();
@@ -29,16 +29,20 @@ namespace VMFramework
 		template<class PageType>
 		void* Allocate()
 		{
-			if (m_usedMemory + sizeof(PageType) > m_size)
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(m_currentPosition, alignof(void*));
+
+			if (m_usedMemory + adjustment + sizeof(PageType) > m_size)
 				return nullptr;
 
-			uintptr_t pageAddress = (uintptr_t)m_currentPosition;
-			m_currentPosition = (void*)(pageAddress + sizeof(PageType));
+			void* aligned_address = PointerMath::Add(m_currentPosition, adjustment);
 
-			m_usedMemory += sizeof(PageType);
+			m_currentPosition = PointerMath::Add(aligned_address, sizeof(PageType));
+
+			m_usedMemory += sizeof(PageType) + adjustment;
+
 			m_numOfAllocations++;
 
-			return (void*)pageAddress;
+			return aligned_address;
 		}
 
 		void Clear();

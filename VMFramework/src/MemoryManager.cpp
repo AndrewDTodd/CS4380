@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "../include/StackAllocator.h"
+#include "../include/LinearAllocator.h"
 
 #define MUL(a,b) ((a) * (b))
 
@@ -58,7 +58,7 @@ namespace VMFramework
 
 		this->m_systemMemory = malloc(systemBytes);
 
-		this->m_systemAllocator = new (this->m_systemMemory) StackAllocator(systemBytes - sizeof(StackAllocator), PointerMath::Add(this->m_systemMemory, sizeof(StackAllocator)));
+		this->m_systemAllocator = new (this->m_systemMemory) LinearAllocator(systemBytes - sizeof(LinearAllocator), PointerMath::Add(this->m_systemMemory, sizeof(LinearAllocator)));
 
 		const_cast<MemoryMap*&>(m_memoryMap) = &memoryMap;
 
@@ -74,7 +74,8 @@ namespace VMFramework
 			throw std::runtime_error("Calling ShutDown on an inactive MemoryManager is invalid");
 #endif // _DEBUG
 
-		this->m_systemAllocator->~StackAllocator();
+		this->m_systemAllocator->Clear();
+		this->m_systemAllocator->~LinearAllocator();
 		this->m_systemAllocator = nullptr;
 		free(this->m_systemMemory);
 		this->m_systemMemory = nullptr;

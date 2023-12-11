@@ -5,6 +5,7 @@
 
 #include "../include/VM4380.h"
 #include <Machine.h>
+#include <DWORDMemoryMap.h>
 
 using namespace VMFramework;
 
@@ -12,6 +13,7 @@ class VM4380Testing : public ::testing::Test
 {
 protected:
 	VM4380* _instance;
+	DWORDMemoryMap _memoryMap;
 
 	uint8_t _program[78] =
 	{
@@ -41,12 +43,12 @@ TEST_F(VM4380Testing, Validate_StartUp)
 {
 	ASSERT_EQ(_instance->m_memoryManager, nullptr);
 
-	ASSERT_NO_THROW({ _instance->StartUp(); });
+	ASSERT_NO_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); });
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
 
 #ifdef _DEBUG
-	ASSERT_THROW({ _instance->StartUp(); }, std::runtime_error);
+	ASSERT_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); }, std::runtime_error);
 #endif // _DEBUG
 
 	ASSERT_NO_THROW({ _instance->ShutDown(); });
@@ -58,7 +60,7 @@ TEST_F(VM4380Testing, Validate_ShutDown)
 	ASSERT_THROW({ _instance->ShutDown(); }, std::runtime_error);
 #endif // _DEBUG
 
-	ASSERT_NO_THROW({ _instance->StartUp(); });
+	ASSERT_NO_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); });
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
 
@@ -67,7 +69,7 @@ TEST_F(VM4380Testing, Validate_ShutDown)
 
 TEST_F(VM4380Testing, Validate_LoadProgram)
 {
-	ASSERT_NO_THROW({ _instance->StartUp(); });
+	ASSERT_NO_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); });
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
 
@@ -86,7 +88,7 @@ TEST_F(VM4380Testing, Validate_LoadProgram)
 
 TEST_F(VM4380Testing, Validate_SpawnProcess)
 {
-	ASSERT_NO_THROW({ _instance->StartUp(); });
+	ASSERT_NO_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); });
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
 
@@ -100,7 +102,7 @@ TEST_F(VM4380Testing, Validate_SpawnProcess)
 
 	std::cout.rdbuf(capturedOutput.rdbuf());
 
-	ASSERT_NO_THROW({ _instance->SpawnProcess(0x06); });
+	ASSERT_NO_THROW({ _instance->SpawnProcess(&_program[6]);});
 
 	ASSERT_EQ(_instance->m_processes.size(), 1);
 	ASSERT_EQ(_instance->m_processThreads.size(), 1);

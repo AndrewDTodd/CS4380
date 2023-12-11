@@ -17,16 +17,32 @@ namespace VMFramework
 		}
 	};
 
+	/*template<std::unsigned_integral SystemPtr>
+	class segmentation_fault : public std::exception
+	{
+	private:
+		const SystemPtr _virtualAddress;
+	public:
+		explicit segmentation_fault(const SystemPtr& virtualAddress) : _virtualAddress(virtualAddress)
+		{}
+
+		const char* what() const noexcept override
+		{
+			std::stringstream stream << "Segmentation Fault. Provided address is not valid: 0x" << std::hex << _virtualAddress;
+			return stream.str().c_str();
+		}
+	};*/
+
 	template<typename T>
 	concept PageAllocatorType = std::is_same_v<T, PageAllocator>;
 
 	class MemoryMap
 	{
 	protected:
-		const uint8_t* const& m_normalPagePhysicalAddressOrdinal;
+		const uint8_t* m_normalPagePhysicalAddressOrdinal = nullptr;
 		//const size_t m_userSpaceBytes;
 		PageAllocator** m_pageAllocators = nullptr;
-		const size_t m_numPageAllocators;
+		const size_t m_numPageAllocators = 0;
 
 		MemoryMap();
 		~MemoryMap();
@@ -36,9 +52,25 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="pageAllocators...">Variadic parameter containing the collection of PageAllocators that the derived Memory Map uses internally/supports</param>
 		template<PageAllocatorType... Page_Allocators>
-		void SetPageAllocators(Page_Allocators*... pageAllocators);
+		void SetPageAllocators(Page_Allocators*... pageAllocators)
+		{
+#ifdef _DEBUG
+			assert(m_pageAllocators == nullptr);
+#endif // _DEBUG
+
+			constexpr size_t numAllocators = sizeof...(pageAllocators);
+			const_cast<size_t&>(m_numPageAllocators) = numAllocators;
+
+			m_pageAllocators = new PageAllocator* [numAllocators] {pageAllocators...};
+		}
 
 	public:
+		enum PageReadWrite
+		{
+			readonly = false,
+			read_write = true
+		};
+
 		/// <summary>
 		/// Called by the MemoryManager to properly set up the Memory Maps resources with the provided systemAllocator resource
 		/// </summary>
@@ -52,7 +84,7 @@ namespace VMFramework
 		/// <param name="pageType">Id representing the type of page that should be created. Supported types determined by the specific MemoryMap implementation</param>
 		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		virtual void* AllocateUserPage(const uint8_t& pageType) = 0;
+		virtual inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable) = 0;
 
 		/// <summary>
 		/// Used to create a new page of memory in the system's/kernel's address space
@@ -60,7 +92,7 @@ namespace VMFramework
 		/// <param name="pageType">Id representing the type of page that should be created. Supported types determined by the specific MemoryMap implementation</param>
 		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		virtual void* AllocateKernelPage(const uint8_t& pageType) = 0;
+		virtual inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable) = 0;
 		
 		/// <summary>
 		/// Used to create as many pages as are necessary in the process's/users address space to satisfy the request for memory
@@ -68,7 +100,7 @@ namespace VMFramework
 		/// <param name="bytesNeeded">The amount of memory requested</param>
 		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		virtual inline void* AllocateUserPagesFor(const size_t& bytesNeeded) = 0;
+		virtual inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable) = 0;
 
 		/// <summary>
 		/// Used to create as many pages as are necessary in the system's/kernel's address space to satisfy the request for memory
@@ -76,7 +108,14 @@ namespace VMFramework
 		/// <param name="bytesNeeded">The amount of memory requested</param>
 		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		virtual inline void* AllocateKernelPagesFor(const size_t& bytesNeeded) = 0;
+		virtual inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable) = 0;
+
+		/// <summary>
+		/// Used to free any number of contiguouse pages that start at the address provided
+		/// </summary>
+		/// <param name="pagesStart">Pointer to the beginning of the first page in the sequence</param>
+		/// <param name="pagesBytes">The length in bytes of the sequence to free</param>
+		virtual inline void FreePages(void* pagesStart, const size_t& pagesBytes) = 0;
 
 		/// <summary>
 		/// Used to translate a virtual address into the mapped physical system address in system memory
@@ -84,7 +123,7 @@ namespace VMFramework
 		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses/pointers</typeparam>
 		/// <param name="virtualAddress">The virtual address to be translated to its associated physical address</param>
 		/// <returns>A system address/pointer that is mapped to the provided virtual address</returns>
-		template<std::unsigned_integral SystemPtr>
+		template<std::integral SystemPtr>
 		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress)
 		{
 			return nullptr;
@@ -96,10 +135,10 @@ namespace VMFramework
 		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses/pointers</typeparam>
 		/// <param name="physicalAddress">The the system address to be translated to a virtual address</param>
 		/// <returns>A virtual address mapped to the provided physical address</returns>
-		template<std::unsigned_integral SystemPtr>
+		template<std::integral SystemPtr>
 		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
 		{
-			return nullptr;
+			return 0;
 		};
 	};
 }

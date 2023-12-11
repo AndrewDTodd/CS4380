@@ -4,15 +4,16 @@
 
 using namespace VMFramework;
 
-void VM4380::SpawnProcess(const int32_t& initialPC)
+void VM4380::SpawnProcess(const void* initialPC)
 {
-	StackAllocator* processStack = AllocateNewAllocator<StackAllocator>(PROCESS_STACK_BYTES, this->m_memoryManager->m_systemAllocator);
+	void* stackMemory = m_memoryManager->AllocateUserPagesFor(PROCESS_STACK_SIZE);
 
 	try
 	{
-		Process_4380* process = new Process_4380(initialPC, processStack,
+		Process_4380* process = new Process_4380(initialPC,
 			m_programSegment, m_codeSegment, (m_programSegment + m_programSize),
-			VM4380::_sharedMutex, &m_ISA);
+			&m_ISA, VM4380::_sharedMutex,
+			m_memoryManager, PROCESS_STACK_SIZE, stackMemory);
 
 		std::thread processThread(&Process_4380::Run, process);
 
@@ -25,12 +26,11 @@ void VM4380::SpawnProcess(const int32_t& initialPC)
 			std::cerr << "Error when spawning process: " << rntEx.what() << std::endl;
 		RESET_TERMINAL
 
-		//Free this process stack from the system's resources
-		DeallocateDelete<StackAllocator>(*MemoryManager::GetInstance()->m_systemAllocator, *processStack);
+		m_memoryManager->FreePages(stackMemory, PROCESS_STACK_SIZE);
 	}
 }
 
-int32_t VM4380::CalculatePrimaryThreadInitPC()
+const void* VM4380::CalculatePrimaryThreadInitPC()
 {
 	int32_t offset;
 	if constexpr (is_little_endian)
@@ -51,5 +51,5 @@ int32_t VM4380::CalculatePrimaryThreadInitPC()
 	if (offset < 0 || offset >= m_programSize)
 		throw std::runtime_error("Offset to initial PC at begining of program is invalid. Offset is to byte " + std::to_string(offset) + ". Program size is " + std::to_string(m_programSize) + " bytes.");
 
-	return offset;
+	return m_programSegment + offset;
 }

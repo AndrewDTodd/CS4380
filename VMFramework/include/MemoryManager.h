@@ -6,7 +6,7 @@
 #include <shared_mutex>
 #include <concepts>
 
-#include "StackAllocator.h"
+#include "LinearAllocator.h"
 #include "MemoryMap.h"
 
 //#define TOTAL_GIBIGYTES_FOR_SYSTEM 1
@@ -33,7 +33,7 @@ namespace VMFramework
 		/// <summary>
 		/// Allocator used to partition the systemMemory and divy it up to the MemoryMap instances PageAllocators
 		/// </summary>
-		VMFramework::StackAllocator* m_systemAllocator = nullptr;
+		VMFramework::LinearAllocator* m_systemAllocator = nullptr;
 
 		/// <summary>
 		/// Pointer the the instance of this singleton that is created when GetInstance is called
@@ -79,9 +79,9 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configured MemoryMap implementation</param>
 		/// <returns>Pointer to the page allocated in system memory</returns>
-		inline void* AllocateUserPage(const uint8_t& pageType)
+		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap::PageReadWrite::read_write)
 		{
-			return m_memoryMap->AllocateUserPage(pageType);
+			return m_memoryMap->AllocateUserPage(pageType, pageWritable);
 		}
 
 		/// <summary>
@@ -89,9 +89,9 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configuration of MemoryMap implementation</param>
 		/// <returns>Pointer to the page allocated in system memory</returns>
-		inline void* AllocateKernelPage(const uint8_t& pageType)
+		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap::PageReadWrite::readonly)
 		{
-			return m_memoryMap->AllocateUserPage(pageType);
+			return m_memoryMap->AllocateUserPage(pageType, pageWritable);
 		}
 
 		/// <summary>
@@ -99,9 +99,9 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
-		inline void* AllocateUserPagesFor(const size_t& bytesNeeded)
+		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap::PageReadWrite::read_write)
 		{
-			return m_memoryMap->AllocateUserPagesFor(bytesNeeded);
+			return m_memoryMap->AllocateUserPagesFor(bytesNeeded, pageWritable);
 		}
 
 		/// <summary>
@@ -109,9 +109,19 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
-		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded)
+		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap::PageReadWrite::readonly)
 		{
-			return m_memoryMap->AllocateKernelPagesFor(bytesNeeded);
+			return m_memoryMap->AllocateKernelPagesFor(bytesNeeded, pageWritable);
+		}
+
+		/// <summary>
+		/// Used to free an allocation made by a process
+		/// </summary>
+		/// <param name="pagesStart">Poiner to the first byte of the first page in the sequence of pages to be freed</param>
+		/// <param name="pagesBytes">The number of bytes that was allocated and will now be freed. The total size of the pages to free</param>
+		inline void FreePages(void* pagesStart, const size_t& pagesBytes)
+		{
+			return m_memoryMap->FreePages(pagesStart, pagesBytes);
 		}
 
 		/// <summary>
@@ -120,7 +130,7 @@ namespace VMFramework
 		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses</typeparam>
 		/// <param name="virtualAddress">The virtual address to be translated/mapped into its associated physical address in system memory</param>
 		/// <returns>Pointer to the location in memory the provided virtual address maps to</returns>
-		template<std::unsigned_integral SystemPtr>
+		template<std::integral SystemPtr>
 		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress)
 		{
 			return m_memoryMap->Virtual_To_Physical<SystemPtr>(virtualAddress);
@@ -132,7 +142,7 @@ namespace VMFramework
 		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses</typeparam>
 		/// <param name="physicalAddress">The system/physical address to be translated/mapped into its associated virtual address in the caller's address space</param>
 		/// <returns>Virtual address in the callers address sapace associated with the provided system pointer</returns>
-		template<std::unsigned_integral SystemPtr>
+		template<std::integral SystemPtr>
 		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
 		{
 			return m_memoryMap->Physical_To_Virtual<SystemPtr>(physicalAddress);

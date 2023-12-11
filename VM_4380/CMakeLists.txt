@@ -175,6 +175,10 @@ target_link_libraries(VM4380_Tests PRIVATE GTest::gtest_main)
 #include the VMFramework library
 target_link_libraries(VM4380_Tests PRIVATE VMFramework)
 
+target_include_directories(VM4380_Tests PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+target_include_directories(VM4380 PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
+
 include(GoogleTest)
 gtest_discover_tests(VM4380_Tests)
 ################################################################################################################################################################

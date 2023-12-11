@@ -31,6 +31,7 @@ add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
 set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/DWORDMemoryMap.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/LinearAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryMap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PageAllocator.cpp
@@ -76,7 +77,7 @@ enable_testing()
 set(VM_FRAMEWORK_UNIT_TESTS
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework_UnitTests/MemoryManagerTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework_UnitTests/PointerMathTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework_UnitTests/StackAllocatorTests.cpp
+	
 
 )
 
@@ -88,6 +89,9 @@ target_link_libraries(VMFrameworkTests PRIVATE GTest::gtest_main)
 
 #include the VMFramework library
 target_link_libraries(VMFrameworkTests PRIVATE VMFramework)
+
+target_include_directories(VMFrameworkTests PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
 
 include(GoogleTest)
 gtest_discover_tests(VMFrameworkTests)

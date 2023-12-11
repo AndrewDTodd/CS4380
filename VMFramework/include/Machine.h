@@ -25,10 +25,6 @@
 
 namespace VMFramework
 {
-	constexpr size_t PROCESS_STACK_MiB = 8;
-	constexpr size_t PROCESS_STACK_BYTES = (MebiByte * PROCESS_STACK_MiB);
-	constexpr size_t SYSTEM_MEMORY = (GibiByte);
-
 	class segmentation_fault : public std::exception
 	{
 	private:
@@ -180,7 +176,7 @@ namespace VMFramework
 		/// Logic for how to do this is dependent of architecture and therefore must be implemented by realizing class
 		/// </summary>
 		/// <returns>Pouinter to the byte in the program segment to start execution at</returns>
-		virtual RegisterType CalculatePrimaryThreadInitPC() = 0;
+		virtual const void* CalculatePrimaryThreadInitPC() = 0;
 
 		/// <summary>
 		/// Will attempt to load the binary at the specified path and run the program. Used by StartUp(char*) to launch program
@@ -231,8 +227,8 @@ namespace VMFramework
 				return;
 			}
 
-			RegisterType offset = CalculatePrimaryThreadInitPC();
-			m_codeSegment = m_programSegment + offset;
+			const void* offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = static_cast<const uint8_t*>(offset);
 
 			SpawnProcess(offset);
 		}
@@ -241,7 +237,7 @@ namespace VMFramework
 		/// Create a new process to execute starting at the specified program location
 		/// </summary>
 		/// <param name="initialPC">Pointer to the location in the program where this process should begin execution</param>
-		virtual void SpawnProcess(const RegisterType& initialPC) = 0;
+		virtual void SpawnProcess(const void* initialPC) = 0;
 
 	public:
 		/// <summary>
@@ -442,8 +438,8 @@ namespace VMFramework
 				return;
 			}
 
-			RegisterType offset = CalculatePrimaryThreadInitPC();
-			m_codeSegment = m_programSegment + offset;
+			const void* offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = static_cast<const uint8_t*>(offset);
 
 			SpawnProcess(offset);
 		}
@@ -499,8 +495,8 @@ namespace VMFramework
 					return;
 			}
 
-			RegisterType offset = CalculatePrimaryThreadInitPC();
-			m_codeSegment = m_programSegment + offset;
+			const void* offset = CalculatePrimaryThreadInitPC();
+			m_codeSegment = static_cast<const uint8_t*>(offset);
 
 			SpawnProcess(offset);
 		}

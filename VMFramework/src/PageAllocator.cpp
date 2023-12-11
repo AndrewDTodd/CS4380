@@ -5,7 +5,7 @@
 
 namespace VMFramework
 {
-	PageAllocator::PageAllocator(const size_t& size, void* start) : Allocator(size, start)
+	PageAllocator::PageAllocator(const size_t& size, void* start) : Allocator(size, start), m_currentPosition(start)
 	{
 		assert(size > 0);
 	}

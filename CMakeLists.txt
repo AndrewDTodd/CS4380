@@ -217,6 +217,7 @@ set(ASM_4380_INSTRUCTIONS_TRP
 set(VM_FRAMEWORK_SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/Allocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/DWORDMemoryMap.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/LinearAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/MemoryManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/MemoryMap.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/src/PageAllocator.cpp
@@ -327,7 +328,7 @@ set(ASM_4380_UNIT_TESTS
 set(VM_FRAMEWORK_UNIT_TESTS
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/MemoryManagerTests.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/PointerMathTests.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/VMFramework/VMFramework_UnitTests/StackAllocatorTests.cpp
+	
 
 )
 ############################################################################
@@ -409,8 +410,8 @@ target_include_directories(VM4380 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/VM_4380/in
 include(FetchContent)
 FetchContent_Declare(
 	googletest
-	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 	DOWNLOAD_EXTRACT_TIMESTAMP true
+	URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -465,6 +466,11 @@ target_link_libraries(runAllTargetTests PRIVATE VMFramework)
 
 #include the AssemblerFramework library
 target_link_libraries(runAllTargetTests PRIVATE ASMFramework)
+
+target_include_directories(runAllTargetTests PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
+target_include_directories(monoSystem PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
+
 
 include(GoogleTest)
 gtest_discover_tests(runAllTargetTests)

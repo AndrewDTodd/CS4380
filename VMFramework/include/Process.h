@@ -139,18 +139,18 @@ namespace VMFramework
 
 			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
 
-			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignment);
+			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignment);
 
 			if (m_usedMemory + adjustment + size > m_size)
 				throw stack_overflow();
 
-			void* aligned_address = PointerMath::Add(currentPos, adjustment);
+			void* aligned_address = PointerMath::Subtract(currentPos, adjustment);
 
 #ifdef _DEBUG
 			m_prev_stack_pointer = currentPos;
 #endif // _DEBUG
 
-			currentPos = PointerMath::Add(aligned_address, size);
+			currentPos = PointerMath::Subtract(aligned_address, size);
 			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(currentPos);
 
 			m_usedMemory += size + adjustment;
@@ -178,14 +178,14 @@ namespace VMFramework
 		/// <param name="stackBytes">The number of bytes alloted to this process's stack</param>
 		/// <param name="stackStart">The address where the stack begins in memory</param>
 		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
-		Process(const RegisterType& initialPC, 
+		Process(const void* initialPC, 
 			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
 			ISAType* isa, std::shared_mutex& machineMutex, MemoryManager* memoryManager,
 			const size_t& stackBytes, void* stackStart): Allocator(stackBytes, stackStart),
 			_programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), 
 			_ISA(isa), _machineMutex(machineMutex), _memoryManager(memoryManager)
 		{
-			this->m_registers[16] = initialPC;
+			this->m_registers[16] = _memoryManager->Physical_To_Virtual<RegisterType>(initialPC);
 
 			if (_programStart == nullptr || _codeSegment == nullptr || _programEnd == nullptr)
 			{
@@ -204,24 +204,24 @@ namespace VMFramework
 				throw std::runtime_error(stream.str());
 			}
 
-			if (_programStart + this->m_registers[16] < _codeSegment)
+			if (initialPC < _codeSegment)
 			{
 				std::stringstream stream;
 				stream << "The initial PC cannot be less than the beginning address of the code segment of the program. Initial PC: 0x"
 					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(_programStart + this->m_registers[16])
+					<< reinterpret_cast<std::uintptr_t>(initialPC)
 					<< ". Code start address: 0x"
 					<< reinterpret_cast<std::uintptr_t>(_codeSegment);
 
 				throw std::runtime_error(stream.str());
 			}
 
-			if (_programStart + this->m_registers[16] < _programStart)
+			if (initialPC < _programStart || initialPC == nullptr)
 			{
 				std::stringstream stream;
 				stream << "The initial PC cannot be less than the beginning address of the program. Initial PC: 0x"
 					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(_programStart + this->m_registers[16])
+					<< reinterpret_cast<std::uintptr_t>(initialPC)
 					<< ". Program start address: 0x"
 					<< reinterpret_cast<std::uintptr_t>(_programStart);
 
@@ -292,9 +292,9 @@ namespace VMFramework
 		{
 			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
 
-			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignof(TypeToPop));
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPop));
 
-			void* prevPos = PointerMath::Subtract(currentPos, adjustment);
+			void* prevPos = PointerMath::Add(currentPos, adjustment);
 
 			m_numOfAllocations--;
 
@@ -303,18 +303,18 @@ namespace VMFramework
 			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(prevPos);
 		}
 
-		template<template TypeToPeek>
+		template<typename TypeToPeek>
 		void Peek(TypeToPeek& receiver)
 		{
 			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
 
-			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignof(TypeToPop));
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPeek));
 
-			void* prevPos = PointerMath::Subtract(currentPos, adjustment);
+			void* prevPos = PointerMath::Add(currentPos, adjustment);
 
 			m_numOfAllocations--;
 
-			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
+			receiver = *reinterpret_cast<TypeToPeek*>(currentPos);
 		}
 
 		void* AdvanceFrame()
@@ -325,6 +325,8 @@ namespace VMFramework
 #endif // _DEBUG
 
 			m_registers[20] = m_registers[19];
+
+			return _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[20]);
 		}
 	};
 }

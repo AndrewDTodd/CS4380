@@ -7,21 +7,17 @@
 
 namespace VMFramework
 {
+	MemoryMap::MemoryMap()
+	{}
+
 	MemoryMap::~MemoryMap()
 	{
+		for (size_t pageAllocator = 0; pageAllocator < m_numPageAllocators; pageAllocator++)
+		{
+			m_pageAllocators[pageAllocator]->Clear();
+			m_pageAllocators[pageAllocator]->ClearAllocator();
+		}
+
 		delete[] m_pageAllocators;
-	}
-
-	template<PageAllocatorType... Page_Allocators>
-	void MemoryMap::SetPageAllocators(Page_Allocators*... pageAllocators)
-	{
-#ifdef _DEBUG
-		assert(m_pageAllocators == nullptr);
-#endif // _DEBUG
-
-		constexpr size_t numAllocators = sizeof...(pageAllocators);
-		const_cast<size_t>(m_numPageAllocators) = numAllocators;
-
-		m_pageAllocators = new PageAllocator* [numAllocators]{pageAllocators...};
 	}
 }

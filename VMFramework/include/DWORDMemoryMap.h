@@ -4,6 +4,9 @@
 #include "MemoryMap.h"
 
 #include <filesystem>
+#include <sstream>
+
+#include "Machine.h"
 
 namespace VMFramework
 {
@@ -13,8 +16,8 @@ namespace VMFramework
 		static constexpr size_t MebiByte = 1048576;
 		static constexpr size_t SIZE_OF_NORMAL_PAGE = 4096;
 		static constexpr size_t NUM_OF_ENTRIES_PER_PAGE_TABLE = 1024;
-		static constexpr size_t NUM_OF_ENTRIES_IN_GLOBAL_DIR = 512;
-		static constexpr size_t BYTES_IN_NORMAL_PAGE_SPACE = NUM_OF_ENTRIES_IN_GLOBAL_DIR * NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
+		static constexpr size_t MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR = 512;
+		static constexpr size_t BYTES_IN_NORMAL_PAGE_SPACE = MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR * NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
 		static constexpr size_t BYTES_PER_PAGE_TABLE = NUM_OF_ENTRIES_PER_PAGE_TABLE * SIZE_OF_NORMAL_PAGE;
 
 		struct FourKiBPage
@@ -86,23 +89,25 @@ namespace VMFramework
 			uint32_t pageOffset : 22 = 0;
 		};
 
-		//uint32_t* m_pageGlobalDirectory[512];
 		PageTableEntry** m_pageGlobalDirectory;
-		const uint16_t m_pageGlobalDirectoryCount;
+		const uint16_t m_pageGlobalDirectoryCount = 0;
 		uint16_t m_currentPageTable = 0;
 		uint16_t m_pageTableNextIndex = 0;
 		uint16_t m_normalPageCount = 0;
  
-		const uint8_t* const& m_extendedPagesPhysicalAddressOrdinal;
-		//uint32_t* m_extendedPageGlobalDirectory[512];
+		const uint8_t* m_extendedPagesPhysicalAddressOrdinal = nullptr;
 		PageTableEntry* m_extendedPageGlobalDirectory;
-		const uint16_t m_extendedPageGlobalDirectoryCount;
+		const uint16_t m_extendedPageGlobalDirectoryCount = 0;
 		uint16_t m_nextExtendedPage = 0;
 		uint16_t m_extendedPageCount = 0;
 
-		
-
 	public:
+		enum PageTypes
+		{
+			normal = 0,
+			extended = 1
+		};
+
 		DWORDMemoryMap();
 		~DWORDMemoryMap();
 
@@ -115,7 +120,62 @@ namespace VMFramework
 		/// <param name="pageType">Id representing the type of page that should be created. 0 for normal page(4KiB), 1 for extended page(4MiB)</param>
 		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		void* AllocateUserPage(const uint8_t& pageType) override;
+		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable) override
+		{
+#ifdef _DEBUG
+			assert(pageType < m_numPageAllocators);
+#endif // _DEBUG
+
+			void* userPageAddress;
+			if (pageType == 0)
+			{
+				userPageAddress = m_pageAllocators[0]->Allocate<FourKiBPage>();
+				if (userPageAddress == nullptr)
+					throw out_of_memory();
+
+				m_normalPageCount++;
+
+				PageTableEntry entry;
+				entry.user = 1;
+				entry.present = 1;
+				entry.rw = pageWritable;
+				entry.frame_number = m_pageTableNextIndex;
+
+				m_pageGlobalDirectory[m_currentPageTable][m_pageTableNextIndex] = entry;
+				m_pageTableNextIndex++;
+
+				if (m_pageTableNextIndex == 1024)
+				{
+					m_currentPageTable++;
+#ifdef _DEBUG
+					assert(m_currentPageTable < m_pageGlobalDirectoryCount);
+#endif // _DEBUG
+
+					m_pageTableNextIndex = 0;
+				}
+			}
+			else
+			{
+				userPageAddress = m_pageAllocators[1]->Allocate<FourMiBPage>();
+				if (userPageAddress == nullptr)
+					throw out_of_memory();
+
+				m_extendedPageCount++;
+
+				PageTableEntry entry;
+				entry.user = 1;
+				entry.present = 1;
+				entry.pse = 1;
+				entry.rw = pageWritable;
+				entry.frame_number = m_nextExtendedPage;
+
+				m_extendedPageGlobalDirectory[m_nextExtendedPage] = entry;
+
+				m_nextExtendedPage++;
+			}
+
+			return userPageAddress;
+		}
 
 		/// <summary>
 		/// Used to create a new page of memory in the system's/kernel's address space
@@ -123,7 +183,62 @@ namespace VMFramework
 		/// <param name="pageType">Id representing the type of page that should be created. 0 for normal page(4KiB), 1 for extended page(4MiB)</param>
 		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		void* AllocateKernelPage(const uint8_t& pageType) override;
+		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable) override
+		{
+#ifdef _DEBUG
+			assert(pageType < m_numPageAllocators - 1);
+#endif // _DEBUG
+
+			void* kernelPageAddress;
+			if (pageType == 0)
+			{
+				kernelPageAddress = m_pageAllocators[0]->Allocate<FourKiBPage>();
+				if (kernelPageAddress == nullptr)
+					throw out_of_memory();
+
+				m_normalPageCount++;
+
+				PageTableEntry entry;
+				entry.user = 0;
+				entry.present = 1;
+				entry.rw = pageWritable;
+				entry.frame_number = m_pageTableNextIndex;
+
+				m_pageGlobalDirectory[m_currentPageTable][m_pageTableNextIndex] = entry;
+				m_pageTableNextIndex++;
+
+				if (m_pageTableNextIndex == 1024)
+				{
+					m_currentPageTable++;
+#ifdef _DEBUG
+					assert(m_currentPageTable < m_pageGlobalDirectoryCount);
+#endif // _DEBUG
+
+					m_pageTableNextIndex = 0;
+				}
+			}
+			else
+			{
+				kernelPageAddress = m_pageAllocators[1]->Allocate<FourMiBPage>();
+				if (kernelPageAddress == nullptr)
+					throw out_of_memory();
+
+				m_extendedPageCount++;
+
+				PageTableEntry entry;
+				entry.user = 0;
+				entry.present = 1;
+				entry.pse = 1;
+				entry.rw = pageWritable;
+				entry.frame_number = m_nextExtendedPage;
+
+				m_extendedPageGlobalDirectory[m_nextExtendedPage] = entry;
+
+				m_nextExtendedPage++;
+			}
+
+			return kernelPageAddress;
+		}
 
 		/// <summary>
 		/// Used to create as many pages as are necessary in the process's/users address space to satisfy the request for memory
@@ -131,7 +246,7 @@ namespace VMFramework
 		/// <param name="bytesNeeded">The amount of memory requested</param>
 		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		inline void* AllocateUserPagesFor(const size_t& bytesNeeded) override
+		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable) override
 		{
 			size_t numPagesNeeded;
 			void* addressFirstPage;
@@ -142,11 +257,11 @@ namespace VMFramework
 				if (bytesNeeded % sizeof(FourMiBPage) != 0)
 					numPagesNeeded++;
 
-				addressFirstPage = AllocateUserPage(1);
+				addressFirstPage = AllocateUserPage(1, pageWritable);
 
 				for (size_t page = 1; page < numPagesNeeded; page++)
 				{
-					AllocateUserPage(1);
+					AllocateUserPage(1, pageWritable);
 				}
 
 				return addressFirstPage;
@@ -157,11 +272,11 @@ namespace VMFramework
 				if (bytesNeeded % sizeof(FourKiBPage) != 0)
 					numPagesNeeded++;
 
-				addressFirstPage = AllocateUserPage(0);
+				addressFirstPage = AllocateUserPage(0, pageWritable);
 
 				for (size_t page = 1; page < numPagesNeeded; page++)
 				{
-					AllocateUserPage(0);
+					AllocateUserPage(0, pageWritable);
 				}
 
 				return addressFirstPage;
@@ -174,7 +289,7 @@ namespace VMFramework
 		/// <param name="bytesNeeded">The amount of memory requested</param>
 		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded) override
+		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable) override
 		{
 			size_t numPagesNeeded;
 			void* addressFirstPage;
@@ -185,11 +300,11 @@ namespace VMFramework
 				if (bytesNeeded % sizeof(FourMiBPage) != 0)
 					numPagesNeeded++;
 
-				addressFirstPage = AllocateKernelPage(1);
+				addressFirstPage = AllocateKernelPage(1, pageWritable);
 
 				for (size_t page = 1; page < numPagesNeeded; page++)
 				{
-					AllocateKernelPage(1);
+					AllocateKernelPage(1, pageWritable);
 				}
 
 				return addressFirstPage;
@@ -200,14 +315,69 @@ namespace VMFramework
 				if (bytesNeeded % sizeof(FourKiBPage) != 0)
 					numPagesNeeded++;
 
-				addressFirstPage = AllocateKernelPage(0);
+				addressFirstPage = AllocateKernelPage(0, pageWritable);
 
 				for (size_t page = 1; page < numPagesNeeded; page++)
 				{
-					AllocateKernelPage(0);
+					AllocateKernelPage(0, pageWritable);
 				}
 
 				return addressFirstPage;
+			}
+		}
+
+		inline void FreePages(void* pagesStart, const size_t& pagesBytes) override
+		{
+			const DWORDVirtualAddress startVirtualAddress = static_cast<DWORDVirtualAddress>(Physical_To_Virtual(pagesStart));
+#ifdef _DEBUG
+			const DWORDVirtualAddress endVirtualAddress = static_cast<DWORDVirtualAddress>(Physical_To_Virtual(static_cast<const uint8_t*>(pagesStart) + pagesBytes));
+
+			assert((startVirtualAddress.pageGlobalDirectoryIndex < MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1 && endVirtualAddress.pageGlobalDirectoryIndex < MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1) ||
+				(startVirtualAddress.pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1 && endVirtualAddress.pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1));
+#endif // _DEBUG
+
+			void* endAddress = static_cast<uint8_t*>(pagesStart) + pagesBytes;
+
+			if (startVirtualAddress.pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1)
+			{
+				for (void* currentAddress = pagesStart; currentAddress < endAddress; currentAddress = static_cast<uint8_t*>(currentAddress) + sizeof(FourKiBPage))
+				{
+					DWORDVirtualAddress currentVirtualAddress = static_cast<DWORDVirtualAddress>(Physical_To_Virtual(currentAddress));
+
+					PageTableEntry* entryPtr = m_pageGlobalDirectory[currentVirtualAddress.pageGlobalDirectoryIndex];
+					if (entryPtr != nullptr)
+					{
+						PageTableEntry& entry = entryPtr[currentVirtualAddress.pageTableIndex];
+
+						entry.present = 0;
+						entry.frame_number = 0;
+					}
+					else
+					{
+						std::stringstream stream;
+						stream << "Provided address is not valid: 0x" << std::hex << *reinterpret_cast<uint32_t*>(&currentVirtualAddress);
+						throw segmentation_fault(stream.str());
+					}
+				}
+			}
+			else
+			{
+				for (void* currentAddress = pagesStart; currentAddress < endAddress; currentAddress = static_cast<uint8_t*>(currentAddress) + sizeof(FourMiBPage))
+				{
+					DWORDExtendedPageAddress currentVirtualAddress = static_cast<DWORDExtendedPageAddress>(Physical_To_Virtual(currentAddress));
+
+					PageTableEntry entry = m_extendedPageGlobalDirectory[currentVirtualAddress.pageGlobalDirectoryIndex];
+
+					entry.present = 0;
+					entry.frame_number = 0;
+
+					if (entry.unused1)
+					{
+						std::stringstream stream;
+						stream << "Provided address is not valid: 0x" << std::hex << *reinterpret_cast<uint32_t*>(&currentVirtualAddress);
+						throw segmentation_fault(stream.str());
+					}
+				}
 			}
 		}
 
@@ -216,24 +386,24 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="virtualAddress">The internal virtual address needing translation</param>
 		/// <returns>Pointer to the physical address in the system's memory</returns>
-		inline void* Virtual_To_Physical(const uint32_t& virtualAddress)
+		inline void* Virtual_To_Physical(const int32_t& virtualAddress)
 		{
 			PageTableEntry pte;
 			uint8_t* physicalAddress;
 
-			const DWORDVirtualAddress pageAddress = reinterpret_cast<const DWORDVirtualAddress&>(virtualAddress);
+			const DWORDVirtualAddress pageAddress = static_cast<const DWORDVirtualAddress>(virtualAddress);
 
 			//This means the virtual address is to an extended page
-			if (pageAddress.pageGlobalDirectoryIndex > 511)
+			if (pageAddress.pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1)
 			{
-				const DWORDExtendedPageAddress extendedPageAddress = reinterpret_cast<const DWORDExtendedPageAddress&>(pageAddress);
+				const DWORDExtendedPageAddress* extendedPageAddress = reinterpret_cast<const DWORDExtendedPageAddress*>(&pageAddress);
 
-				if (extendedPageAddress.pageGlobalDirectoryIndex > m_extendedPageCount)
+				if (extendedPageAddress->pageGlobalDirectoryIndex > m_extendedPageCount)
 					throw std::invalid_argument("The global directory index portion of the virtual address is not valid");
 
-				pte = m_extendedPageGlobalDirectory[extendedPageAddress.pageGlobalDirectoryIndex];
+				pte = m_extendedPageGlobalDirectory[extendedPageAddress->pageGlobalDirectoryIndex];
 
-				physicalAddress = const_cast<uint8_t*&>(m_extendedPagesPhysicalAddressOrdinal) + (pte.frame_number * sizeof(FourMiBPage)) + extendedPageAddress.pageOffset;
+				physicalAddress = const_cast<uint8_t*&>(m_extendedPagesPhysicalAddressOrdinal) + (pte.frame_number * sizeof(FourMiBPage)) + extendedPageAddress->pageOffset;
 			}
 			//This means the virtual address is to a normal page
 			else
@@ -256,7 +426,7 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="physicalAddress">The physical system address to translate into a virtual address</param>
 		/// <returns>The virtual address mapped to the provided physical address</returns>
-		inline uint32_t Physical_To_Virtual(const void* const& physicalAddress)
+		inline int32_t Physical_To_Virtual(const void* const& physicalAddress)
 		{
 			if (physicalAddress < m_normalPagePhysicalAddressOrdinal)
 				throw std::invalid_argument("The address provided for translation is not within our pagable address space");
