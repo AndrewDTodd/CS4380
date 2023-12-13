@@ -30,10 +30,10 @@ add_definitions(-DVERSION_BUILD=${VERSION_BUILD})
 
 set(SOURCE_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Allocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/DWORDMemoryMap.cpp
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/src/LinearAllocator.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryManager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryMap.cpp
+	
+	
 	${CMAKE_CURRENT_SOURCE_DIR}/src/PageAllocator.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/VMFramework_GetVersion.cpp
 

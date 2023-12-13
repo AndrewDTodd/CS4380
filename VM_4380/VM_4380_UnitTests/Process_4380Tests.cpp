@@ -17,8 +17,8 @@ class Process_4380Testing : public ::testing::Test
 protected:
 	std::shared_mutex _mutex;
 
-	MemoryManager* _memoryManager;
-	DWORDMemoryMap _memoryMap;
+	MemoryManager<int32_t>* _memoryManager;
+	DWORDMemoryMap<int32_t> _memoryMap;
 
 	void* stackMemory;
 
@@ -36,10 +36,10 @@ protected:
 
 	void SetUp() override
 	{
-		_memoryManager = MemoryManager::GetInstance();
+		_memoryManager = MemoryManager<int32_t>::GetInstance();
 		_memoryManager->StartUp(VMFramework::MebiByte, _memoryMap);
 
-		_program = static_cast<uint8_t*>(_memoryManager->AllocateUserPage(DWORDMemoryMap::PageTypes::normal));
+		_program = static_cast<uint8_t*>(_memoryManager->AllocateUserPage(DWORDMemoryMap<int32_t>::PageTypes::normal));
 
 		std::memcpy(_program, programCode, 78);
 
@@ -129,7 +129,7 @@ TEST_F(Process_4380Testing, Validate_Increment)
 
 	_process->Increment();
 
-	ASSERT_EQ(_memoryManager->Virtual_To_Physical<uint32_t>(_process->m_registers[16]), _program + 0x12);
+	ASSERT_EQ(_memoryManager->Virtual_To_Physical(_process->m_registers[16]), _program + 0x12);
 }
 
 TEST_F(Process_4380Testing, Validate_Decode)

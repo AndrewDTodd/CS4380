@@ -36,16 +36,29 @@ namespace VMFramework
 	template<typename T>
 	concept PageAllocatorType = std::is_same_v<T, PageAllocator>;
 
+	template<std::integral RegisterType>
 	class MemoryMap
 	{
 	protected:
 		const uint8_t* m_normalPagePhysicalAddressOrdinal = nullptr;
-		//const size_t m_userSpaceBytes;
 		PageAllocator** m_pageAllocators = nullptr;
 		const size_t m_numPageAllocators = 0;
 
-		MemoryMap();
-		~MemoryMap();
+		MemoryMap()
+		{}
+
+		virtual ~MemoryMap()
+		{
+			for (size_t pageAllocator = 0; pageAllocator < m_numPageAllocators; pageAllocator++)
+			{
+				m_pageAllocators[pageAllocator]->Clear();
+			}
+
+			delete[] m_pageAllocators;
+			m_pageAllocators = nullptr;
+			m_normalPagePhysicalAddressOrdinal = nullptr;
+			const_cast<size_t&>(m_numPageAllocators) = 0;
+		}
 
 		/// <summary>
 		/// Used internally by deriving types to set the m_pageAllocators collection
@@ -77,6 +90,11 @@ namespace VMFramework
 		/// <param name="systemBytes">The number of bytes available in the systems memory to be managed by the Memory Map sub-system</param>
 		/// <param name="systemAllocator">The allocator used at the MemoryManager level to provide access to the systems memory</param>
 		virtual void Initialize(const size_t& systemBytes, Allocator* const& systemAllocator) = 0;
+
+		virtual void ShutDown()
+		{
+			this->~MemoryMap();
+		}
 
 		/// <summary>
 		/// Used to create a new page of memory in the process's/users address space
@@ -120,26 +138,16 @@ namespace VMFramework
 		/// <summary>
 		/// Used to translate a virtual address into the mapped physical system address in system memory
 		/// </summary>
-		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses/pointers</typeparam>
 		/// <param name="virtualAddress">The virtual address to be translated to its associated physical address</param>
 		/// <returns>A system address/pointer that is mapped to the provided virtual address</returns>
-		template<std::integral SystemPtr>
-		inline void* Virtual_To_Physical(const SystemPtr& virtualAddress)
-		{
-			return nullptr;
-		};
+		virtual inline void* Virtual_To_Physical(const RegisterType& virtualAddress) = 0;
 
 		/// <summary>
 		/// Used to translate a physical system address into the mapped virtual address in the proecess's virtual address space
 		/// </summary>
-		/// <typeparam name="SystemPtr">The type used by the underlying machine for its virtual addresses/pointers</typeparam>
 		/// <param name="physicalAddress">The the system address to be translated to a virtual address</param>
 		/// <returns>A virtual address mapped to the provided physical address</returns>
-		template<std::integral SystemPtr>
-		inline SystemPtr Physical_To_Virtual(const void* const& physicalAddress)
-		{
-			return 0;
-		};
+		virtual inline RegisterType Physical_To_Virtual(const void* const& physicalAddress) = 0;
 	};
 }
 #endif // !MEMORY_MAP_H

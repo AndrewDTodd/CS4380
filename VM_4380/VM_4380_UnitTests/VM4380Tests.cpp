@@ -13,9 +13,10 @@ class VM4380Testing : public ::testing::Test
 {
 protected:
 	VM4380* _instance;
-	DWORDMemoryMap _memoryMap;
+	DWORDMemoryMap<int32_t> _memoryMap;
 
-	uint8_t _program[78] =
+	uint8_t* _program;
+	uint8_t programCode[78] =
 	{
 		0x06, 0x00, 0x00, 0x00, 0x57, 0x65, 0x01, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x15, 0x00,
@@ -80,7 +81,7 @@ TEST_F(VM4380Testing, Validate_LoadProgram)
 	
 	for (uint8_t byteNum = 0; byteNum < _instance->m_programSize; byteNum++)
 	{
-		ASSERT_EQ(_instance->m_programSegment[byteNum], _program[byteNum]);
+		ASSERT_EQ(_instance->m_programSegment[byteNum], programCode[byteNum]);
 	}
 
 	ASSERT_NO_THROW({ _instance->ShutDown(); });
@@ -91,6 +92,10 @@ TEST_F(VM4380Testing, Validate_SpawnProcess)
 	ASSERT_NO_THROW({ _instance->StartUp(VMFramework::MebiByte * 400, _memoryMap); });
 
 	ASSERT_NE(_instance->m_memoryManager, nullptr);
+
+	_program = static_cast<uint8_t*>(_instance->m_memoryManager->AllocateUserPage(DWORDMemoryMap<int32_t>::PageTypes::normal));
+
+	std::memcpy(_program, programCode, 78);
 
 	_instance->m_programSegment = _program;
 	_instance->m_codeSegment = _program + 0x06;

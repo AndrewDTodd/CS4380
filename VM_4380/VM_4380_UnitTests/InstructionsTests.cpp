@@ -33,17 +33,17 @@ protected:
 		0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
 
-	MemoryManager* m_memoryManager;
-	DWORDMemoryMap m_memoryMap;
+	MemoryManager<int32_t>* m_memoryManager;
+	DWORDMemoryMap<int32_t> m_memoryMap;
 
 	Process_4380* _process;
 
 	void SetUp() override
 	{
-		m_memoryManager = MemoryManager::GetInstance();
+		m_memoryManager = MemoryManager<int32_t>::GetInstance();
 		m_memoryManager->StartUp(VMFramework::MebiByte * 400, m_memoryMap);
 
-		_program = static_cast<uint8_t*>(m_memoryManager->AllocateUserPage(DWORDMemoryMap::PageTypes::normal));
+		_program = static_cast<uint8_t*>(m_memoryManager->AllocateUserPage(DWORDMemoryMap<int32_t>::PageTypes::normal));
 
 		std::memcpy(_program, programCode, 78);
 

@@ -74,7 +74,7 @@ namespace VMFramework
 		/// <summary>
 		/// After StartUp will point to the machine's memory manager that is used to control dynamic memory allocation for stack and heaps as well as program segment
 		/// </summary>
-		MemoryManager* m_memoryManager = nullptr;
+		MemoryManager<RegisterType>* m_memoryManager = nullptr;
 
 		ISA m_ISA;
 
@@ -267,7 +267,7 @@ namespace VMFramework
 		/// <summary>
 		/// Will launch the machine and initialize the system
 		/// </summary>
-		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -277,7 +277,7 @@ namespace VMFramework
 #endif // _DEBUG
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
-			this->m_memoryManager = MemoryManager::GetInstance();
+			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
 			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 		}
 
@@ -285,7 +285,7 @@ namespace VMFramework
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap, const char* programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const char* programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -296,7 +296,7 @@ namespace VMFramework
 
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
-			this->m_memoryManager = MemoryManager::GetInstance();
+			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
 			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 
 			std::filesystem::path filePath(programBinary);
@@ -318,7 +318,7 @@ namespace VMFramework
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const size_t& systemBytes, MemoryMap& memoryMap, const std::filesystem::path& programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const std::filesystem::path& programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -329,7 +329,7 @@ namespace VMFramework
 
 
 			//Aquire pointer to MemoryManager instance and initialize the subsystem
-			this->m_memoryManager = MemoryManager::GetInstance();
+			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
 			this->m_memoryManager->StartUp(systemBytes, memoryMap);
 
 			//lauch the provided program

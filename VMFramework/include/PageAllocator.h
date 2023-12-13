@@ -29,20 +29,20 @@ namespace VMFramework
 		template<class PageType>
 		void* Allocate()
 		{
-			uint8_t adjustment = PointerMath::AlignForwardAdjustment(m_currentPosition, alignof(void*));
+			//uint8_t adjustment = PointerMath::AlignForwardAdjustment(m_currentPosition, alignof(void*));
 
-			if (m_usedMemory + adjustment + sizeof(PageType) > m_size)
+			if (m_usedMemory + sizeof(PageType) > m_size)
 				return nullptr;
 
-			void* aligned_address = PointerMath::Add(m_currentPosition, adjustment);
+			//void* aligned_address = PointerMath::Add(m_currentPosition, adjustment);
+			void* allocationAddress = m_currentPosition;
+			m_currentPosition = PointerMath::Add(m_currentPosition, sizeof(PageType));
 
-			m_currentPosition = PointerMath::Add(aligned_address, sizeof(PageType));
-
-			m_usedMemory += sizeof(PageType) + adjustment;
+			m_usedMemory += sizeof(PageType);
 
 			m_numOfAllocations++;
 
-			return aligned_address;
+			return allocationAddress;
 		}
 
 		void Clear();

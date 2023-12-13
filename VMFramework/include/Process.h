@@ -93,7 +93,7 @@ namespace VMFramework
 		/// <summary>
 		/// Pointer to the machines MemoryManager sub-system
 		/// </summary>
-		MemoryManager* _memoryManager;
+		MemoryManager<RegisterType>* _memoryManager;
 
 		bool _run = true;
 
@@ -137,7 +137,7 @@ namespace VMFramework
 		{
 			assert(size != 0);
 
-			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
 
 			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignment);
 
@@ -151,7 +151,7 @@ namespace VMFramework
 #endif // _DEBUG
 
 			currentPos = PointerMath::Subtract(aligned_address, size);
-			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(currentPos);
+			m_registers[19] = _memoryManager->Physical_To_Virtual(currentPos);
 
 			m_usedMemory += size + adjustment;
 
@@ -180,12 +180,24 @@ namespace VMFramework
 		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
 		Process(const void* initialPC, 
 			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
-			ISAType* isa, std::shared_mutex& machineMutex, MemoryManager* memoryManager,
+			ISAType* isa, std::shared_mutex& machineMutex, MemoryManager<RegisterType>* memoryManager,
 			const size_t& stackBytes, void* stackStart): Allocator(stackBytes, stackStart),
 			_programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), 
 			_ISA(isa), _machineMutex(machineMutex), _memoryManager(memoryManager)
 		{
-			this->m_registers[16] = _memoryManager->Physical_To_Virtual<RegisterType>(initialPC);
+			if (initialPC < _programStart || initialPC == nullptr)
+			{
+				std::stringstream stream;
+				stream << "The initial PC cannot be less than the beginning address of the program. Initial PC: 0x"
+					<< std::hex
+					<< reinterpret_cast<std::uintptr_t>(initialPC)
+					<< ". Program start address: 0x"
+					<< reinterpret_cast<std::uintptr_t>(_programStart);
+
+				throw std::runtime_error(stream.str());
+			}
+
+			this->m_registers[16] = _memoryManager->Physical_To_Virtual(initialPC);
 
 			if (_programStart == nullptr || _codeSegment == nullptr || _programEnd == nullptr)
 			{
@@ -216,23 +228,11 @@ namespace VMFramework
 				throw std::runtime_error(stream.str());
 			}
 
-			if (initialPC < _programStart || initialPC == nullptr)
-			{
-				std::stringstream stream;
-				stream << "The initial PC cannot be less than the beginning address of the program. Initial PC: 0x"
-					<< std::hex
-					<< reinterpret_cast<std::uintptr_t>(initialPC)
-					<< ". Program start address: 0x"
-					<< reinterpret_cast<std::uintptr_t>(_programStart);
-
-				throw std::runtime_error(stream.str());
-			}
-
 			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
-			stackBegin += m_size;
+			stackBegin += m_size - 1;
 
-			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual<RegisterType>(stackBegin);
-			m_registers[17] = _memoryManager->Physical_To_Virtual<RegisterType>(m_start);
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(stackBegin);
+			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
 		}
 
 		/// <summary>
@@ -269,8 +269,8 @@ namespace VMFramework
 			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
 			stackBegin += m_size;
 
-			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual<RegisterType>(stackBegin);
-			m_registers[17] = _memoryManager->Physical_To_Virtual<RegisterType>(m_start);
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(stackBegin);
+			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
 
 #ifdef _DEBUG
 			m_prev_stack_pointer = nullptr;
@@ -290,7 +290,7 @@ namespace VMFramework
 		template<typename TypeToPop>
 		void Pop(TypeToPop& receiver)
 		{
-			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
 
 			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPop));
 
@@ -300,13 +300,13 @@ namespace VMFramework
 
 			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
 
-			m_registers[19] = _memoryManager->Physical_To_Virtual<RegisterType>(prevPos);
+			m_registers[19] = _memoryManager->Physical_To_Virtual(prevPos);
 		}
 
 		template<typename TypeToPeek>
 		void Peek(TypeToPeek& receiver)
 		{
-			void* currentPos = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[19]);
+			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
 
 			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPeek));
 
@@ -320,13 +320,13 @@ namespace VMFramework
 		void* AdvanceFrame()
 		{
 #ifdef _DEBUG
-			void* currentFramePointer = _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[20]);
+			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
 			m_previouse_frame_pointer = currentFramePointer;
 #endif // _DEBUG
 
 			m_registers[20] = m_registers[19];
 
-			return _memoryManager->Virtual_To_Physical<RegisterType>(m_registers[20]);
+			return _memoryManager->Virtual_To_Physical(m_registers[20]);
 		}
 	};
 }

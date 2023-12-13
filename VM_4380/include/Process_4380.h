@@ -39,7 +39,7 @@ protected:
 	FRIEND_TEST(Process_4380Testing, Validate_Fetch);
 	inline void Fetch() override
 	{
-		const uint8_t* _nextInstruction = _programStart + m_registers[16];
+		const uint8_t* _nextInstruction = static_cast<const uint8_t*>(_memoryManager->Virtual_To_Physical(m_registers[16]));
 		if (_nextInstruction >= _codeSegment && _nextInstruction <= _programEnd - sizeof(FetchBlock))
 		{
 			FetchBlock block;
@@ -78,7 +78,9 @@ protected:
 	inline void Increment() override
 	{
 		//Increment the PC by 12 (3 * 4 bytes for int32_t, or 12 bytes)
-		m_registers[16] += sizeof(FetchBlock);
+		uint8_t* PCPhysicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(m_registers[16]));
+		PCPhysicalAddress += sizeof(FetchBlock);
+		m_registers[16] = _memoryManager->Physical_To_Virtual(PCPhysicalAddress);
 	}
 
 	/// <summary>
@@ -132,7 +134,7 @@ public:
 	/// <param name="isa">Pointer to the ISA instance to use</param>
 	Process_4380(const void* initialPC, 
 		const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd,
-		ISA_4380* isa, std::shared_mutex& machineMutex, VMFramework::MemoryManager* memoryManager,
+		ISA_4380* isa, std::shared_mutex& machineMutex, VMFramework::MemoryManager<int32_t>* memoryManager,
 		const size_t& stackBytes, void* stackStart);
 
 	//Arth ******************************************************************************
