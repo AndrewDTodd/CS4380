@@ -17,6 +17,30 @@
 
 #include "rootConfig.h"
 
+const size_t registerCount = 21;
+
+struct HeapPointerRegisters : public VMFramework::Registers<int32_t>
+{
+public:
+	inline static int32_t heapPointer = 0;
+
+	int32_t& operator[](const size_t& reg) override
+	{
+		if (reg == 21)
+		{
+			return heapPointer;
+		}
+#ifdef _DEBUG
+		else if (reg >= registerCount)
+		{
+			throw std::out_of_range("There is no register " + reg);
+		}
+#endif // _DEBUG
+
+		return registers[reg];
+	}
+};
+
 class Process_4380 : public VMFramework::Process<Process_4380, int32_t, ISA_4380>
 {
 protected:
@@ -77,10 +101,17 @@ protected:
 	FRIEND_TEST(Process_4380Testing, Validate_Increment);
 	inline void Increment() override
 	{
-		//Increment the PC by 12 (3 * 4 bytes for int32_t, or 12 bytes)
-		uint8_t* PCPhysicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(m_registers[16]));
-		PCPhysicalAddress += sizeof(FetchBlock);
-		m_registers[16] = _memoryManager->Physical_To_Virtual(PCPhysicalAddress);
+		////Increment the PC by 12 (3 * 4 bytes for int32_t, or 12 bytes)
+		if constexpr (is_little_endian)
+		{
+			m_registers[16] += sizeof(FetchBlock);
+		}
+		else
+		{
+			uint8_t* PCPhysicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(m_registers[16]));
+			PCPhysicalAddress += sizeof(FetchBlock);
+			m_registers[16] = _memoryManager->Physical_To_Virtual(PCPhysicalAddress);
+		}
 	}
 
 	/// <summary>
@@ -134,7 +165,7 @@ public:
 	/// <param name="isa">Pointer to the ISA instance to use</param>
 	Process_4380(const void* initialPC, 
 		const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd,
-		ISA_4380* isa, std::shared_mutex& machineMutex, VMFramework::MemoryManager<int32_t>* memoryManager,
+		ISA_4380* isa, VMFramework::Registers<int32_t>& processRegisters, VMFramework::MemoryManager<int32_t>* memoryManager,
 		const size_t& stackBytes, void* stackStart);
 
 	//Arth ******************************************************************************
@@ -162,9 +193,21 @@ public:
 	//************************************************************************************
 	
 	//Heap *******************************************************************************
+	FRIEND_TEST(VMInstructionTesting, Validate_ALCI);
+	friend ALCI;
+	FRIEND_TEST(VMInstructionsTesting, Validate_ALLC_L);
+	friend ALLC_L;
+	FRIEND_TEST(VMInstructionsTesting, Validate_ALLC_R);
+	friend ALLC_R;
+	FRIEND_TEST(VMInstructionsTesting, Validate_FREE);
+	friend FREE;
 	//************************************************************************************
 	
 	//Jump *******************************************************************************
+	FRIEND_TEST(VMInstructionsTesting, Validate_BAL_L);
+	friend BAL_L;
+	FRIEND_TEST(VMInstructionsTesting, Validate_BAL_R);
+	friend BAL_R;
 	FRIEND_TEST(VMInstructionsTesting, Validate_BGT);
 	friend BGT;
 	FRIEND_TEST(VMInstructionsTesting, Validate_BLT);
@@ -180,6 +223,12 @@ public:
 	//************************************************************************************
 	
 	//Logical ****************************************************************************
+	FRIEND_TEST(VMInstructionsTesting, Validate_AND);
+	friend AND;
+	FRIEND_TEST(VMInstructionsTesting, Validate_NOT);
+	friend NOT;
+	FRIEND_TEST(VMInstructionsTesting, Validate_OR);
+	friend OR;
 	//************************************************************************************
 	
 	//Move *******************************************************************************
@@ -208,6 +257,25 @@ public:
 	//************************************************************************************
 	
 	//Multi-Thread ***********************************************************************
+	FRIEND_TEST(VMInstructionsTesting, Validate_BLK);
+	friend BLK;
+	FRIEND_TEST(VMInstructionsTesting, Validate_END);
+	friend END;
+	FRIEND_TEST(VMInstructionsTesting, Validate_LCK);
+	friend LCK;
+	FRIEND_TEST(VMInstructionsTesting, Validate_RUN);
+	friend RUN;
+	FRIEND_TEST(VMInstructionsTesting, Validate_ULK);
+	friend ULK;
+	//************************************************************************************
+
+	//Stack ******************************************************************************
+	FRIEND_TEST(VMInstructionsTesting, Validate_PEEK);
+	friend PEEK;
+	FRIEND_TEST(VMInstructionsTesting, Validate_POP);
+	friend POP;
+	FRIEND_TEST(VMInstructionsTesting, Validate_PUSH);
+	friend PUSH;
 	//************************************************************************************
 	
 	//TRP ********************************************************************************

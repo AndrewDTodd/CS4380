@@ -167,5 +167,5 @@ TEST_F(Process_4380Testing, Validate_Execute)
 
 	_process->Execute();
 
-	ASSERT_EQ(_program + _process->m_registers[16], _program + 0x12);
+	ASSERT_EQ(_process->m_registers[16], _process->_memoryManager->Physical_To_Virtual(_program + 0x12));
 }

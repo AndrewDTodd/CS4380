@@ -61,4 +61,4 @@ size_t BGT_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 	}
 
 		return sizeof(int32_t) * 3;
-	}
+}

@@ -78,11 +78,11 @@ TEST_F(VMInstructionsTesting, Validate_ADD)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](13)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](13)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](13)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](13)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](13)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](13)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](13)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_ADDI)
@@ -103,11 +103,11 @@ TEST_F(VMInstructionsTesting, Validate_ADDI)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](14)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](14)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](14)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](14)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](14)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](14)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](14)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_DIV)
@@ -128,11 +128,11 @@ TEST_F(VMInstructionsTesting, Validate_DIV)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](17)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](17)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](17)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](17)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](17)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](17)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](17)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_DIVI)
@@ -153,11 +153,11 @@ TEST_F(VMInstructionsTesting, Validate_DIVI)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](34)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](34)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](34)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](34)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](34)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](34)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](34)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_MUL)
@@ -178,11 +178,11 @@ TEST_F(VMInstructionsTesting, Validate_MUL)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](16)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](16)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](16)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](16)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](16)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](16)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](16)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_MULI)
@@ -203,11 +203,11 @@ TEST_F(VMInstructionsTesting, Validate_MULI)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](33)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](33)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](33)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](33)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](33)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](33)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](33)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_SUB)
@@ -228,11 +228,11 @@ TEST_F(VMInstructionsTesting, Validate_SUB)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](15)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](15)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](15)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](15)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](15)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](15)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](15)->Op(_process));
 }
 //*******************************************************************************************************
 
@@ -273,11 +273,11 @@ TEST_F(VMInstructionsTesting, Validate_CMP)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](20)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](20)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](20)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](20)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](20)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](20)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](20)->Op(_process));
 }
 
 TEST_F(VMInstructionsTesting, Validate_CMPI)
@@ -316,11 +316,11 @@ TEST_F(VMInstructionsTesting, Validate_CMPI)
 	_process->operandOne = 18;
 	ASSERT_THROW(_isa.operator[](32)->Op(_process), VMFramework::protection_fault);
 	_process->operandOne = 19;
-	ASSERT_THROW(_isa.operator[](32)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](32)->Op(_process));
 	_process->operandOne = 20;
-	ASSERT_THROW(_isa.operator[](32)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](32)->Op(_process));
 	_process->operandOne = 21;
-	ASSERT_THROW(_isa.operator[](32)->Op(_process), VMFramework::protection_fault);
+	ASSERT_NO_THROW(_isa.operator[](32)->Op(_process));
 }
 //*******************************************************************************************************
 
@@ -333,7 +333,8 @@ TEST_F(VMInstructionsTesting, Validate_BGT)
 
 	_isa.operator[](4)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 
 	_process->m_registers[0] = 0;
 	_process->operandOne = 0;
@@ -341,7 +342,7 @@ TEST_F(VMInstructionsTesting, Validate_BGT)
 
 	_isa.operator[](4)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_BLT)
@@ -352,7 +353,8 @@ TEST_F(VMInstructionsTesting, Validate_BLT)
 
 	_isa.operator[](5)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 
 	_process->m_registers[0] = 0;
 	_process->operandOne = 0;
@@ -360,7 +362,7 @@ TEST_F(VMInstructionsTesting, Validate_BLT)
 
 	_isa.operator[](5)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_BNZ)
@@ -371,7 +373,8 @@ TEST_F(VMInstructionsTesting, Validate_BNZ)
 
 	_isa.operator[](3)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 
 	_process->m_registers[0] = 1;
 	_process->operandOne = 0;
@@ -379,7 +382,8 @@ TEST_F(VMInstructionsTesting, Validate_BNZ)
 
 	_isa.operator[](3)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x30);
+	targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x30);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 
 	_process->m_registers[0] = 0;
 	_process->operandOne = 0;
@@ -387,7 +391,7 @@ TEST_F(VMInstructionsTesting, Validate_BNZ)
 
 	_isa.operator[](3)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x30);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_BRZ)
@@ -415,7 +419,8 @@ TEST_F(VMInstructionsTesting, Validate_BRZ)
 
 	_isa.operator[](6)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x40);
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x40);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_JMP_L)
@@ -423,17 +428,19 @@ TEST_F(VMInstructionsTesting, Validate_JMP_L)
 	_process->operandOne = 0x12;
 	_isa.operator[](1)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[16], 0x12);
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_JMR)
 {
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
 	_process->m_registers[0] = 0x12;
 	_process->operandOne = 0;
 
 	_isa.operator[](2)->Op(_process);
 
-	ASSERT_EQ(_program + _process->m_registers[16], _program + 0x12);
+	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
 }
 //*******************************************************************************************************
 
@@ -441,11 +448,11 @@ TEST_F(VMInstructionsTesting, Validate_JMR)
 TEST_F(VMInstructionsTesting, Validate_LDA)
 {
 	_process->operandOne = 0;
-	_process->operandTwo = 4;
+	_process->operandTwo = 0x12;
 
 	_isa.operator[](8)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[0], 4);
+	ASSERT_EQ(_process->m_registers[0], 0x12);
 }
 
 TEST_F(VMInstructionsTesting, Validate_LDB_L)

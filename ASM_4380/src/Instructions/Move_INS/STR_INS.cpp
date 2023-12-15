@@ -9,7 +9,7 @@ size_t STR_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 {
 #ifdef _DEBUG
 	if (args.size() != 2)
-		throw std::runtime_error("The .STR instruction expects two arguments, " + std::to_string(args.size()) + " given");
+		throw std::runtime_error("The STR instruction expects two arguments, " + std::to_string(args.size()) + " given");
 #endif // _DEBUG
 
 	//Register to label version

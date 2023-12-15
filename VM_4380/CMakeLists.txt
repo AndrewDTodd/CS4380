@@ -48,11 +48,16 @@ set(VM_4380_INSTRUCTIONS_COMP
 )
 
 set(VM_4380_INSTRUCTIONS_HEAP
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Heap/ALCI.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Heap/ALLC_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Heap/ALLC_R.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Heap/FREE.cpp
 
 )
 
 set(VM_4380_INSTRUCTIONS_JUMP
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BAL_L.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BAL_R.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BGT.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BLT.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Jump/BNZ.cpp
@@ -63,7 +68,9 @@ set(VM_4380_INSTRUCTIONS_JUMP
 )
 
 set(VM_4380_INSTRUCTIONS_LOGICAL
-	
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Logical/AND.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Logical/NOT.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Logical/OR.cpp
 
 )
 
@@ -83,6 +90,18 @@ set(VM_4380_INSTRUCTIONS_MOVE
 )
 
 set(VM_4380_INSTRUCTIONS_MULTI_THREAD
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Multi_Thread/BLK.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Multi_Thread/END.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Multi_Thread/LCK.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Multi_Thread/RUN.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Multi_Thread/ULK.cpp
+
+)
+
+set(VM_4380_INSTRUCTIONS_STACK
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack/PEEK.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack/POP.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Instructions/Stack/PUSH.cpp
 
 )
 
@@ -101,6 +120,7 @@ ${VM_4380_INSTRUCTIONS_JUMP}
 ${VM_4380_INSTRUCTIONS_LOGICAL} 
 ${VM_4380_INSTRUCTIONS_MOVE} 
 ${VM_4380_INSTRUCTIONS_MULTI_THREAD} 
+${VM_4380_INSTRUCTIONS_STACK}
 ${VM_4380_INSTRUCTIONS_TRP})
 
 #Signify that the VM_4380 executable depends upon the VMFramework library

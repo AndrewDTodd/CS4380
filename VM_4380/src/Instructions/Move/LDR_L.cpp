@@ -10,62 +10,29 @@ LDR_L::LDR_L() : Instruction(10)
 
 void LDR_L::Op(Process_4380* executingProcess)
 {
-	if (!(executingProcess->operandOne > 15 && executingProcess->operandOne < 22))
+	executingProcess->CheckRegisterIDInvalid<16, 17, 18>(executingProcess->operandOne);
+
+	const uint8_t* _source = executingProcess->_programStart + executingProcess->operandTwo;
+	if (_source < executingProcess->_programEnd)
 	{
-		const uint8_t* _source = executingProcess->_programStart + executingProcess->operandTwo;
-		if (_source < executingProcess->_programEnd)
+		if constexpr (is_little_endian)
 		{
-			if constexpr (is_little_endian)
-			{
-				std::memcpy(&executingProcess->m_registers[executingProcess->operandOne], _source, sizeof(int32_t));
-			}
-			else
-			{
-				int32_t value;
-				std::memcpy(&value, _source, sizeof(int32_t));
-
-				uint8_t* bytePtr = reinterpret_cast<uint8_t*>(&value);
-
-				std::reverse(bytePtr, bytePtr + sizeof(int32_t));
-
-				executingProcess->m_registers[executingProcess->operandOne] = value;
-			}
+			std::memcpy(&executingProcess->m_registers[executingProcess->operandOne], _source, sizeof(int32_t));
 		}
 		else
 		{
-			throw VMFramework::segmentation_fault("Tried to read from memory outside the program space");
+			int32_t value;
+			std::memcpy(&value, _source, sizeof(int32_t));
+
+			uint8_t* bytePtr = reinterpret_cast<uint8_t*>(&value);
+
+			std::reverse(bytePtr, bytePtr + sizeof(int32_t));
+
+			executingProcess->m_registers[executingProcess->operandOne] = value;
 		}
 	}
 	else
 	{
-#ifdef _DEBUG
-		switch (executingProcess->operandOne)
-		{
-		case 16:
-			throw VMFramework::protection_fault("LDR used to modify PC");
-			break;
-
-		case 17:
-			throw VMFramework::protection_fault("LDR used to modify SL");
-			break;
-
-		case 18:
-			throw VMFramework::protection_fault("LDR used to modify SB");
-			break;
-
-		case 19:
-			throw VMFramework::protection_fault("LDR used to modify SP");
-			break;
-
-		case 20:
-			throw VMFramework::protection_fault("LDR used to modify FP");
-			break;
-
-		case 21:
-			throw VMFramework::protection_fault("LDR used to modify HP");
-		}
-#else
-		throw VMFramework::protection_fault("Improper modification of reserved register");
-#endif // _DEBUG
+		throw VMFramework::segmentation_fault("Tried to read from memory outside the program space");
 	}
 }

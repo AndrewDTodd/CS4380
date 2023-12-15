@@ -7,5 +7,5 @@ JMP_L::JMP_L() : Instruction(1)
 
 void JMP_L::Op(Process_4380* executingProcess)
 {
-	executingProcess->m_registers[16] = executingProcess->operandOne;
+	executingProcess->m_registers[16] = executingProcess->_memoryManager->Physical_To_Virtual(executingProcess->_programStart + executingProcess->operandOne);
 }

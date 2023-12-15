@@ -139,6 +139,19 @@ void TRP::Op(Process_4380* executingProcess)
 		}
 		break;
 
+	case(5):
+		uint8_t* str = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[3]));
+		uint8_t& length = *str;
+
+		for (uint8_t charNum = 1; charNum < length; charNum++)
+		{
+			std::cout << str[charNum];
+		}
+		break;
+
+	case(6):
+
+
 	default:
 		throw std::runtime_error("Invalid trap code detected: " + std::to_string(executingProcess->operandOne));
 	}

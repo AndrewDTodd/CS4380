@@ -17,42 +17,9 @@ size_t PEEK_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Work
 
 	int32_t id = langDef->GetRegisterID<int32_t>(registerMnemonic);
 
+	CheckRegisterIDInvalid<int32_t, 16, 17, 18>(id);
+
 	SerializeToBuffer<int32_t>(buffer, opcode, id, 0);
-
-	if (id > 15)
-	{
-		switch (id)
-		{
-		case 16:
-			throw Warning("This is not a valid way to set the PC and will result in a runtime protection fault", sizeof(int32_t) * 3);
-			break;
-
-		case 17:
-			throw Warning("Setting the SL in this way is dangerous. Behavior is undefined. Reconsider what you're doing", sizeof(int32_t) * 3);
-			break;
-
-		case 18:
-			throw Warning("Setting the SB in this way is dangerous. Behavior is undefined. Reconsider what you're doing", sizeof(int32_t) * 3);
-			break;
-
-		case 19:
-			throw Warning("Setting the SP this way is dangerous. Behavior is undefined. Reconsider what you're doing", sizeof(int32_t) * 3);
-			break;
-
-		case 20:
-			throw Warning("Setting the FP this way is dangerous. Behavior is undefined. Reconsider what you're doing", sizeof(int32_t) * 3);
-			break;
-
-		case 21:
-			throw Warning("Setting the HP this way is dangerous. Behavior is undefined. Reconsider what you're doing", sizeof(int32_t) * 3);
-			break;
-
-#ifdef _DEBUG
-		default:
-			throw std::logic_error("**Debug logic_error** Somehow LanguageDefinition->GetRegisterID returned a value that we dont handle");
-			break;
-#endif // _DEBUG
-		}
 
 	return sizeof(int32_t) * 3;
 }

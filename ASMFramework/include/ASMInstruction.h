@@ -202,6 +202,44 @@ namespace ASMFramework
 			}
 		}
 
+		/// <summary>
+		/// Used internally by the CheckRegisterIDWarning method to make a string with the register ids that will trigger a warning
+		/// </summary>
+		/// <typeparam name="...WarnRegisterIDs">A collection of the register IDs that are to trigger a warning in the calling context</typeparam>
+		/// <returns>A string with the registers that trigger a warning</returns>
+		template<uint8_t... WarnRegisterIDs>
+		inline std::string Warning_MakeStringFlagedRegisters() const
+		{
+			std::ostringstream oss;
+			((oss << ", R" << WarnRegisterIDs), ...);
+			return oss.str();
+		}
+
+		/// <summary>
+		/// Used internally by the CheckRegisterIDInvalid method to make a string with the invalid register ids
+		/// </summary>
+		/// <typeparam name="...InvalidRegisterIDs">A collection of the register IDs that are invalid in the calling context</typeparam>
+		/// <returns>A string with the registers that are invalid</returns>
+		template<uint8_t... InvalidRegisterIDs>
+		inline std::string Exeption_MakeStringInvalidRegisters() const
+		{
+			std::ostringstream oss;
+			((oss << ", R" << InvalidRegisterIDs), ...);
+			return oss.str();
+		}
+
+		/// <summary>
+		/// Called by an Assember INS to verify the provided register id and throw an exeption if it is invalid in the calling context
+		/// </summary>
+		/// <typeparam name="RegisterType">The type used for the register id to be validated</typeparam>
+		/// <typeparam name="...InvalidRegisterIDs">A collection of the register IDs that are to be considered invalid in the calling context</typeparam>
+		/// <param name="id">The register id to verify</param>
+		template<std::integral RegisterType, uint8_t... InvalidRegisterIDs>
+		inline void CheckRegisterIDInvalid(const RegisterType& id) const
+		{
+			((id == InvalidRegisterIDs ? throw std::runtime_error("You may not set the value of special registers this way." + Exeption_MakeStringInvalidRegisters<InvalidRegisterIDs>()) : void()), ...);
+		}
+
 	public:
 		class NotImplemented : public std::exception
 		{
@@ -242,6 +280,18 @@ namespace ASMFramework
 		/// <exception cref="ASMInstruction::NotImplemented Thrown by the instruction to signify that its tooling is not implemented, and therefore the instruction is unsupported at this time"/>
 		/// <exception cref="ASMInstruction::Warning Thrown by the instruciton if a condition is met that warrants a warning to the user, but not a failure of the assembly process. Will return the number of bytes written to the buffer allong with the warning message"/>
 		virtual size_t Implementation(std::vector<uint8_t>& buffer, Workpiece* const& workpiece, const LanguageDefinition* const& langDef, const std::vector<std::string>& args) const = 0;
+
+		/// <summary>
+		/// Called by an Assember INS to check the provided register id against those that should trigger a warning in the calling context
+		/// </summary>
+		/// <typeparam name="RegisterType">The type used for the register id to be validated</typeparam>
+		/// <typeparam name="...WarnRegisterIDs">A collection of the register IDs that should trigger a warning in the calling context</typeparam>
+		/// <param name="id">The register id to check</param>
+		template<std::integral RegisterType, uint8_t... WarnRegisterIDs>
+		inline void CheckRegisterIDWarning(const RegisterType& id, size_t&& bytesWritten) const
+		{
+			((id == WarnRegisterIDs ? throw Warning("R" + std::to_string(id) + "is considered dangerouse to use in this context. The following registers will cause this warning in this context" + Warning_MakeStringFlagedRegisters<WarnRegisterIDs>(), bytesWritten) : void()), ...);
+		}
 	};
 }
 #endif // !ASMINSTRUCTION_H

@@ -15,6 +15,15 @@ namespace VMFramework
 		{}
 
 	public:
+		class NotImplemented : public std::exception
+		{
+		public:
+			const char* what() const noexcept override
+			{
+				return "Machine does not yet support this Instruction";
+			}
+		};
+
 		/// <summary>
 		/// The numeric code associated with this operation
 		/// </summary>

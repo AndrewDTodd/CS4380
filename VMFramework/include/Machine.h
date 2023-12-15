@@ -39,20 +39,6 @@ namespace VMFramework
 		}
 	};
 
-	class protection_fault : public std::exception
-	{
-	private:
-		const std::string _msg;
-	public:
-		explicit protection_fault(std::string&& message): _msg(message)
-		{}
-
-		const char* what() const noexcept override
-		{
-			return _msg.c_str();
-		}
-	};
-
 	template<typename Derived, typename RegisterType, typename ProcessType, typename ISA>
 	requires std::derived_from<ProcessType, VMFramework::Process<ProcessType, RegisterType, ISA>> && std::derived_from<ISA, VMFramework::ISA<RegisterType, ProcessType>>
 	class Machine

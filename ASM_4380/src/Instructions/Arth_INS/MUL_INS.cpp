@@ -17,10 +17,11 @@ size_t MUL_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 	int32_t registerIdOne = langDef->GetRegisterID<int32_t>(args[0]);
 	int32_t registerIdTwo = langDef->GetRegisterID<int32_t>(args[1]);
 
-	if (registerIdOne > 15)
-		throw std::runtime_error("You may not set the value of special registers this way. \"" + args[0] + "\" is not valid in this context. R0 - R15 are valid");
+	CheckRegisterIDInvalid<int32_t, 16, 17, 18>(registerIdOne);
 
 	SerializeToBuffer<int32_t>(buffer, opcode, registerIdOne, registerIdTwo);
+
+	CheckRegisterIDWarning<int32_t, 19, 20, 21>(registerIdOne, sizeof(int32_t) * 3);
 
 	return sizeof(int32_t) * 3;
 }

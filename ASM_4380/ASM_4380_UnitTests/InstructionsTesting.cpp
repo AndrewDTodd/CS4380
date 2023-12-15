@@ -43,7 +43,12 @@ TEST_F(ASMInstructionsTesting, Validate_ADD)
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R-12", "R0"}), std::out_of_range);
 
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "R0"}), std::runtime_error);
-	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), std::runtime_error);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
 
 	ASSERT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -67,6 +72,14 @@ TEST_F(ASMInstructionsTesting, Validate_ADI)
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", ""}), std::runtime_error);
 	
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#FFF"}), std::runtime_error);
+
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "#12"}), std::runtime_error);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
+	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
 
 	ASSERT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
@@ -153,6 +166,14 @@ TEST_F(ASMInstructionsTesting, Validate_DIVI)
 
 	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#FFF"}), std::runtime_error);
 
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "#12"}), std::runtime_error);
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
+	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
+	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
+
 	ASSERT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
 	int32_t* _intPtr = reinterpret_cast<int32_t*>(_buffer.data() + _buffer.size() - sizeof(int32_t) * 3);
@@ -234,7 +255,12 @@ TEST_F(ASMInstructionsTesting, Validate_DIV)
 	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R-12", "R0"}), std::out_of_range);
 
 	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "R0"}), std::runtime_error);
-	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), std::runtime_error);
+	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
+	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
+	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
+	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
 
 	ASSERT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -255,9 +281,16 @@ TEST_F(ASMInstructionsTesting, Validate_MULI)
 	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R-12", ""}), std::out_of_range);
 
 	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", ""}), std::runtime_error);
-	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", ""}), std::runtime_error);
 
 	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#FFF"}), std::runtime_error);
+
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "#12"}), std::runtime_error);
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
+	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
+	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
 
 	ASSERT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
@@ -340,7 +373,12 @@ TEST_F(ASMInstructionsTesting, Validate_MUL)
 	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R-12", "R0"}), std::out_of_range);
 
 	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "R0"}), std::runtime_error);
-	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), std::runtime_error);
+	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
+	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
+	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
+	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
 
 	ASSERT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -361,7 +399,12 @@ TEST_F(ASMInstructionsTesting, Validate_SUB)
 	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R-12", "R0"}), std::out_of_range);
 
 	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"PC", "R0"}), std::runtime_error);
-	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), std::runtime_error);
+	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
+	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
+
+	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
+	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
+	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
 
 	ASSERT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 

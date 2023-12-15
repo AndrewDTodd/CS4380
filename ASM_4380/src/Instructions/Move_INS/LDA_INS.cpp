@@ -17,10 +17,14 @@ size_t LDA_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 	int32_t id = langDef->GetRegisterID<int32_t>(args[0]);
 	int64_t offset = GetLabelOffset(labelName, workpiece);
 
+	CheckRegisterIDInvalid<int32_t, 16, 17, 18>(id);
+
 	SerializeToBuffer<int32_t>(buffer, opcode, id, offset);
 
 	if (offset == 0)
 		AddUnresolvedLabel<int32_t>(labelName, buffer, workpiece);
+
+	CheckRegisterIDWarning<int32_t, 19, 20, 21>(id, sizeof(int32_t) * 3);
 
 	return sizeof(int32_t) * 3;
 }

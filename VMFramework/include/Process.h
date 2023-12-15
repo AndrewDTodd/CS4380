@@ -16,7 +16,7 @@
 #include "MemoryManager.h"
 #include "ISA.h"
 
-constexpr size_t registerCount = 22;
+extern const size_t registerCount;
 
 namespace VMFramework
 {
@@ -29,16 +29,39 @@ namespace VMFramework
 		}
 	};
 
+	class stack_underflow : public std::exception
+	{
+	public:
+		const char* what() const noexcept override
+		{
+			return "Stack Underflow detected: Calling Pop when there isn't anything on the stack";
+		}
+	};
+
+	class protection_fault : public std::exception
+	{
+	private:
+		const std::string _msg;
+	public:
+		explicit protection_fault(std::string&& message) : _msg(message)
+		{}
+
+		const char* what() const noexcept override
+		{
+			return _msg.c_str();
+		}
+	};
+
 	template<typename RegisterType>
 	struct Registers
 	{
 	public:
 		RegisterType registers[registerCount];
 
-		RegisterType& operator[](const size_t& reg)
+		virtual RegisterType& operator[](const size_t& reg)
 		{
 #ifdef _DEBUG
-			if (reg < 0 || reg >= registerCount)
+			if (reg >= registerCount)
 			{
 				throw std::out_of_range("There is no register " + reg);
 			}
@@ -58,7 +81,7 @@ namespace VMFramework
 		/// <summary>
 		/// Register state of this thread of execution
 		/// </summary>
-		ProcessRegisters m_registers;
+		ProcessRegisters& m_registers;
 
 		/// <summary>
 		/// Stack for this thread of execution
@@ -88,7 +111,7 @@ namespace VMFramework
 		/// <summary>
 		/// Reference to the Machine instances mutex. Used for concurrent read access and exclusive write access
 		/// </summary>
-		const std::shared_mutex& _machineMutex;
+		//const std::shared_mutex& _machineMutex;
 
 		/// <summary>
 		/// Pointer to the machines MemoryManager sub-system
@@ -163,7 +186,161 @@ namespace VMFramework
 		void Deallocate(void* p) override
 		{
 		}
+
+		void ClearAllocator() override
+		{
+			Allocator::ClearAllocator();
+
+			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
+			stackBegin += m_size;
+
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(stackBegin);
+			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
+
+#ifdef _DEBUG
+			m_prev_stack_pointer = nullptr;
+			m_previouse_frame_pointer = nullptr;
+#endif // _DEBUG
+		}
+
+		template<typename TypeToPush>
+		void* Push(const TypeToPush& itemToPush)
+		{
+			TypeToPush* stackInstance = static_cast<TypeToPush*>(Allocate(sizeof(TypeToPush), alignof(TypeToPush)));
+			*stackInstance = itemToPush;
+
+			return stackInstance;
+		}
+
+		template<typename TypeToPop>
+		void Pop(TypeToPop& receiver)
+		{
+			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
+
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPop));
+
+			void* prevPos = PointerMath::Add(currentPos, adjustment);
+
+			m_numOfAllocations--;
+
+			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
+
+			m_registers[19] = _memoryManager->Physical_To_Virtual(prevPos);
+		}
+
+		template<typename TypeToPeek>
+		void Peek(TypeToPeek& receiver)
+		{
+			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
+
+			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPeek));
+
+			void* prevPos = PointerMath::Add(currentPos, adjustment);
+
+			m_numOfAllocations--;
+
+			receiver = *reinterpret_cast<TypeToPeek*>(currentPos);
+		}
+
+		void AdvanceFrame()
+		{
+#ifdef _DEBUG
+			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
+			m_previouse_frame_pointer = currentFramePointer;
+#endif // _DEBUG
+
+			Push<RegisterType>(m_registers[20]);
+
+			m_registers[20] = m_registers[19];
+		}
+		void RollBackFrame()
+		{
+			RegisterType* framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
+			framePointer++;
+			m_registers[20] = *framePointer;
+			framePointer++;
+			m_registers[19] = _memoryManager->Physical_To_Virtual(framePointer);
+
+#ifdef _DEBUG
+			framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
+
+			if (static_cast<RegisterType*>(m_previouse_frame_pointer) != framePointer)
+				throw std::logic_error("There is something wrong with the logic of the rolling back of frames, or frame advancement and rollback have not all been handled by the internal functions");
+#endif // _DEBUG
+		}
+
+		void AdvanceAndLink()
+		{
+#ifdef _DEBUG
+			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
+			m_previouse_frame_pointer = currentFramePointer;
+#endif // _DEBUG
+
+			Push<RegisterType>(m_registers[20]);
+
+			m_registers[20] = m_registers[19];
+
+			Push<RegisterType>(m_registers[16]);
+		}
+		RegisterType RollBackWithLink()
+		{
+			RegisterType* framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
+
+			RegisterType& link = *framePointer;
+
+			framePointer++;
+			m_registers[20] = *framePointer;
+			framePointer++;
+			m_registers[19] = _memoryManager->Physical_To_Virtual(framePointer);
+
+#ifdef _DEBUG
+			framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
+
+			if (static_cast<RegisterType*>(m_previouse_frame_pointer) != framePointer)
+				throw std::logic_error("There is something wrong with the logic of the rolling back of frames, or frame advancement and rollback have not all been handled by the internal functions");
+#endif // _DEBUG
+		}
 		//****************************************************************
+
+		/// <summary>
+		/// Used to check if a register id provided as an instruction operand is invalid in the calling context. It is compared to the values provided in the InvalidRegisterIDs and a protection_fault is thrown if it matches any
+		/// </summary>
+		/// <typeparam name="...InvalidRegisterIDs">A collection of the register IDs that are not valid for the calling context</typeparam>
+		/// <param name="id">The register id to validate</param>
+		template<uint8_t... InvalidRegisterIDs>
+		inline void CheckRegisterIDInvalid(const RegisterType& id)
+		{
+			((id == InvalidRegisterIDs ? throw protection_fault(std::string(typeid(*this).name()) + " used to modify R" + std::to_string(InvalidRegisterIDs)) : void()), ...);
+		}
+
+		inline RegisterType INCREMENT_POINTER(const RegisterType& virtualAddress, const RegisterType& bytesToIncrement)
+		{
+			uint8_t* physicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(virtualAddress));
+			physicalAddress += bytesToIncrement;
+			return _memoryManager->Physical_To_Virtual(physicalAddress);
+		}
+
+		inline RegisterType DECREMENT_POINTER(const RegisterType& virtualAddress, const RegisterType& bytesToIncrement)
+		{
+			uint8_t* physicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(virtualAddress));
+			physicalAddress -= bytesToIncrement;
+			return _memoryManager->Physical_To_Virtual(physicalAddress);
+		}
+
+		inline RegisterType MULTIPLY_POINTER(const RegisterType& virtualAddress, const RegisterType& multiple)
+		{
+			uint8_t* physicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(virtualAddress));
+			physicalAddress *= multiple;
+			return _memoryManager->Physical_To_Virtual(physicalAddress);
+		}
+
+		inline RegisterType DIVIDE_POINTER(const RegisterType& virtualAddress, const RegisterType& divisor)
+		{
+			uint8_t* physicalAddress = static_cast<uint8_t*>(_memoryManager->Virtual_To_Physical(virtualAddress));
+			physicalAddress /= divisor;
+			return _memoryManager->Physical_To_Virtual(physicalAddress);
+		}
+
 	public:
 		/// <summary>
 		/// Create Process specifying where in the program it will begin execution
@@ -180,10 +357,10 @@ namespace VMFramework
 		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
 		Process(const void* initialPC, 
 			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
-			ISAType* isa, std::shared_mutex& machineMutex, MemoryManager<RegisterType>* memoryManager,
+			ISAType* isa, Registers<RegisterType>& processRegisters, MemoryManager<RegisterType>* memoryManager,
 			const size_t& stackBytes, void* stackStart): Allocator(stackBytes, stackStart),
 			_programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), 
-			_ISA(isa), _machineMutex(machineMutex), _memoryManager(memoryManager)
+			_ISA(isa), m_registers(processRegisters), _memoryManager(memoryManager)
 		{
 			if (initialPC < _programStart || initialPC == nullptr)
 			{
@@ -260,73 +437,6 @@ namespace VMFramework
 
 				delete this;
 			}
-		}
-
-		void ClearAllocator() override
-		{
-			Allocator::ClearAllocator();
-
-			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
-			stackBegin += m_size;
-
-			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(stackBegin);
-			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
-
-#ifdef _DEBUG
-			m_prev_stack_pointer = nullptr;
-			m_previouse_frame_pointer = nullptr;
-#endif // _DEBUG
-		}
-
-		template<typename TypeToPush>
-		void* Push(const TypeToPush& itemToPush)
-		{
-			TypeToPush* stackInstance = static_cast<TypeToPush*>(Allocate(sizeof(TypeToPush), alignof(TypeToPush)));
-			*stackInstance = itemToPush;
-
-			return stackInstance;
-		}
-
-		template<typename TypeToPop>
-		void Pop(TypeToPop& receiver)
-		{
-			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
-
-			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPop));
-
-			void* prevPos = PointerMath::Add(currentPos, adjustment);
-
-			m_numOfAllocations--;
-
-			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
-
-			m_registers[19] = _memoryManager->Physical_To_Virtual(prevPos);
-		}
-
-		template<typename TypeToPeek>
-		void Peek(TypeToPeek& receiver)
-		{
-			void* currentPos = _memoryManager->Virtual_To_Physical(m_registers[19]);
-
-			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPeek));
-
-			void* prevPos = PointerMath::Add(currentPos, adjustment);
-
-			m_numOfAllocations--;
-
-			receiver = *reinterpret_cast<TypeToPeek*>(currentPos);
-		}
-
-		void* AdvanceFrame()
-		{
-#ifdef _DEBUG
-			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
-			m_previouse_frame_pointer = currentFramePointer;
-#endif // _DEBUG
-
-			m_registers[20] = m_registers[19];
-
-			return _memoryManager->Virtual_To_Physical(m_registers[20]);
 		}
 	};
 }

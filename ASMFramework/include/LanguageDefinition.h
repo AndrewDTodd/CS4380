@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <concepts>
 #include <limits>
+#include <sstream>
 
 namespace ASMFramework
 {
@@ -88,7 +89,7 @@ namespace ASMFramework
 		/// <param name="...mnemonics">Parameter pack (variable number) of Keywords (strings) to load into LanguageDefinition</param>
 		void SetRegisterMnemonics(StringType auto&&... mnemonics)
 		{
-			static_assert(sizeof...(mnemonics) <= 255, "System only supports up to 255 registers");
+			static_assert(sizeof...(mnemonics) <= 255, "Framework only supports up to 255 registers");
 
 			std::unordered_map<std::string, const uint8_t>& non_const_regMnemonics =
 				const_cast<std::unordered_map<std::string, const uint8_t>&>(m_registerMnemonics);
@@ -207,7 +208,6 @@ namespace ASMFramework
 		{
 			return static_cast<TargetType>(m_registerMnemonics.at(mnemonic));
 		}
-
 
 		LanguageDefinition(const LanguageDefinition&) = delete;
 		LanguageDefinition& operator=(const LanguageDefinition&) = delete;

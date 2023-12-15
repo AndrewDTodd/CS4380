@@ -9,7 +9,7 @@ size_t LDB_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 {
 #ifdef _DEBUG
 	if (args.size() != 2)
-		throw std::runtime_error("The .LDB instruction expects two arguments, " + std::to_string(args.size()) + " given");
+		throw std::runtime_error("The LDB instruction expects two arguments, " + std::to_string(args.size()) + " given");
 #endif // _DEBUG
 
 	//Label to register version
@@ -22,10 +22,14 @@ size_t LDB_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 
 		uint64_t& offset = GetLabelOffset(labelName, workpiece);
 
+		CheckRegisterIDInvalid<int32_t, 16, 17, 18>(registerID);
+
 		SerializeToBuffer<int32_t>(buffer, opcode, registerID, offset);
 
 		if (offset == 0)
 			AddUnresolvedLabel<int32_t>(labelName, buffer, workpiece);
+
+		CheckRegisterIDWarning<int32_t, 19, 20, 21>(registerID, sizeof(int32_t) * 3);
 	}
 	//Register to Register verison
 	else
@@ -35,7 +39,11 @@ size_t LDB_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 		int32_t registerOneID = langDef->GetRegisterID<int32_t>(args[0]);
 		int32_t registerTwoID = langDef->GetRegisterID<int32_t>(args[1]);
 
+		CheckRegisterIDInvalid<int32_t, 16, 17, 18>(registerOneID);
+
 		SerializeToBuffer<int32_t>(buffer, opcode, registerOneID, registerTwoID);
+
+		CheckRegisterIDWarning<int32_t, 19, 20, 21>(registerOneID, sizeof(int32_t) * 3);
 	}
 
 	return sizeof(int32_t) * 3;

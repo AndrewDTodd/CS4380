@@ -25,9 +25,15 @@ Instruction<int32_t, Process_4380>* instructions[] =
 	//***************
 
 	//Heap **********
+	new ALCI(),
+	new ALLC_L(),
+	new ALLC_R(),
+	new FREE(),
 	//***************
 
 	//Jump **********
+	new BAL_L(),
+	new BAL_R(),
 	new BGT(),
 	new BLT(),
 	new BNZ(),
@@ -37,6 +43,9 @@ Instruction<int32_t, Process_4380>* instructions[] =
 	//***************
 
 	//Logical *******
+	new AND(),
+	new NOT(),
+	new OR(),
 	//***************
 
 	//Move **********
@@ -54,6 +63,17 @@ Instruction<int32_t, Process_4380>* instructions[] =
 	//***************
 
 	//Multi_Thread **
+	new BLK(),
+	new END(),
+	new LCK(),
+	new RUN(),
+	new ULK(),
+	//***************
+
+	//Stack *********
+	new PEEK(),
+	new POP(),
+	new PUSH(),
 	//***************
 
 	//TRP ***********
@@ -61,6 +81,6 @@ Instruction<int32_t, Process_4380>* instructions[] =
 	//***************
 };
 
-ISA_4380::ISA_4380(): ISA<int32_t, Process_4380>(instructions, 27)
+ISA_4380::ISA_4380(): ISA<int32_t, Process_4380>(instructions, 44)
 {
 }

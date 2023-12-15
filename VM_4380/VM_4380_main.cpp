@@ -10,6 +10,7 @@
 #include "rootConfig.h"
 
 constexpr size_t maxPathLength = 256;
+constexpr size_t SYSTEM_MEMORY = VMFramework::GibiByte;
 
 int main(int argc, char* argv[])
 {
@@ -29,9 +30,9 @@ int main(int argc, char* argv[])
 
 	VM = VM4380::GetInstance();
 
-	VMFramework::DWORDMemoryMap memoryMap;
+	VMFramework::DWORDMemoryMap<int32_t> memoryMap;
 
-	VM->StartUp(VMFramework::SYSTEM_MEMORY, memoryMap);
+	VM->StartUp(SYSTEM_MEMORY, memoryMap);
 
 	std::filesystem::path filePath;
 	if (argc > 1)
