@@ -18,11 +18,13 @@ FIB_BODY	PUSH	R15				;store the current link register (R15) on the stack
 			ADI		R0, #-1			;calculate this levels n - 1 and set it to R0 (the register used to pass argument one to a subroutine)
 			PUSH	R0				;store our current n value on the stack
 			BAL		R15, FIB		;recursive call one to FIB
+			POP		FP				;BAL will write the current FP onto the stack when called, so when we return from it we need to restore it from the stack
 			MOV		R1, R0			;copy value returned from call to fib into R1 (returned from fib in R0)
 			POP		R0				;restore the value of n from the stack, put it back into R0 so it can be used as an argument to next branch of fib
 			PUSH	R1				;store the result of that branch of recusion (FIB) that just returned. Returned DWORD in R0, we copied into R1
 			ADI		R0, #1			;calculate this levels n - 2
 			BAL		R15, FIB		;recursive call two to FIB
+			POP		FP				;again restore the FP from the stack
 			POP		R1				;restore the result of first branch of fib back into R1
 			ADD		R0, R1			;calculate fin(n - 1) + fin(n - 2), result in R0 for returning of value
 			POP		R15				;restore out R15 (link register) value that we pushed at the beginning of this recursive step
@@ -43,6 +45,7 @@ WHILE_BODY	LDA		R3, WHILE_MSG
 
 CALL_FIB	PUSH	R0
 			BAL		R15, FIB
+			POP		FP
 
 			LDA		R3, RTN_MSG_ONE
 			TRP		#5

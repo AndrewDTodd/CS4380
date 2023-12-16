@@ -206,7 +206,15 @@ namespace ASMFramework
 		template<std::integral TargetType>
 		inline TargetType GetRegisterID(const std::string& mnemonic) const
 		{
-			return static_cast<TargetType>(m_registerMnemonics.at(mnemonic));
+			try
+			{
+				return static_cast<TargetType>(m_registerMnemonics.at(mnemonic));
+			}
+			//If the Register mnemonic argument inst in the language definition
+			catch (const std::out_of_range& rangeEx)
+			{
+				throw std::runtime_error("The register mnemonic - \"" + mnemonic + "\" - is undefined (not contained within the language definition)");
+			}
 		}
 
 		LanguageDefinition(const LanguageDefinition&) = delete;
