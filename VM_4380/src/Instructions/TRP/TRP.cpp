@@ -15,7 +15,13 @@ TRP::TRP() : Instruction(21)
 
 void TRP::Op(Process_4380* executingProcess)
 {
+	uint8_t placeholder = 0;
 	std::string input;
+	uint8_t* heapStrPtr;
+	uint8_t* str;
+	uint8_t& length = placeholder;
+	size_t strLength;
+	char* cstrPtr;
 
 	switch (executingProcess->operandOne)
 	{
@@ -55,7 +61,7 @@ void TRP::Op(Process_4380* executingProcess)
 			}
 			catch (const std::invalid_argument& argEx)
 			{
-				throw std::runtime_error("invlaid_argument thrown when trying to convert input to base ten int \"" + input +
+				throw std::runtime_error("invalid_argument thrown when trying to convert input to base ten int \"" + input +
 					"\"\n>>>" + argEx.what());
 			}
 			catch (const std::out_of_range& rngEx)
@@ -74,7 +80,7 @@ void TRP::Op(Process_4380* executingProcess)
 		}
 		catch (const std::invalid_argument& argEx)
 		{
-			throw std::runtime_error("invlaid_argument thrown when trying to convert input to base ten int \"" + input +
+			throw std::runtime_error("invalid_argument thrown when trying to convert input to base ten int \"" + input +
 				"\"\n>>>" + argEx.what());
 		}
 		catch (const std::out_of_range& rngEx)
@@ -100,7 +106,7 @@ void TRP::Op(Process_4380* executingProcess)
 				unsigned long value = std::stoul(input, nullptr, 16);
 
 				if (value > std::numeric_limits<uint8_t>::max())
-					throw std::runtime_error("Cannot assign byte value to register outisde the range of " + std::to_string(std::numeric_limits<uint8_t>::min()) + " - " +
+					throw std::runtime_error("Cannot assign byte value to register outside the range of " + std::to_string(std::numeric_limits<uint8_t>::min()) + " - " +
 						std::to_string(std::numeric_limits<uint8_t>::max()) + " inclusive. Argument was \"" + input + "\" (" + std::to_string(value) + ")");
 
 				executingProcess->m_registers[3] = static_cast<uint8_t>(value);
@@ -123,14 +129,14 @@ void TRP::Op(Process_4380* executingProcess)
 			unsigned long value = std::stoul(input);
 			
 			if (value > std::numeric_limits<uint8_t>::max())
-				throw std::runtime_error("Cannot assign byte value to register outisde the range of " + std::to_string(std::numeric_limits<uint8_t>::min()) + " - " +
+				throw std::runtime_error("Cannot assign byte value to register outside the range of " + std::to_string(std::numeric_limits<uint8_t>::min()) + " - " +
 					std::to_string(std::numeric_limits<uint8_t>::max()) + " inclusive. Argument was \"" + input + "\"");
 
 			executingProcess->m_registers[3] = static_cast<uint8_t>(value);
 		}
 		catch (const std::invalid_argument& argEx)
 		{
-			throw std::runtime_error("invlaid_argument, cannot convert input - \"" + input + "\" - to byte\n>>>" + argEx.what());
+			throw std::runtime_error("invalid_argument, cannot convert input - \"" + input + "\" - to byte\n>>>" + argEx.what());
 		}
 		catch (const std::out_of_range& rngEx)
 		{
@@ -140,8 +146,8 @@ void TRP::Op(Process_4380* executingProcess)
 		break;
 
 	case(5):
-		uint8_t* str = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[3]));
-		uint8_t& length = *str;
+		str = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[3]));
+		length = *str;
 
 		for (uint8_t charNum = 1; charNum < length; charNum++)
 		{
@@ -150,7 +156,53 @@ void TRP::Op(Process_4380* executingProcess)
 		break;
 
 	case(6):
+		std::cin >> input;
 
+		heapStrPtr = static_cast<uint8_t*>(executingProcess->_memoryManager->HeapAllocate(input.length() + 1, 1));
+
+		executingProcess->m_registers[21] = executingProcess->_memoryManager->Physical_To_Virtual(VMFramework::PointerMath::Subtract(heapStrPtr, input.length() + 2));
+
+		std::memcpy(heapStrPtr, input.c_str(), input.length() + 1);
+
+		executingProcess->m_registers[3] = executingProcess->_memoryManager->Physical_To_Virtual(heapStrPtr);
+		break;
+
+	case(7):
+		cstrPtr = static_cast<char*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[3]));
+
+		strLength = std::strlen(cstrPtr);
+
+		if (strLength < std::numeric_limits<uint8_t>::min() || strLength > std::numeric_limits<uint8_t>::max())
+			throw std::runtime_error("Machine only supports pascal strings with 255 characters or less");
+
+		heapStrPtr = static_cast<uint8_t*>(executingProcess->_memoryManager->HeapAllocate(strLength + 1, 1));
+
+		executingProcess->m_registers[21] = executingProcess->_memoryManager->Physical_To_Virtual(VMFramework::PointerMath::Subtract(heapStrPtr, strLength + 2));
+
+		*heapStrPtr = static_cast<uint8_t>(strLength);
+
+		std::memcpy(heapStrPtr + 1, cstrPtr, strLength);
+
+		executingProcess->m_registers[3] = executingProcess->_memoryManager->Physical_To_Virtual(heapStrPtr);
+		break;
+
+	case(99):
+		std::cout << "BRKPT reached. Press Enter to continue...";
+		
+		// Clear input buffer
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+		// Waits for the user to press Enter
+		std::cin.get();
+
+#if defined(_LINUX_TARGET) || defined(_MAC_TARGET)
+		// Move the cursor up by one line
+		std::cout << "\033[A";
+
+		// Clear the line
+		std::cout << "\033[K";
+#endif //defined(_LINUX_TARGET) || defined(_MAC_TARGET)
+		break;
 
 	default:
 		throw std::runtime_error("Invalid trap code detected: " + std::to_string(executingProcess->operandOne));

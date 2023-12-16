@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	catch (const std::exception& ex)
 	{
 		RED_TERMINAL
-			std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
+			std::cerr << "Unhandled exception caught by root catch. Error: " << ex.what() << std::endl;
 		RESET_TERMINAL
 	}
 

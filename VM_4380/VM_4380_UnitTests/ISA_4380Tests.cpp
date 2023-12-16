@@ -77,7 +77,7 @@ public:
 
 TEST_F(ISA_4380Testing, Validate_Constructor)
 {
-	//Verify the ISA_4380 constructor imlementation doesnt cause exeption
+	//Verify the ISA_4380 constructor implementation doesn't cause exception
 	ASSERT_NO_THROW(ISA_4380 _instance);
 }
 

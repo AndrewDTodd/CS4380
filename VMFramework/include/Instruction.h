@@ -2,6 +2,7 @@
 #define VM_INSTRUCTION_H
 
 #include <concepts>
+#include <stdexcept>
 
 //#include "Process.h"
 

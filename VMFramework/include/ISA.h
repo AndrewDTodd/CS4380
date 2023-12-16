@@ -12,7 +12,7 @@
 #include "Instruction.h"
 //#include "Process.h"
 
-constexpr size_t cexp_setSize = 40;
+constexpr size_t cexp_setSize = 45;
 
 namespace VMFramework
 {
@@ -42,7 +42,7 @@ namespace VMFramework
 				{
 					throw std::out_of_range("The instructionSet collection has been initialized with " + std::to_string(cexp_setSize) + 
 						" spaces. The specified opcode (" + std::to_string(instructions[index]->opcode) +
-						") is out of range for the instructionSet collection. Set the cexp_setSize varable to increase the set size if this opcode is correct");
+						") is out of range for the instructionSet collection. Set the cexp_setSize variable to increase the set size if this opcode is correct");
 				}
 			}
 		}

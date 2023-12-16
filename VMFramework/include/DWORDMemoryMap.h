@@ -44,7 +44,7 @@ namespace VMFramework
 		struct PageTableEntry
 		{
 			uint32_t frame_number : 20 = 0;
-			uint32_t unised3 : 1 = 0;
+			uint32_t unused3 : 1 = 0;
 			uint32_t unused2 : 1 = 0;
 			uint32_t unused1 : 1 = 0;
 			uint32_t global : 1 = 0;
@@ -86,7 +86,7 @@ namespace VMFramework
 
 			////used to signify if the page has a 4MiB size, 1, or a 4KiB size, 0
 			////**(this is done by having only one entry in the pageTable pointed to by an index in the _pageGlobalDirectory. 
-			////With just one entry we dont need to index into a page table and we can use those 10 bits as part of the offset)**
+			////With just one entry we don't need to index into a page table and we can use those 10 bits as part of the offset)**
 			//uint32_t pse : 1 = 0;
 
 			////is the frame in the global access space (not just local to one process), 1, or is it local to one process, 0
@@ -95,7 +95,7 @@ namespace VMFramework
 
 			//uint32_t unused1 : 1 = 0; //can be used by process if desired
 			//uint32_t unused2 : 1 = 0; //can be used by process if desired
-			//uint32_t unised3 : 1 = 0; //can be used by process if desired
+			//uint32_t unused3 : 1 = 0; //can be used by process if desired
 
 			////the frame number in memory that we need.
 			////Multiply frame_size by frame_number and add to m_physicalAddressOrdinal to get the address of the first byte of the frame
@@ -207,9 +207,9 @@ namespace VMFramework
 		/// Used to create a new page of memory in the process's/users address space
 		/// </summary>
 		/// <param name="pageType">Id representing the type of page that should be created. 0 for normal page(4KiB), 1 for extended page(4MiB)</param>
-		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
+		/// <returns>Pointer to the beginning of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable) override
+		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) override
 		{
 #ifdef _DEBUG
 			assert(pageType < this->m_numPageAllocators);
@@ -244,6 +244,9 @@ namespace VMFramework
 
 					m_pageTableNextIndex = 0;
 				}
+
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourKiBPage);
 			}
 			else
 			{
@@ -264,6 +267,9 @@ namespace VMFramework
 				m_extendedPageGlobalDirectory[m_nextExtendedPage] = entry;
 
 				m_nextExtendedPage++;
+
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourMiBPage);
 			}
 
 			return userPageAddress;
@@ -273,9 +279,9 @@ namespace VMFramework
 		/// Used to create a new page of memory in the system's/kernel's address space
 		/// </summary>
 		/// <param name="pageType">Id representing the type of page that should be created. 0 for normal page(4KiB), 1 for extended page(4MiB)</param>
-		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
+		/// <returns>Pointer to the beginning of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable) override
+		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) override
 		{
 #ifdef _DEBUG
 			assert(pageType < this->m_numPageAllocators - 1);
@@ -310,6 +316,9 @@ namespace VMFramework
 
 					m_pageTableNextIndex = 0;
 				}
+
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourKiBPage);
 			}
 			else
 			{
@@ -330,6 +339,9 @@ namespace VMFramework
 				m_extendedPageGlobalDirectory[m_nextExtendedPage] = entry;
 
 				m_nextExtendedPage++;
+
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourMiBPage);
 			}
 
 			return kernelPageAddress;
@@ -339,9 +351,9 @@ namespace VMFramework
 		/// Used to create as many pages as are necessary in the process's/users address space to satisfy the request for memory
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested</param>
-		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
+		/// <returns>Pointer to the beginning of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable) override
+		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) override
 		{
 			size_t numPagesNeeded;
 			void* addressFirstPage;
@@ -359,6 +371,9 @@ namespace VMFramework
 					AllocateUserPage(1, pageWritable);
 				}
 
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourMiBPage) * numPagesNeeded;
+
 				return addressFirstPage;
 			}
 			else
@@ -374,6 +389,9 @@ namespace VMFramework
 					AllocateUserPage(0, pageWritable);
 				}
 
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourKiBPage) * numPagesNeeded;
+
 				return addressFirstPage;
 			}
 		}
@@ -382,9 +400,9 @@ namespace VMFramework
 		/// Used to create as many pages as are necessary in the system's/kernel's address space to satisfy the request for memory
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested</param>
-		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
+		/// <returns>Pointer to the beginning of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable) override
+		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) override
 		{
 			size_t numPagesNeeded;
 			void* addressFirstPage;
@@ -402,6 +420,9 @@ namespace VMFramework
 					AllocateKernelPage(1, pageWritable);
 				}
 
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourMiBPage) * numPagesNeeded;
+
 				return addressFirstPage;
 			}
 			else
@@ -416,6 +437,9 @@ namespace VMFramework
 				{
 					AllocateKernelPage(0, pageWritable);
 				}
+
+				if (numBytesAllocated_out != nullptr)
+					*numBytesAllocated_out = sizeof(FourKiBPage) * numPagesNeeded;
 
 				return addressFirstPage;
 			}
@@ -493,7 +517,7 @@ namespace VMFramework
 			{
 				const DWORDExtendedPageAddress* extendedPageAddress = reinterpret_cast<const DWORDExtendedPageAddress*>(&pageAddress);
 
-				if (extendedPageAddress->pageGlobalDirectoryIndex > m_extendedPageCount)
+				if (extendedPageAddress->pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1 + m_extendedPageCount)
 					throw std::invalid_argument("The global directory index portion of the virtual address is not valid");
 
 				pte = m_extendedPageGlobalDirectory[extendedPageAddress->pageGlobalDirectoryIndex];
@@ -527,7 +551,7 @@ namespace VMFramework
 			if (physicalAddress == nullptr)
 				throw std::invalid_argument("This Memory Map doesn't support translation of nullptr into a virtual address");
 			else if (physicalAddress < this->m_normalPagePhysicalAddressOrdinal)
-				throw std::invalid_argument("The address provided for translation is not within our pagable address space");
+				throw std::invalid_argument("The address provided for translation is not within our pageable address space");
 #else
 				if (physicalAddress < this->m_normalPagePhysicalAddressOrdinal)
 				throw std::invalid_argument("The address provided for translation is not within our pagable address space");

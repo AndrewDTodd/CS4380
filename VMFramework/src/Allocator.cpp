@@ -24,7 +24,7 @@ namespace VMFramework
 
 #ifdef _DEBUG
 		if (m_numOfAllocations != 0 || m_usedMemory != 0)
-			throw std::runtime_error("Destorying the Allocator before all allocations have been freed results in memory leak. Ensure all allocations have been deallocated");
+			throw std::runtime_error("Destroying the Allocator before all allocations have been freed results in memory leak. Ensure all allocations have been deallocated");
 #endif // _DEBUG
 	}
 

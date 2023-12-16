@@ -7,5 +7,7 @@ FREE::FREE() : Instruction(38)
 
 void FREE::Op(Process_4380* executingProcess)
 {
-	throw NotImplemented();
+	void* ptrToHeapAlloc = executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[executingProcess->operandOne]);
+
+	executingProcess->_memoryManager->HeapFree(ptrToHeapAlloc);
 }

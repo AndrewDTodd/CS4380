@@ -9,5 +9,8 @@ void ALLC_R::Op(Process_4380* executingProcess)
 {
 	executingProcess->CheckRegisterIDInvalid<16, 17, 18>(executingProcess->operandOne);
 
-	throw NotImplemented();
+	int32_t* bytesToAllocatePtr = static_cast<int32_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[executingProcess->operandTwo]));
+
+	executingProcess->m_registers[executingProcess->operandOne] = 
+		executingProcess->_memoryManager->Physical_To_Virtual(executingProcess->_memoryManager->HeapAllocate(*bytesToAllocatePtr, sizeof(int32_t)));
 }

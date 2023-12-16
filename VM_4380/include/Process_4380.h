@@ -17,30 +17,6 @@
 
 #include "rootConfig.h"
 
-const size_t registerCount = 21;
-
-struct HeapPointerRegisters : public VMFramework::Registers<int32_t>
-{
-public:
-	inline static int32_t heapPointer = 0;
-
-	int32_t& operator[](const size_t& reg) override
-	{
-		if (reg == 21)
-		{
-			return heapPointer;
-		}
-#ifdef _DEBUG
-		else if (reg >= registerCount)
-		{
-			throw std::out_of_range("There is no register " + reg);
-		}
-#endif // _DEBUG
-
-		return registers[reg];
-	}
-};
-
 class Process_4380 : public VMFramework::Process<Process_4380, int32_t, ISA_4380>
 {
 protected:
@@ -160,12 +136,12 @@ public:
 	/// </summary>
 	/// <param name="initialPC">The offset in the program to begin execution at</param>
 	/// <param name="processStack">Pointer to the StackAllocator for this process</param>
-	/// <param name="programStart">Pointer to the begining of the program in memory</param>
+	/// <param name="programStart">Pointer to the beginning of the program in memory</param>
 	/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 	/// <param name="isa">Pointer to the ISA instance to use</param>
 	Process_4380(const void* initialPC, 
 		const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd,
-		ISA_4380* isa, VMFramework::Registers<int32_t>& processRegisters, VMFramework::MemoryManager<int32_t>* memoryManager,
+		ISA_4380* isa, VMFramework::MemoryManager<int32_t>* memoryManager,
 		const size_t& stackBytes, void* stackStart);
 
 	//Arth ******************************************************************************
@@ -193,7 +169,7 @@ public:
 	//************************************************************************************
 	
 	//Heap *******************************************************************************
-	FRIEND_TEST(VMInstructionTesting, Validate_ALCI);
+	FRIEND_TEST(VMInstructionsTesting, Validate_ALCI);
 	friend ALCI;
 	FRIEND_TEST(VMInstructionsTesting, Validate_ALLC_L);
 	friend ALLC_L;

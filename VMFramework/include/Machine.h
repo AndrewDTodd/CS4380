@@ -71,7 +71,7 @@ namespace VMFramework
 		std::vector<std::thread> m_processThreads = std::vector<std::thread>();
 
 		/// <summary>
-		/// Pointer to the begining (first byte) of the program's data in memory
+		/// Pointer to the beginning (first byte) of the program's data in memory
 		/// </summary>
 		const uint8_t* m_programSegment = nullptr;
 
@@ -158,17 +158,17 @@ namespace VMFramework
 		}
 
 		/// <summary>
-		/// Used to deturmine the initial PC for the first process spawned by the machine when launching a program. 
+		/// Used to determine the initial PC for the first process spawned by the machine when launching a program. 
 		/// Logic for how to do this is dependent of architecture and therefore must be implemented by realizing class
 		/// </summary>
-		/// <returns>Pouinter to the byte in the program segment to start execution at</returns>
+		/// <returns>Pointer to the byte in the program segment to start execution at</returns>
 		virtual const void* CalculatePrimaryThreadInitPC() = 0;
 
 		/// <summary>
 		/// Will attempt to load the binary at the specified path and run the program. Used by StartUp(char*) to launch program
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		/// <exception cref="rumtime_error Thrown if initial PC specified in loaded binary is invalid"/>
+		/// <exception cref="runtime_error Thrown if initial PC specified in loaded binary is invalid"/>
 		virtual inline void LaunchProgram_INTERNAL(const std::filesystem::path& binPath)
 		{
 			//Lock has already been obtained by the calling StartUp(char*) method
@@ -196,7 +196,7 @@ namespace VMFramework
 				RESET_TERMINAL
 				return;
 			}
-			//Could not deturmine program size, memory allocation failed, or could not load program into memory
+			//Could not determine program size, memory allocation failed, or could not load program into memory
 			catch (const std::runtime_error& loadEx)
 			{
 				RED_TERMINAL
@@ -232,7 +232,7 @@ namespace VMFramework
 		/// <returns>Pointer to Machine instance</returns>
 		static Derived* GetInstance()
 		{
-			//Aquire concurrent lock for read access
+			//Acquire concurrent lock for read access
 			std::shared_lock<std::shared_mutex> readLock(_sharedMutex);
 
 			if (!s_instance)
@@ -253,7 +253,7 @@ namespace VMFramework
 		/// <summary>
 		/// Will launch the machine and initialize the system
 		/// </summary>
-		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const size_t& heapBytes, IHeapContainer<RegisterType>& heapContainer)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -262,16 +262,16 @@ namespace VMFramework
 				throw std::runtime_error("Calling StartUp on an already active VM is invalid");
 #endif // _DEBUG
 
-			//Aquire pointer to MemoryManager instance and initialize the subsystem
+			//Acquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
-			this->m_memoryManager->StartUp(systemBytes, memoryMap);
+			this->m_memoryManager->StartUp(systemBytes, memoryMap, heapBytes, heapContainer);
 		}
 
 		/// <summary>
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const char* programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const size_t& heapBytes, IHeapContainer<RegisterType>& heapContainer, const char* programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -281,13 +281,13 @@ namespace VMFramework
 #endif // _DEBUG
 
 
-			//Aquire pointer to MemoryManager instance and initialize the subsystem
+			//Acquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
-			this->m_memoryManager->StartUp(systemBytes, memoryMap);
+			this->m_memoryManager->StartUp(systemBytes, memoryMap, heapBytes, heapContainer);
 
 			std::filesystem::path filePath(programBinary);
 
-			//lauch the provided program
+			//launch the provided program
 			try
 			{
 				LaunchProgram_INTERNAL(programBinary);
@@ -304,7 +304,7 @@ namespace VMFramework
 		/// Will launch the machine and initialize the system then attempt to launch a program from the specified binaries path
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const std::filesystem::path& programBinary)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const size_t& heapBytes, IHeapContainer<RegisterType>& heapContainer, const std::filesystem::path& programBinary)
 		{
 			//Lock the Machine for a write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -314,11 +314,11 @@ namespace VMFramework
 #endif // _DEBUG
 
 
-			//Aquire pointer to MemoryManager instance and initialize the subsystem
+			//Acquire pointer to MemoryManager instance and initialize the subsystem
 			this->m_memoryManager = MemoryManager<RegisterType>::GetInstance();
-			this->m_memoryManager->StartUp(systemBytes, memoryMap);
+			this->m_memoryManager->StartUp(systemBytes, memoryMap, heapBytes, heapContainer);
 
-			//lauch the provided program
+			//launch the provided program
 			try
 			{
 				LaunchProgram_INTERNAL(programBinary);
@@ -375,7 +375,7 @@ namespace VMFramework
 		/// Will attempt to load the binary at the specified path and run the program
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
+		/// <exception cref="runtime_error">Thrown if initial PC specified in loaded binary is invalid</exception>
 		virtual void LaunchProgram(const char* programBinary)
 		{
 			//Lock the Machine for a write
@@ -407,7 +407,7 @@ namespace VMFramework
 				RESET_TERMINAL
 				return;
 			}
-			//Could not deturmine program size, memory allocation failed, or could not load program into memory
+			//Could not determine program size, memory allocation failed, or could not load program into memory
 			catch (const std::runtime_error& loadEx)
 			{
 				RED_TERMINAL
@@ -434,7 +434,7 @@ namespace VMFramework
 		/// Will attempt to load the binary at the specified path and run the program
 		/// </summary>
 		/// <param name="programBinary">Path to a valid program binary to run</param>
-		/// <exeption cref="rumtime_error">Thrown if initial PC specified in loaded binary is invalid</exeption>
+		/// <exception cref="runtime_error">Thrown if initial PC specified in loaded binary is invalid</exception>
 		virtual void LaunchProgram(const std::filesystem::path& programBinary)
 		{
 			//Lock the Machine for a write
@@ -464,7 +464,7 @@ namespace VMFramework
 				RESET_TERMINAL
 					return;
 			}
-			//Could not deturmine program size, memory allocation failed, or could not load program into memory
+			//Could not determine program size, memory allocation failed, or could not load program into memory
 			catch (const std::runtime_error& loadEx)
 			{
 				RED_TERMINAL

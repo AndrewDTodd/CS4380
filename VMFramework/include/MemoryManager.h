@@ -9,6 +9,7 @@
 
 #include "LinearAllocator.h"
 #include "MemoryMap.h"
+#include "IHeapContainer.h"
 
 //#define TOTAL_GIBIGYTES_FOR_SYSTEM 1
 
@@ -17,6 +18,15 @@ namespace VMFramework
 	constexpr size_t GibiByte = 1073741824;
 	constexpr size_t MebiByte = 1048576;
 	constexpr size_t KibiByte = 1024;
+
+	class double_free : public std::exception
+	{
+	public:
+		const char* what() const noexcept override
+		{
+			return "Double Free detected: Called HeapFree on a particular heap allocated block twice";
+		}
+	};
 
 	template<std::integral RegisterType>
 	class MemoryManager
@@ -33,9 +43,14 @@ namespace VMFramework
 		void* m_systemMemory = nullptr;
 
 		/// <summary>
-		/// Allocator used to partition the systemMemory and divy it up to the MemoryMap instances PageAllocators
+		/// Allocator used to partition the systemMemory and divvy it up to the MemoryMap instances PageAllocators
 		/// </summary>
 		VMFramework::LinearAllocator* m_systemAllocator = nullptr;
+
+		/// <summary>
+		/// Pointer to interface implementing instance that will be deferred to for heap allocation
+		/// </summary>
+		IHeapContainer<RegisterType>* m_heapContainer = nullptr;
 
 		/// <summary>
 		/// Pointer the the instance of this singleton that is created when GetInstance is called
@@ -90,7 +105,7 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="systemBytes"></param>
 		/// <param name="memoryMap"></param>
-		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap)
+		void StartUp(const size_t& systemBytes, MemoryMap<RegisterType>& memoryMap, const size_t& heapBytes, IHeapContainer<RegisterType>& heapContainer)
 		{
 			//Acquire exclusive lock for write
 			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
@@ -107,6 +122,9 @@ namespace VMFramework
 			m_memoryMap = &memoryMap;
 
 			m_memoryMap->Initialize(m_systemAllocator->GetSize(), m_systemAllocator);
+
+			m_heapContainer = &heapContainer;
+			m_heapContainer->Initialize(heapBytes, m_memoryMap);
 		}
 		
 		/// <summary>
@@ -120,12 +138,15 @@ namespace VMFramework
 			if (!this->m_systemMemory)
 				throw std::runtime_error("Calling ShutDown on an inactive MemoryManager is invalid");
 #endif // _DEBUG
+
+			this->m_heapContainer->ShutDown();
 			
 			this->m_memoryMap->ShutDown();
 
 			this->m_systemAllocator->Clear();
 			this->m_systemAllocator->~LinearAllocator();
 			this->m_systemAllocator = nullptr;
+
 			free(this->m_systemMemory);
 			this->m_systemMemory = nullptr;
 
@@ -135,21 +156,27 @@ namespace VMFramework
 		/// <summary>
 		/// Used to create a new page worth of memory in the callers address space
 		/// </summary>
-		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configured MemoryMap implementation</param>
+		/// <param name="pageType">The id of the kind of page to allocate. Available kinds dependant on configured MemoryMap implementation</param>
 		/// <returns>Pointer to the page allocated in system memory</returns>
-		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::read_write)
+		inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::read_write, size_t* numBytesAllocated_out = nullptr)
 		{
-			return m_memoryMap->AllocateUserPage(pageType, pageWritable);
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			return m_memoryMap->AllocateUserPage(pageType, pageWritable, numBytesAllocated_out);
 		}
 
 		/// <summary>
 		/// Used to create a new page worth of memory in the systems/kernels address space
 		/// </summary>
-		/// <param name="pageType">The id of the kind of page to allocate. Avalable kinds dependant on configuration of MemoryMap implementation</param>
+		/// <param name="pageType">The id of the kind of page to allocate. Available kinds dependant on configuration of MemoryMap implementation</param>
 		/// <returns>Pointer to the page allocated in system memory</returns>
-		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::readonly)
+		inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::readonly, size_t* numBytesAllocated_out = nullptr)
 		{
-			return m_memoryMap->AllocateUserPage(pageType, pageWritable);
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			return m_memoryMap->AllocateUserPage(pageType, pageWritable, numBytesAllocated_out);
 		}
 
 		/// <summary>
@@ -157,9 +184,12 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
-		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::read_write)
+		inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::read_write, size_t* numBytesAllocated_out = nullptr)
 		{
-			return m_memoryMap->AllocateUserPagesFor(bytesNeeded, pageWritable);
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			return m_memoryMap->AllocateUserPagesFor(bytesNeeded, pageWritable, numBytesAllocated_out);
 		}
 
 		/// <summary>
@@ -167,18 +197,24 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested in bytes</param>
 		/// <returns>Pointer to the first of the pages allocated in system memory to satisfy the memory request</returns>
-		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::readonly)
+		inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable = MemoryMap<RegisterType>::PageReadWrite::readonly, size_t* numBytesAllocated_out = nullptr)
 		{
-			return m_memoryMap->AllocateKernelPagesFor(bytesNeeded, pageWritable);
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			return m_memoryMap->AllocateKernelPagesFor(bytesNeeded, pageWritable, numBytesAllocated_out);
 		}
 
 		/// <summary>
 		/// Used to free an allocation made by a process
 		/// </summary>
-		/// <param name="pagesStart">Poiner to the first byte of the first page in the sequence of pages to be freed</param>
+		/// <param name="pagesStart">Pointer to the first byte of the first page in the sequence of pages to be freed</param>
 		/// <param name="pagesBytes">The number of bytes that was allocated and will now be freed. The total size of the pages to free</param>
 		inline void FreePages(void* pagesStart, const size_t& pagesBytes)
 		{
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
 			return m_memoryMap->FreePages(pagesStart, pagesBytes);
 		}
 
@@ -196,10 +232,36 @@ namespace VMFramework
 		/// Used to translate an address/pointer in system/physical address space into the virtual address space of the caller
 		/// </summary>
 		/// <param name="physicalAddress">The system/physical address to be translated/mapped into its associated virtual address in the caller's address space</param>
-		/// <returns>Virtual address in the callers address sapace associated with the provided system pointer</returns>
+		/// <returns>Virtual address in the callers address space associated with the provided system pointer</returns>
 		inline RegisterType Physical_To_Virtual(const void* const& physicalAddress)
 		{
 			return m_memoryMap->Physical_To_Virtual(physicalAddress);
+		}
+
+		void* HeapAllocate(const size_t& bytesToAllocate, const uint8_t& alignment)
+		{
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			return m_heapContainer->HeapAllocate(bytesToAllocate, alignment);
+		}
+
+		void HeapFree(void* ptrToFree)
+		{
+			//Acquire exclusive lock for write
+			std::unique_lock<std::shared_mutex> writeLock(_sharedMutex);
+
+			m_heapContainer->HeapFree(ptrToFree);
+		}
+
+		size_t GetHeapUsedMem()
+		{
+			return m_heapContainer->GetHeapUsedMem();
+		}
+
+		size_t GetHeapNumAlloc()
+		{
+			return m_heapContainer->GetHeapNumAlloc();
 		}
 
 		//Do not attempt to copy, manager is a singleton

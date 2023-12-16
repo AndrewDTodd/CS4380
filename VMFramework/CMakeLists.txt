@@ -91,7 +91,7 @@ target_link_libraries(VMFrameworkTests PRIVATE GTest::gtest_main)
 target_link_libraries(VMFrameworkTests PRIVATE VMFramework)
 
 target_include_directories(VMFrameworkTests PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
-
+target_include_directories(VMFramework PRIVATE ${googletest_SOURCE_DIR}/googletest/include)
 
 include(GoogleTest)
 gtest_discover_tests(VMFrameworkTests)

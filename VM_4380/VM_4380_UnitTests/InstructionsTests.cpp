@@ -13,14 +13,14 @@
 #include "../include/Process_4380.h"
 #include "../include/ISA_4380.h"
 #include "../include/DWORDMemoryMap.h"
+#include "../include/ExpandingHeapAllocator.h"
+#include "../include/HeapContainer.h"
 
 using namespace VMFramework;
 
 class VMInstructionsTesting : public ::testing::Test
 {
 protected:
-	std::shared_mutex _mutex;
-
 	ISA_4380 _isa;
 
 	uint8_t* _program; 
@@ -35,13 +35,14 @@ protected:
 
 	MemoryManager<int32_t>* m_memoryManager;
 	DWORDMemoryMap<int32_t> m_memoryMap;
+	HeapContainer<int32_t, ExpandingHeapAllocator<int32_t>> m_heapContainer;
 
 	Process_4380* _process;
 
 	void SetUp() override
 	{
 		m_memoryManager = MemoryManager<int32_t>::GetInstance();
-		m_memoryManager->StartUp(VMFramework::MebiByte * 400, m_memoryMap);
+		m_memoryManager->StartUp(VMFramework::MebiByte * 400, m_memoryMap, VMFramework::MebiByte * 4, m_heapContainer);
 
 		_program = static_cast<uint8_t*>(m_memoryManager->AllocateUserPage(DWORDMemoryMap<int32_t>::PageTypes::normal));
 
@@ -49,7 +50,7 @@ protected:
 
 		void* stackMemory = m_memoryManager->AllocateUserPagesFor(VMFramework::MebiByte * 8);
 
-		_process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, m_memoryManager, VMFramework::MebiByte * 8, stackMemory);
+		_process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, m_memoryManager, VMFramework::MebiByte * 8, stackMemory);
 	}
 
 	void TearDown() override
@@ -324,7 +325,167 @@ TEST_F(VMInstructionsTesting, Validate_CMPI)
 }
 //*******************************************************************************************************
 
+//Heap **************************************************************************************************
+TEST_F(VMInstructionsTesting, Validate_ALCI)
+{
+	_process->m_registers[0] = 0;
+	_process->operandOne = 0;
+	_process->operandTwo = 255;
+
+	size_t heapAllocSizeBefore = _process->_memoryManager->GetHeapUsedMem();
+	size_t heapNumAllocBefore = _process->_memoryManager->GetHeapNumAlloc();
+
+	_isa.operator[](35)->Op(_process);
+
+	EXPECT_NE(0, _process->m_registers[0]);
+
+	EXPECT_TRUE((heapAllocSizeBefore + 255) <= _process->_memoryManager->GetHeapUsedMem());
+
+	EXPECT_EQ(heapNumAllocBefore + 1, _process->_memoryManager->GetHeapNumAlloc());
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](35)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](35)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](35)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_ALLC_L)
+{
+	_process->m_registers[0] = 0;
+	_process->operandOne = 0;
+	_process->operandTwo = 255;
+
+	size_t heapAllocSizeBefore = _process->_memoryManager->GetHeapUsedMem();
+	size_t heapNumAllocBefore = _process->_memoryManager->GetHeapNumAlloc();
+
+	_isa.operator[](36)->Op(_process);
+
+	EXPECT_NE(0, _process->m_registers[0]);
+
+	EXPECT_TRUE((heapAllocSizeBefore + 255) <= _process->_memoryManager->GetHeapUsedMem());
+
+	EXPECT_EQ(heapNumAllocBefore + 1, _process->_memoryManager->GetHeapNumAlloc());
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](36)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](36)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](36)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_ALLC_R)
+{
+	int32_t* bytesToAllocatePtr = static_cast<int32_t*>(_process->_memoryManager->HeapAllocate(sizeof(int32_t), alignof(int32_t)));
+	*bytesToAllocatePtr = 255;
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = _process->_memoryManager->Physical_To_Virtual(bytesToAllocatePtr);
+	_process->operandOne = 0;
+	_process->operandTwo = 1;
+
+	size_t heapAllocSizeBefore = _process->_memoryManager->GetHeapUsedMem();
+	size_t heapNumAllocBefore = _process->_memoryManager->GetHeapNumAlloc();
+
+	_isa.operator[](37)->Op(_process);
+
+	EXPECT_NE(0, _process->m_registers[0]);
+
+	EXPECT_TRUE((heapAllocSizeBefore + 255) <= _process->_memoryManager->GetHeapUsedMem());
+
+	EXPECT_EQ(heapNumAllocBefore + 1, _process->_memoryManager->GetHeapNumAlloc());
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](37)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](37)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](37)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_FREE)
+{
+	_process->m_registers[0] = 0;
+	_process->operandOne = 0;
+	_process->operandTwo = 255;
+
+	size_t heapAllocSizeBefore = _process->_memoryManager->GetHeapUsedMem();
+	size_t heapNumAllocBefore = _process->_memoryManager->GetHeapNumAlloc();
+
+	_isa.operator[](36)->Op(_process);
+
+	ASSERT_NE(0, _process->m_registers[0]);
+
+	ASSERT_TRUE((heapAllocSizeBefore + 255) <= _process->_memoryManager->GetHeapUsedMem());
+
+	ASSERT_EQ(heapNumAllocBefore + 1, _process->_memoryManager->GetHeapNumAlloc());
+
+	_isa.operator[](38)->Op(_process);
+
+	EXPECT_EQ(heapAllocSizeBefore, _process->_memoryManager->GetHeapUsedMem());
+
+	EXPECT_EQ(heapNumAllocBefore, _process->_memoryManager->GetHeapNumAlloc());
+
+	ASSERT_THROW(_isa.operator[](38)->Op(_process), VMFramework::double_free);
+}
+//*******************************************************************************************************
+
 //Jump **************************************************************************************************
+TEST_F(VMInstructionsTesting, Validate_BAL_L)
+{
+	int32_t prevPC = _process->m_registers[16];
+	int32_t prevFP = _process->m_registers[20];
+
+	int32_t* buffer = static_cast<int32_t*>(_process->Push<int32_t>(-1));
+
+	int32_t* initialSP_PFP = static_cast<int32_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[19]));
+
+	_process->operandOne = 0x12;
+
+	_isa.operator[](43)->Op(_process);
+
+	int32_t* newFP_PPC = static_cast<int32_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[20]));
+
+	EXPECT_EQ(prevFP, *initialSP_PFP);
+
+	EXPECT_EQ(prevPC, *newFP_PPC);
+
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+
+	EXPECT_EQ(_process->m_registers[16], targetVirtualAddress);
+}
+
+TEST_F(VMInstructionsTesting, Validate_BAL_R)
+{
+	int32_t prevPC = _process->m_registers[16];
+	int32_t prevFP = _process->m_registers[20];
+
+	int32_t* buffer = static_cast<int32_t*>(_process->Push<int32_t>(-1));
+
+	int32_t* initialSP_PFP = static_cast<int32_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[19]));
+
+	_process->operandOne = 15;
+	_process->operandTwo = 0x12;
+
+	_isa.operator[](44)->Op(_process);
+
+	EXPECT_EQ(prevFP, *initialSP_PFP);
+
+	EXPECT_EQ(prevPC, _process->m_registers[15]);
+
+	int32_t targetVirtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+
+	EXPECT_EQ(_process->m_registers[16], targetVirtualAddress);
+}
+
 TEST_F(VMInstructionsTesting, Validate_BGT)
 {
 	_process->m_registers[0] = 1;
@@ -441,6 +602,137 @@ TEST_F(VMInstructionsTesting, Validate_JMR)
 	_isa.operator[](2)->Op(_process);
 
 	ASSERT_EQ(_process->m_registers[16], targetVirtualAddress);
+}
+//*******************************************************************************************************
+
+//Logical ***********************************************************************************************
+TEST_F(VMInstructionsTesting, Validate_AND)
+{
+	_process->operandOne = 0;
+	_process->operandTwo = 1;
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](18)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](18)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](18)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](18)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], true);
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](18)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](18)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](18)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_NOT)
+{
+	_process->operandOne = 0;
+	_process->operandTwo = 1;
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](39)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], true);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](39)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](39)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](39)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](39)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](39)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](39)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_OR)
+{
+	_process->operandOne = 0;
+	_process->operandTwo = 1;
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](19)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], false);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 0;
+
+	_isa.operator[](19)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], true);
+
+	_process->m_registers[0] = 0;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](19)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], true);
+
+	_process->m_registers[0] = 1;
+	_process->m_registers[1] = 1;
+
+	_isa.operator[](19)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], true);
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](19)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](19)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](19)->Op(_process), VMFramework::protection_fault);
 }
 //*******************************************************************************************************
 
@@ -596,6 +888,100 @@ TEST_F(VMInstructionsTesting, Validate_STR_R)
 		ASSERT_EQ(_program[2], 0x56);
 		ASSERT_EQ(_program[3], 0x78);
 	}
+}
+//*******************************************************************************************************
+
+//Multi_Thread ******************************************************************************************
+TEST_F(VMInstructionsTesting, Validate_BLK)
+{
+	using not_implemented = Instruction<int32_t, Process_4380>::NotImplemented;
+	ASSERT_THROW(_isa.operator[](27)->Op(_process), not_implemented);
+}
+
+TEST_F(VMInstructionsTesting, Validate_END)
+{
+	using not_implemented = Instruction<int32_t, Process_4380>::NotImplemented;
+	ASSERT_THROW(_isa.operator[](28)->Op(_process), not_implemented);
+}
+
+TEST_F(VMInstructionsTesting, Validate_LCK)
+{
+	using not_implemented = Instruction<int32_t, Process_4380>::NotImplemented;
+	ASSERT_THROW(_isa.operator[](29)->Op(_process), not_implemented);
+}
+
+TEST_F(VMInstructionsTesting, Validate_RUN)
+{
+	using not_implemented = Instruction<int32_t, Process_4380>::NotImplemented;
+	ASSERT_THROW(_isa.operator[](26)->Op(_process), not_implemented);
+}
+
+TEST_F(VMInstructionsTesting, Validate_ULK)
+{
+	using not_implemented = Instruction<int32_t, Process_4380>::NotImplemented;
+	ASSERT_THROW(_isa.operator[](30)->Op(_process), not_implemented);
+}
+//*******************************************************************************************************
+
+//Stack *************************************************************************************************
+TEST_F(VMInstructionsTesting, Validate_PEEK)
+{
+	EXPECT_THROW(_isa.operator[](42)->Op(_process), VMFramework::stack_underflow);
+
+	_process->Push<int32_t>(-1);
+
+	int32_t stackPointer = _process->m_registers[19];
+
+	_process->operandOne = 0;
+
+	_isa.operator[](42)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], -1);
+
+	EXPECT_EQ(stackPointer, _process->m_registers[19]);
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](42)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](42)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](42)->Op(_process), VMFramework::protection_fault);
+}
+
+TEST_F(VMInstructionsTesting, Validate_POP)
+{
+	int32_t initialSP = _process->m_registers[19];
+
+	_process->Push<int32_t>(-1);
+
+	int32_t newSP = _process->m_registers[19];
+
+	_process->operandOne = 0;
+
+	_isa.operator[](41)->Op(_process);
+
+	EXPECT_EQ(_process->m_registers[0], -1);
+
+	EXPECT_TRUE(_process->m_registers[19] < newSP);
+
+	_process->operandOne = 16;
+	EXPECT_THROW(_isa.operator[](41)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 17;
+	EXPECT_THROW(_isa.operator[](41)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 18;
+	EXPECT_THROW(_isa.operator[](41)->Op(_process), VMFramework::protection_fault);
+
+	_process->operandOne = 0;
+	EXPECT_THROW(_isa.operator[](41)->Op(_process), VMFramework::stack_underflow);
+}
+
+TEST_F(VMInstructionsTesting, Validate_PUSH)
+{
+
 }
 //*******************************************************************************************************
 

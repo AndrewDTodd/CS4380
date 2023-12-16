@@ -16,7 +16,7 @@
 #include "MemoryManager.h"
 #include "ISA.h"
 
-extern const size_t registerCount;
+constexpr size_t registerCount = 21;
 
 namespace VMFramework
 {
@@ -56,12 +56,18 @@ namespace VMFramework
 	struct Registers
 	{
 	public:
-		RegisterType registers[registerCount];
+		int32_t registers[registerCount];
 
-		virtual RegisterType& operator[](const size_t& reg)
+		inline static int32_t heapPointer = 0;
+
+		virtual int32_t& operator[](const size_t& reg)
 		{
+			if (reg == 21)
+			{
+				return heapPointer;
+			}
 #ifdef _DEBUG
-			if (reg >= registerCount)
+			else if (reg >= registerCount)
 			{
 				throw std::out_of_range("There is no register " + reg);
 			}
@@ -81,7 +87,7 @@ namespace VMFramework
 		/// <summary>
 		/// Register state of this thread of execution
 		/// </summary>
-		ProcessRegisters& m_registers;
+		ProcessRegisters m_registers;
 
 		/// <summary>
 		/// Stack for this thread of execution
@@ -118,6 +124,8 @@ namespace VMFramework
 		/// </summary>
 		MemoryManager<RegisterType>* _memoryManager;
 
+		const void* m_stackBase = nullptr;
+
 		bool _run = true;
 
 		/// <summary>
@@ -125,6 +133,7 @@ namespace VMFramework
 		/// </summary>
 		~Process()
 		{
+			this->ClearAllocator();
 
 		}
 
@@ -152,11 +161,11 @@ namespace VMFramework
 		//Process's Stack
 
 #ifdef _DEBUG
-		void* m_prev_stack_pointer = nullptr;
-		void* m_previouse_frame_pointer = nullptr;
+		//void* m_prev_stack_pointer = nullptr;
+		void* m_previous_frame_pointer = nullptr;
 #endif // _DEBUG
 
-		void* Allocate(const size_t& size, const uint8_t& alignment) override
+		inline void* Allocate(const size_t& size, const uint8_t& alignment) override
 		{
 			assert(size != 0);
 
@@ -164,16 +173,17 @@ namespace VMFramework
 
 			uint8_t adjustment = PointerMath::AlignBackwardAdjustment(currentPos, alignment);
 
-			if (m_usedMemory + adjustment + size > m_size)
-				throw stack_overflow();
-
 			void* aligned_address = PointerMath::Subtract(currentPos, adjustment);
 
-#ifdef _DEBUG
-			m_prev_stack_pointer = currentPos;
-#endif // _DEBUG
+//#ifdef _DEBUG
+//			m_prev_stack_pointer = currentPos;
+//#endif // _DEBUG
 
 			currentPos = PointerMath::Subtract(aligned_address, size);
+
+			if (currentPos < m_start)
+				throw stack_overflow();
+
 			m_registers[19] = _memoryManager->Physical_To_Virtual(currentPos);
 
 			m_usedMemory += size + adjustment;
@@ -198,8 +208,8 @@ namespace VMFramework
 			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
 
 #ifdef _DEBUG
-			m_prev_stack_pointer = nullptr;
-			m_previouse_frame_pointer = nullptr;
+			//m_prev_stack_pointer = nullptr;
+			m_previous_frame_pointer = nullptr;
 #endif // _DEBUG
 		}
 
@@ -219,13 +229,20 @@ namespace VMFramework
 
 			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPop));
 
-			void* prevPos = PointerMath::Add(currentPos, adjustment);
+			void* aligned_address = PointerMath::Add(currentPos, adjustment);
+
+			currentPos = PointerMath::Add(aligned_address, sizeof(TypeToPop));
+
+			if (currentPos > m_stackBase)
+				throw stack_underflow();
+
+			m_registers[19] = _memoryManager->Physical_To_Virtual(currentPos);
+
+			m_usedMemory -= sizeof(TypeToPop) + adjustment;
 
 			m_numOfAllocations--;
 
 			receiver = *reinterpret_cast<TypeToPop*>(currentPos);
-
-			m_registers[19] = _memoryManager->Physical_To_Virtual(prevPos);
 		}
 
 		template<typename TypeToPeek>
@@ -235,9 +252,12 @@ namespace VMFramework
 
 			uint8_t adjustment = PointerMath::AlignForwardAdjustment(currentPos, alignof(TypeToPeek));
 
-			void* prevPos = PointerMath::Add(currentPos, adjustment);
+			void* aligned_address = PointerMath::Add(currentPos, adjustment);
 
-			m_numOfAllocations--;
+			currentPos = PointerMath::Add(aligned_address, sizeof(TypeToPeek));
+
+			if (currentPos > m_stackBase)
+				throw stack_underflow();
 
 			receiver = *reinterpret_cast<TypeToPeek*>(currentPos);
 		}
@@ -246,7 +266,7 @@ namespace VMFramework
 		{
 #ifdef _DEBUG
 			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
-			m_previouse_frame_pointer = currentFramePointer;
+			m_previous_frame_pointer = currentFramePointer;
 #endif // _DEBUG
 
 			Push<RegisterType>(m_registers[20]);
@@ -264,7 +284,7 @@ namespace VMFramework
 #ifdef _DEBUG
 			framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
 
-			if (static_cast<RegisterType*>(m_previouse_frame_pointer) != framePointer)
+			if (static_cast<RegisterType*>(m_previous_frame_pointer) != framePointer)
 				throw std::logic_error("There is something wrong with the logic of the rolling back of frames, or frame advancement and rollback have not all been handled by the internal functions");
 #endif // _DEBUG
 		}
@@ -273,7 +293,7 @@ namespace VMFramework
 		{
 #ifdef _DEBUG
 			void* currentFramePointer = _memoryManager->Virtual_To_Physical(m_registers[20]);
-			m_previouse_frame_pointer = currentFramePointer;
+			m_previous_frame_pointer = currentFramePointer;
 #endif // _DEBUG
 
 			Push<RegisterType>(m_registers[20]);
@@ -296,7 +316,7 @@ namespace VMFramework
 #ifdef _DEBUG
 			framePointer = static_cast<RegisterType*>(_memoryManager->Virtual_To_Physical(m_registers[20]));
 
-			if (static_cast<RegisterType*>(m_previouse_frame_pointer) != framePointer)
+			if (static_cast<RegisterType*>(m_previous_frame_pointer) != framePointer)
 				throw std::logic_error("There is something wrong with the logic of the rolling back of frames, or frame advancement and rollback have not all been handled by the internal functions");
 #endif // _DEBUG
 		}
@@ -352,15 +372,15 @@ namespace VMFramework
 		/// <param name="isa">Pointer to the ISA instance to use</param>
 		/// <param name="machineMutex">The shared_mutex in the spawning Machine</param>
 		/// <param name="memoryManager">Pointer to the machines MemoryManger sub-system</param>
-		/// <param name="stackBytes">The number of bytes alloted to this process's stack</param>
+		/// <param name="stackBytes">The number of bytes allotted to this process's stack</param>
 		/// <param name="stackStart">The address where the stack begins in memory</param>
 		/// <exception cref="std::runtime_error Thrown if the Process cannot be created due to issues with the program pointers supplied"/>
 		Process(const void* initialPC, 
 			const uint8_t* programStart, const uint8_t* codeSegmentStart, const uint8_t* programEnd, 
-			ISAType* isa, Registers<RegisterType>& processRegisters, MemoryManager<RegisterType>* memoryManager,
+			ISAType* isa, MemoryManager<RegisterType>* memoryManager,
 			const size_t& stackBytes, void* stackStart): Allocator(stackBytes, stackStart),
 			_programStart(programStart), _codeSegment(codeSegmentStart), _programEnd(programEnd), 
-			_ISA(isa), m_registers(processRegisters), _memoryManager(memoryManager)
+			_ISA(isa), _memoryManager(memoryManager)
 		{
 			if (initialPC < _programStart || initialPC == nullptr)
 			{
@@ -405,15 +425,15 @@ namespace VMFramework
 				throw std::runtime_error(stream.str());
 			}
 
-			uint8_t* stackBegin = reinterpret_cast<uint8_t*>(m_start);
-			stackBegin += m_size - 1;
+			m_stackBase = reinterpret_cast<uint8_t*>(m_start);
+			m_stackBase += m_size - 1;
 
-			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(stackBegin);
+			m_registers[18] = m_registers[19] = m_registers[20] = _memoryManager->Physical_To_Virtual(m_stackBase);
 			m_registers[17] = _memoryManager->Physical_To_Virtual(m_start);
 		}
 
 		/// <summary>
-		/// Run this Process. Preforms the steps of the execution cyle until Stop called
+		/// Run this Process. Preforms the steps of the execution cycle until Stop called
 		/// </summary>
 		void Run()
 		{

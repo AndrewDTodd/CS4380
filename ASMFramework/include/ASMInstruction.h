@@ -30,7 +30,7 @@ namespace ASMFramework
 		/// Gets the offset of the provided label name
 		/// </summary>
 		/// <param name="labelName">The name of the label to get the offset of</param>
-		/// <param name="workpiece">The Workpiece instance being worked upon. Containes the relevent symbol table with the lebel in it</param>
+		/// <param name="workpiece">The Workpiece instance being worked upon. Contains the relevant symbol table with the label in it</param>
 		/// <returns>The offset for the label as contained in the symbol table. Will be 0 for a label whos offset has not yet been determined</returns>
 		static inline size_t& GetLabelOffset(const std::string& labelName, Workpiece* const& workpiece)
 		{
@@ -38,17 +38,17 @@ namespace ASMFramework
 			{
 				return workpiece->_symbolTable.at(labelName);
 			}
-			//If the label argument of JMP isnt in the symbol table we must assume the assembly contains an invalid label name
+			//If the label argument of JMP isn't in the symbol table we must assume the assembly contains an invalid label name
 			catch (const std::out_of_range& rangeEx)
 			{
-				throw std::runtime_error("The label - \"" + labelName + "\" - is undefined (not contained within the sybol table)");
+				throw std::runtime_error("The label - \"" + labelName + "\" - is undefined (not contained within the symbol table)");
 			}
 		}
 
 		/// <summary>
 		/// Add an unresolved label to the workpieces set of deferred labels
 		/// </summary>
-		/// <typeparam name="TargetType">The type of the last item serialized to the buffer. Used to get propper offset. The offset is the types size in bytes subtracted from the buffer size</typeparam>
+		/// <typeparam name="TargetType">The type of the last item serialized to the buffer. Used to get proper offset. The offset is the types size in bytes subtracted from the buffer size</typeparam>
 		/// <param name="labelName">The name of the label that is being deferred</param>
 		/// <param name="buffer">The buffer that was just serialized too, where the deferred label was just written</param>
 		/// <param name="workpiece">The Workpiece instance being worked upon. Contains the relevant deferred label collection</param>
@@ -100,7 +100,7 @@ namespace ASMFramework
 		static inline TargetType GetRegisterID(const std::string& mnemonic, const TargetType& minID, const TargetType& maxID)
 		{
 			if (!std::regex_match(mnemonic, registerPattern))
-				throw std::runtime_error("Inproperly formatted register mnemonic \"" + mnemonic + "\". Accepted values are R" + 
+				throw std::runtime_error("Improperly formatted register mnemonic \"" + mnemonic + "\". Accepted values are R" + 
 					std::to_string(minID) + " - R" + std::to_string(maxID));
 
 			int id = std::stoi(mnemonic.substr(1));
@@ -114,10 +114,10 @@ namespace ASMFramework
 		}*/
 
 		/// <summary>
-		/// Gets the numeric value represented by the supported formated string
+		/// Gets the numeric value represented by the supported formatted string
 		/// </summary>
 		/// <typeparam name="TargetType">The numeric type that the value is to be represented as when returned</typeparam>
-		/// <param name="immediate">The formated strign representing a numeric value</param>
+		/// <param name="immediate">The formatted string representing a numeric value</param>
 		/// <returns>The value represented in the type defined by the TargetType template parameter</returns>
 		template<std::integral TargetType>
 		static inline TargetType GetImmediateValue(const std::string& immediate)
@@ -229,7 +229,7 @@ namespace ASMFramework
 		}
 
 		/// <summary>
-		/// Called by an Assember INS to verify the provided register id and throw an exeption if it is invalid in the calling context
+		/// Called by an Assembler INS to verify the provided register id and throw an exception if it is invalid in the calling context
 		/// </summary>
 		/// <typeparam name="RegisterType">The type used for the register id to be validated</typeparam>
 		/// <typeparam name="...InvalidRegisterIDs">A collection of the register IDs that are to be considered invalid in the calling context</typeparam>
@@ -238,6 +238,18 @@ namespace ASMFramework
 		inline void CheckRegisterIDInvalid(const RegisterType& id) const
 		{
 			((id == InvalidRegisterIDs ? throw std::runtime_error("You may not set the value of special registers this way." + Exeption_MakeStringInvalidRegisters<InvalidRegisterIDs>()) : void()), ...);
+		}
+
+		/// <summary>
+		/// Called by an Assembler INS to check the provided register id against those that should trigger a warning in the calling context
+		/// </summary>
+		/// <typeparam name="RegisterType">The type used for the register id to be validated</typeparam>
+		/// <typeparam name="...WarnRegisterIDs">A collection of the register IDs that should trigger a warning in the calling context</typeparam>
+		/// <param name="id">The register id to check</param>
+		template<std::integral RegisterType, uint8_t... WarnRegisterIDs>
+		inline void CheckRegisterIDWarning(const RegisterType& id, const size_t& bytesWritten) const
+		{
+			((id == WarnRegisterIDs ? throw Warning("R" + std::to_string(id) + " is considered dangerous to use in this context. The following registers will cause this warning in this context" + Warning_MakeStringFlagedRegisters<WarnRegisterIDs>(), bytesWritten) : void()), ...);
 		}
 
 	public:
@@ -257,7 +269,7 @@ namespace ASMFramework
 		public:
 			size_t returnVal;
 
-			Warning(std::string&& msg, size_t&& rtrnVal): message(msg), returnVal(rtrnVal)
+			Warning(std::string&& msg, const size_t& rtrnVal): message(msg), returnVal(rtrnVal)
 			{}
 
 			const char* what() const noexcept override
@@ -278,20 +290,8 @@ namespace ASMFramework
 		/// <returns>The number of bytes written to the buffer</returns>
 		/// <exception cref="std::runtime_error Thrown by the instruction if the operation cannot be completed properly"/>
 		/// <exception cref="ASMInstruction::NotImplemented Thrown by the instruction to signify that its tooling is not implemented, and therefore the instruction is unsupported at this time"/>
-		/// <exception cref="ASMInstruction::Warning Thrown by the instruciton if a condition is met that warrants a warning to the user, but not a failure of the assembly process. Will return the number of bytes written to the buffer allong with the warning message"/>
+		/// <exception cref="ASMInstruction::Warning Thrown by the instruction if a condition is met that warrants a warning to the user, but not a failure of the assembly process. Will return the number of bytes written to the buffer along with the warning message"/>
 		virtual size_t Implementation(std::vector<uint8_t>& buffer, Workpiece* const& workpiece, const LanguageDefinition* const& langDef, const std::vector<std::string>& args) const = 0;
-
-		/// <summary>
-		/// Called by an Assember INS to check the provided register id against those that should trigger a warning in the calling context
-		/// </summary>
-		/// <typeparam name="RegisterType">The type used for the register id to be validated</typeparam>
-		/// <typeparam name="...WarnRegisterIDs">A collection of the register IDs that should trigger a warning in the calling context</typeparam>
-		/// <param name="id">The register id to check</param>
-		template<std::integral RegisterType, uint8_t... WarnRegisterIDs>
-		inline void CheckRegisterIDWarning(const RegisterType& id, size_t&& bytesWritten) const
-		{
-			((id == WarnRegisterIDs ? throw Warning("R" + std::to_string(id) + "is considered dangerouse to use in this context. The following registers will cause this warning in this context" + Warning_MakeStringFlagedRegisters<WarnRegisterIDs>(), bytesWritten) : void()), ...);
-		}
 	};
 }
 #endif // !ASMINSTRUCTION_H

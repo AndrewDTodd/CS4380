@@ -9,9 +9,15 @@
 #include <ASMFramework_GetVersion.h>
 #include <VMFramework_GetVersion.h>
 
+#include <DWORDMemoryMap.h>
+#include <ExpandingHeapAllocator.h>
+#include <HeapContainer.h>
+
 #include "rootConfig.h"
 
 constexpr size_t maxPathLength = 256;
+constexpr size_t SYSTEM_MEMORY = VMFramework::GibiByte;
+constexpr size_t SYSTEM_INIT_HEAP = VMFramework::MebiByte * 4;
 
 int main(int argc, char* argv[])
 {
@@ -50,7 +56,10 @@ int main(int argc, char* argv[])
 
 		VM = VM4380::GetInstance();
 
-		VM->StartUp();
+		VMFramework::DWORDMemoryMap<int32_t> memoryMap;
+		VMFramework::HeapContainer<int32_t, VMFramework::ExpandingHeapAllocator<int32_t>> heapContainer;
+
+		VM->StartUp(SYSTEM_MEMORY, memoryMap, SYSTEM_INIT_HEAP, heapContainer);
 
 		try
 		{
@@ -65,7 +74,7 @@ int main(int argc, char* argv[])
 		catch (const std::exception& ex)
 		{
 			RED_TERMINAL
-				std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
+				std::cerr << "Unhandled exception caught by root catch. Error: " << ex.what() << std::endl;
 			RESET_TERMINAL
 		}
 
@@ -112,7 +121,7 @@ int main(int argc, char* argv[])
 		catch (const std::exception& ex)
 		{
 			RED_TERMINAL
-				std::cerr << "Unhandled exeption caught by root catch. Error: " << ex.what() << std::endl;
+				std::cerr << "Unhandled exception caught by root catch. Error: " << ex.what() << std::endl;
 			RESET_TERMINAL
 		}
 

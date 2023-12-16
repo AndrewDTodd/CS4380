@@ -9,6 +9,8 @@
 #include "../include/Process_4380.h"
 #include "../include/ISA_4380.h"
 #include "../include/DWORDMemoryMap.h"
+#include "../include/HeapContainer.h"
+#include "../include/ExpandingHeapAllocator.h"
 
 using namespace VMFramework;
 
@@ -19,6 +21,7 @@ protected:
 
 	MemoryManager<int32_t>* _memoryManager;
 	DWORDMemoryMap<int32_t> _memoryMap;
+	HeapContainer<int32_t, ExpandingHeapAllocator<int32_t>> _heapContainer;
 
 	void* stackMemory;
 
@@ -37,7 +40,7 @@ protected:
 	void SetUp() override
 	{
 		_memoryManager = MemoryManager<int32_t>::GetInstance();
-		_memoryManager->StartUp(VMFramework::MebiByte, _memoryMap);
+		_memoryManager->StartUp(VMFramework::MebiByte * 400, _memoryMap, VMFramework::MebiByte * 100, _heapContainer);
 
 		_program = static_cast<uint8_t*>(_memoryManager->AllocateUserPage(DWORDMemoryMap<int32_t>::PageTypes::normal));
 
@@ -57,57 +60,57 @@ TEST_F(Process_4380Testing, Validate_ConstructorValidInput)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);});
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], nullptr, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], nullptr, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullCodeSegmentPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, nullptr, &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, nullptr, &_program[77], &_isa, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnNullProgramEndPointer)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], nullptr, &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], nullptr, &_isa, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidCodeStart)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, _program - 1, &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[6], _program, _program - 1, &_program[77], &_isa, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnPCInDataSegment)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(&_program[5], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);}, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(&_program[5], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);}, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_ConstructorThrowsOnInvalidPC)
 {
 	Process_4380* _process;
 
-	ASSERT_THROW({ _process = new Process_4380(nullptr, _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory); }, std::runtime_error);
-	ASSERT_THROW({ _process = new Process_4380(_program - 1, _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(nullptr, _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory); }, std::runtime_error);
+	ASSERT_THROW({ _process = new Process_4380(_program - 1, _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory); }, std::runtime_error);
 }
 
 TEST_F(Process_4380Testing, Validate_Fetch)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);});
 
 	_process->Fetch();
 
@@ -125,7 +128,7 @@ TEST_F(Process_4380Testing, Validate_Increment)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);});
 
 	_process->Increment();
 
@@ -136,7 +139,7 @@ TEST_F(Process_4380Testing, Validate_Decode)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);});
 
 	_process->opcode = 1;
 
@@ -155,7 +158,7 @@ TEST_F(Process_4380Testing, Validate_Execute)
 {
 	Process_4380* _process;
 
-	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _mutex, _memoryManager, 100, stackMemory);});
+	ASSERT_NO_THROW({ _process = new Process_4380(&_program[6], _program, &_program[6], &_program[77], &_isa, _memoryManager, 100, stackMemory);});
 
 	_process->Fetch();
 

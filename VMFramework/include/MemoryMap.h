@@ -100,36 +100,36 @@ namespace VMFramework
 		/// Used to create a new page of memory in the process's/users address space
 		/// </summary>
 		/// <param name="pageType">Id representing the type of page that should be created. Supported types determined by the specific MemoryMap implementation</param>
-		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
+		/// <returns>Pointer to the beginning of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		virtual inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable) = 0;
+		virtual inline void* AllocateUserPage(const uint8_t& pageType, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) = 0;
 
 		/// <summary>
 		/// Used to create a new page of memory in the system's/kernel's address space
 		/// </summary>
 		/// <param name="pageType">Id representing the type of page that should be created. Supported types determined by the specific MemoryMap implementation</param>
-		/// <returns>Pointer to the beggining of the allocated page in memory</returns>
+		/// <returns>Pointer to the beginning of the allocated page in memory</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if the page allocator for the specified page type does not have sufficient memory to satisfy the page allocation"/>
-		virtual inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable) = 0;
+		virtual inline void* AllocateKernelPage(const uint8_t& pageType, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) = 0;
 		
 		/// <summary>
 		/// Used to create as many pages as are necessary in the process's/users address space to satisfy the request for memory
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested</param>
-		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
+		/// <returns>Pointer to the beginning of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		virtual inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable) = 0;
+		virtual inline void* AllocateUserPagesFor(const size_t& bytesNeeded, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) = 0;
 
 		/// <summary>
 		/// Used to create as many pages as are necessary in the system's/kernel's address space to satisfy the request for memory
 		/// </summary>
 		/// <param name="bytesNeeded">The amount of memory requested</param>
-		/// <returns>Pointer to the beggining of the set of pages allocated</returns>
+		/// <returns>Pointer to the beginning of the set of pages allocated</returns>
 		/// <exception cref="VMFramework::out_of_memory Thrown if memory map is unable to allocate the required pages for the requested amount of memory"/>
-		virtual inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable) = 0;
+		virtual inline void* AllocateKernelPagesFor(const size_t& bytesNeeded, const bool& pageWritable, size_t* numBytesAllocated_out = nullptr) = 0;
 
 		/// <summary>
-		/// Used to free any number of contiguouse pages that start at the address provided
+		/// Used to free any number of contiguous pages that start at the address provided
 		/// </summary>
 		/// <param name="pagesStart">Pointer to the beginning of the first page in the sequence</param>
 		/// <param name="pagesBytes">The length in bytes of the sequence to free</param>
@@ -143,7 +143,7 @@ namespace VMFramework
 		virtual inline void* Virtual_To_Physical(const RegisterType& virtualAddress) = 0;
 
 		/// <summary>
-		/// Used to translate a physical system address into the mapped virtual address in the proecess's virtual address space
+		/// Used to translate a physical system address into the mapped virtual address in the process's virtual address space
 		/// </summary>
 		/// <param name="physicalAddress">The the system address to be translated to a virtual address</param>
 		/// <returns>A virtual address mapped to the provided physical address</returns>

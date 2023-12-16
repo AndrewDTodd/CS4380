@@ -12,7 +12,7 @@ void VM4380::SpawnProcess(const void* initialPC)
 	{
 		Process_4380* process = new Process_4380(initialPC,
 			m_programSegment, m_codeSegment, (m_programSegment + m_programSize),
-			&m_ISA, VM4380::_sharedMutex,
+			&m_ISA,
 			m_memoryManager, PROCESS_STACK_SIZE, stackMemory);
 
 		std::thread processThread(&Process_4380::Run, process);

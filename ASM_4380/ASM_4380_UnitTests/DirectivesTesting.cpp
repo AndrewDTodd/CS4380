@@ -79,7 +79,7 @@ TEST_F(ASMDirectivesTesting, Validate_CSTR)
 {
 	CSTR_DIR _cstr;
 
-	ASSERT_THROW(_cstr.Implementation(&_workpiece, std::vector<std::string>{}), ASMDirective::NotImplemented);
+	ASSERT_NO_THROW(_cstr.Implementation(&_workpiece, std::vector<std::string>{}));
 }
 
 TEST_F(ASMDirectivesTesting, Validate_INT)
@@ -194,5 +194,5 @@ TEST_F(ASMDirectivesTesting, Validate_STR)
 {
 	STR_DIR _str;
 
-	ASSERT_THROW(_str.Implementation(&_workpiece, std::vector<std::string>{}), ASMDirective::NotImplemented);
+	ASSERT_NO_THROW(_str.Implementation(&_workpiece, std::vector<std::string>{}));
 }

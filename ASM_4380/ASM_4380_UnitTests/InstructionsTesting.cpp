@@ -46,9 +46,9 @@ TEST_F(ASMInstructionsTesting, Validate_ADD)
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -77,9 +77,9 @@ TEST_F(ASMInstructionsTesting, Validate_ADI)
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
 	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
-	EXPECT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_add.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
@@ -170,9 +170,9 @@ TEST_F(ASMInstructionsTesting, Validate_DIVI)
 	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
 	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
-	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
-	EXPECT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_divi.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
@@ -258,9 +258,9 @@ TEST_F(ASMInstructionsTesting, Validate_DIV)
 	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
 	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
-	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
-	EXPECT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
+	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_div.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -288,9 +288,9 @@ TEST_F(ASMInstructionsTesting, Validate_MULI)
 	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "#12"}), std::runtime_error);
 	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "#12"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}));
-	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}));
-	EXPECT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}));
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "#12"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "#12"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_muli.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "#12345"}));
 
@@ -376,9 +376,9 @@ TEST_F(ASMInstructionsTesting, Validate_MUL)
 	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
 	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
-	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
-	EXPECT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
+	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_mul.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 
@@ -402,9 +402,9 @@ TEST_F(ASMInstructionsTesting, Validate_SUB)
 	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SL", "R0"}), std::runtime_error);
 	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SB", "R0"}), std::runtime_error);
 
-	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}));
-	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}));
-	EXPECT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}));
+	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"SP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"FP", "R0"}), ASMFramework::ASMInstruction::Warning);
+	EXPECT_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"HP", "R0"}), ASMFramework::ASMInstruction::Warning);
 
 	ASSERT_NO_THROW(_sub.Implementation(_buffer, &_workpiece, &_langDef, std::vector<std::string>{"R0", "R1"}));
 

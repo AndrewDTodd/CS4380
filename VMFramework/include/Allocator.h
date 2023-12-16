@@ -44,7 +44,7 @@ namespace VMFramework
 	{
 	protected:
 		/// <summary>
-		/// The address at the begining of this allocators controlled memory block
+		/// The address at the beginning of this allocators controlled memory block
 		/// </summary>
 		void* m_start;
 
@@ -54,7 +54,7 @@ namespace VMFramework
 		size_t m_usedMemory = 0;
 
 		/// <summary>
-		/// The number of individual allocations from this allocator's block of memeory that are active
+		/// The number of individual allocations from this allocator's block of memory that are active
 		/// </summary>
 		size_t m_numOfAllocations = 0;
 
@@ -63,13 +63,13 @@ namespace VMFramework
 		/// </summary>
 		/// <param name="size">The number of bytes this allocator should claim for its block</param>
 		/// <param name="start">The address where this allocators block will begin</param>
-		/// <exeption cref="invalid_argument">Thrown if start is nullptr</exeption>
+		/// <exception cref="invalid_argument">Thrown if start is nullptr</exception>
 		Allocator(const size_t& size, void* start);
 
 		/// <summary>
 		/// Base class destructor, will set Allocators pointers and members to default value
 		/// </summary>
-		/// <exeption cref="runtime_error">Thrown in Debug builds if the number of allocations or the used memory size are not 0, indicating a memory leak</exeption>
+		/// <exception cref="runtime_error">Thrown in Debug builds if the number of allocations or the used memory size are not 0, indicating a memory leak</exception>
 		virtual ~Allocator()
 #ifdef _DEBUG
 			noexcept(false)
@@ -86,9 +86,9 @@ namespace VMFramework
 		/// Make an allocation on this allocator's block of memory
 		/// </summary>
 		/// <param name="size">The number of bytes to claim</param>
-		/// <param name="allignment">The alignment needed for the allocation, default is 8 byte allign</param>
+		/// <param name="alignment">The alignment needed for the allocation, default is 8 byte align</param>
 		/// <returns>A pointer to first byte of the allocation</returns>
-		virtual void* Allocate(const size_t& size, const uint8_t& allignment = 8) = 0;
+		virtual void* Allocate(const size_t& size, const uint8_t& alignment = 8) = 0;
 
 		/// <summary>
 		/// Free up an allocation that was made on this allocator's block of memory
@@ -210,7 +210,7 @@ namespace VMFramework
 	/// <typeparam name="T">The type to allocate instances of to make array</typeparam>
 	/// <param name="allocator">Pointer to allocator to retrieve needed memory from</param>
 	/// <param name="length">The number of instances of T to make</param>
-	/// <returns>Pointer to begining of the allocated array</returns>
+	/// <returns>Pointer to beginning of the allocated array</returns>
 	template<class T> T* AllocateArray(Allocator* allocator, const size_t& length)
 	{
 		assert(length != 0 && "Cannot allocate an array with legth of 0");
@@ -232,7 +232,7 @@ namespace VMFramework
 		for (size_t i = 0; i < length; i++)
 			new (&p[i]) T;
 
-		//Return pointer to the begining of the array (not the header)
+		//Return pointer to the beginning of the array (not the header)
 		return p;
 	}
 
@@ -243,7 +243,7 @@ namespace VMFramework
 	/// <param name="allocator">Pointer to allocator to retrieve needed memory from</param>
 	/// <param name="length">The number of instances of T to make</param>
 	/// <param name="t">An rvalue reference to an instance of T to use for constructing the elements of the array</param>
-	/// <returns>Pointer to begining of the allocated array</returns>
+	/// <returns>Pointer to beginning of the allocated array</returns>
 	template<class T> T* AllocateArray(Allocator* allocator, const size_t& length, T&& t)
 	{
 		assert(length != 0 && "Cannot allocate an array with legth of 0");
@@ -267,7 +267,7 @@ namespace VMFramework
 			new (&p[i]) T(t);
 		}
 
-		//Return pointer to the begining of the array (not the header)
+		//Return pointer to the beginning of the array (not the header)
 		return p;
 	}
 
@@ -294,7 +294,7 @@ namespace VMFramework
 		if (sizeof(size_t) % sizeof(T) > 0)
 			headerSize += 1;
 
-		//Call Deallocate on the allocator with the address at the begining of the array with the additional header memory included
+		//Call Deallocate on the allocator with the address at the beginning of the array with the additional header memory included
 		allocator->Deallocate(array - headerSize);
 	}
 
