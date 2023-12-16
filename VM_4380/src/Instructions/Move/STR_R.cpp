@@ -10,7 +10,7 @@ STR_R::STR_R() : Instruction(22)
 
 void STR_R::Op(Process_4380* executingProcess)
 {
-	uint8_t* _destination = const_cast<uint8_t*>(executingProcess->_programStart) + executingProcess->m_registers[executingProcess->operandTwo];
+	uint8_t* _destination = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[executingProcess->operandTwo]));
 	if (_destination < executingProcess->_codeSegment)
 	{
 		if constexpr (is_little_endian)

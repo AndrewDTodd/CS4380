@@ -742,13 +742,17 @@ TEST_F(VMInstructionsTesting, Validate_LDA)
 	_process->operandOne = 0;
 	_process->operandTwo = 0x12;
 
+	int32_t virtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 0x12);
+
 	_isa.operator[](8)->Op(_process);
 
-	ASSERT_EQ(_process->m_registers[0], 0x12);
+	ASSERT_EQ(_process->m_registers[0], virtualAddress);
 }
 
 TEST_F(VMInstructionsTesting, Validate_LDB_L)
 {
+	_process->m_registers[0] = 0;
+
 	_process->operandOne = 0;
 	_process->operandTwo = 4;
 
@@ -759,7 +763,9 @@ TEST_F(VMInstructionsTesting, Validate_LDB_L)
 
 TEST_F(VMInstructionsTesting, Validate_LDB_R)
 {
-	_process->m_registers[1] = 4;
+	int32_t virtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 4);
+	_process->m_registers[1] = virtualAddress;
+
 	_process->operandOne = 0;
 	_process->operandTwo = 1;
 
@@ -774,24 +780,20 @@ TEST_F(VMInstructionsTesting, Validate_LDR_L)
 	_process->operandTwo = 4;
 
 	_isa.operator[](10)->Op(_process);
-	//As it is in program
-	//0x57, 0x65, 0x01, 0x00,
-	//Interpreted as little-endian 4 byte int
-	//0x00016557
+	
 	ASSERT_EQ(_process->m_registers[0], 0x00016557);
 }
 
 TEST_F(VMInstructionsTesting, Validate_LDR_R)
 {
-	_process->m_registers[1] = 4;
+	int32_t virtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 4);
+	_process->m_registers[1] = virtualAddress;
+
 	_process->operandOne = 0;
 	_process->operandTwo = 1;
 
 	_isa.operator[](23)->Op(_process);
-	//As it is in program
-	//0x57, 0x65, 0x01, 0x00,
-	//Interpreted as little-endian 4 byte int
-	//0x00016557
+	
 	ASSERT_EQ(_process->m_registers[0], 0x00016557);
 }
 
@@ -832,7 +834,10 @@ TEST_F(VMInstructionsTesting, Validate_STB_L)
 TEST_F(VMInstructionsTesting, Validate_STB_R)
 {
 	_process->m_registers[0] = 0x70;
-	_process->m_registers[1] = 4;
+
+	int32_t virtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart + 4);
+	_process->m_registers[1] = virtualAddress;
+
 	_process->operandOne = 0;
 	_process->operandTwo = 1;
 
@@ -868,7 +873,10 @@ TEST_F(VMInstructionsTesting, Validate_STR_L)
 TEST_F(VMInstructionsTesting, Validate_STR_R)
 {
 	_process->m_registers[0] = 0x12345678;
-	_process->m_registers[1] = 0;
+	
+	int32_t virtualAddress = _process->_memoryManager->Physical_To_Virtual(_process->_programStart);
+	_process->m_registers[1] = virtualAddress;
+
 	_process->operandOne = 0;
 	_process->operandTwo = 1;
 

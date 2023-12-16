@@ -9,7 +9,7 @@ void LDB_R::Op(Process_4380* executingProcess)
 {
 	executingProcess->CheckRegisterIDInvalid<16, 17, 18>(executingProcess->operandOne);
 
-	const uint8_t* _source = executingProcess->_programStart + executingProcess->m_registers[executingProcess->operandTwo];
+	const uint8_t* _source = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[executingProcess->operandTwo]));
 	if (_source < executingProcess->_programEnd)
 	{
 		//executingProcess->m_registers[executingProcess->operandOne] = 0;
