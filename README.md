@@ -1,4 +1,4 @@
-# Project3  
+# Project5  
 
 ###### **NOTE: all steps assume user is on Ubuntu 22.04 or compatible Debian system**  
 #### Steps to build  
@@ -27,6 +27,9 @@ Run the following command to make the script executable
 Enter the following command to run the build script
 
     ./Build.sh
+
+###### **NOTE**: I have had issues with the Build.sh script being corrupted by windows (adding carriage returns to the new lines). If this happens the script wont run with the instructions provided.
+###### **NOTE Continued**: If the Build.sh script is corrupted, one can either recreate it (its just two lines), or just manually enter its contents into a terminal in sequence (its two lines...)
 
 #### Steps to run programs/tests  
 ##### Step 1: navigate to build directory  
