@@ -23,18 +23,20 @@ size_t STR_DIR::Implementation(ASMFramework::Workpiece* const& workpiece, const 
 	}
 
 	const std::string& argument = args[0];
-	size_t argLength = argument.length();
+	std::string newArg = argument.substr(1, argument.size() - 2);
+
+	size_t argLength = newArg.size();
 	if (argLength > std::numeric_limits<uint8_t>::max())
 		throw std::runtime_error("The system only supports strings of 255 characters or less. Provided argument has " + std::to_string(argLength) + "characters");
 
-	//Match base ten with # as delimiter
+	//Match with string regex to verify we have a valid argument
 	if (std::regex_match(argument, stringPattern))
 	{
-		const char* cstr = argument.c_str();
+		const char* cstr = newArg.c_str();
 
-		workpiece->_dataSegmentBin.push_back(static_cast<uint8_t>(argument.length()));
+		workpiece->_dataSegmentBin.push_back(static_cast<uint8_t>(argLength));
 
-		std::copy(cstr, cstr + argument.length(), std::back_inserter(workpiece->_dataSegmentBin));
+		std::copy(cstr, cstr + argLength, std::back_inserter(workpiece->_dataSegmentBin));
 	}
 	//Did not match any expected argument types
 	else

@@ -10,7 +10,7 @@ ENDL		.BYT	'\n'
 			JMP		MAIN
 
 FIB			MOV		R1, R0
-			CMPI	R1, #2
+			CMPI	R1, #1
 			BGT		R1, FIB_BODY
 			JMR		R15
 
@@ -22,7 +22,7 @@ FIB_BODY	PUSH	R15				;store the current link register (R15) on the stack
 			MOV		R1, R0			;copy value returned from call to fib into R1 (returned from fib in R0)
 			POP		R0				;restore the value of n from the stack, put it back into R0 so it can be used as an argument to next branch of fib
 			PUSH	R1				;store the result of that branch of recusion (FIB) that just returned. Returned DWORD in R0, we copied into R1
-			ADI		R0, #1			;calculate this levels n - 2
+			ADI		R0, #-1			;calculate this levels n - 2
 			BAL		R15, FIB		;recursive call two to FIB
 			POP		FP				;again restore the FP from the stack
 			POP		R1				;restore the result of first branch of fib back into R1
