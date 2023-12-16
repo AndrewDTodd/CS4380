@@ -520,7 +520,7 @@ namespace VMFramework
 				if (extendedPageAddress->pageGlobalDirectoryIndex > MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR - 1 + m_extendedPageCount)
 					throw std::invalid_argument("The global directory index portion of the virtual address is not valid");
 
-				pte = m_extendedPageGlobalDirectory[extendedPageAddress->pageGlobalDirectoryIndex];
+				pte = m_extendedPageGlobalDirectory[extendedPageAddress->pageGlobalDirectoryIndex - MAX_NUM_OF_ENTRIES_IN_GLOBAL_DIR];
 
 				physicalAddress = const_cast<uint8_t*&>(m_extendedPagesPhysicalAddressOrdinal) + (pte.frame_number * sizeof(FourMiBPage)) + extendedPageAddress->pageOffset;
 			}

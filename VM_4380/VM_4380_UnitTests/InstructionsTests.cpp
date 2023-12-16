@@ -964,7 +964,7 @@ TEST_F(VMInstructionsTesting, Validate_POP)
 
 	EXPECT_EQ(_process->m_registers[0], -1);
 
-	EXPECT_TRUE(_process->m_registers[19] < newSP);
+	EXPECT_TRUE(_process->m_registers[19] > newSP);
 
 	_process->operandOne = 16;
 	EXPECT_THROW(_isa.operator[](41)->Op(_process), VMFramework::protection_fault);

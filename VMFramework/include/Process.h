@@ -124,7 +124,7 @@ namespace VMFramework
 		/// </summary>
 		MemoryManager<RegisterType>* _memoryManager;
 
-		const void* m_stackBase = nullptr;
+		const uint8_t* m_stackBase = nullptr;
 
 		bool _run = true;
 
