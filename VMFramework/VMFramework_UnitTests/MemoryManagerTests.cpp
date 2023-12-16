@@ -66,7 +66,7 @@ TEST_F(MemoryManagerTesting, Validate_HeapAllocate)
 
 	EXPECT_TRUE(afterHeapSize >= (beforeHeapAllocNum + 255));
 
-	EXPECT_EQ((beforeHeapAllocNum++), afterHeapAllocNum);
+	EXPECT_EQ((beforeHeapAllocNum + 1), afterHeapAllocNum);
 }
 
 TEST_F(MemoryManagerTesting, Validate_HeapFree)

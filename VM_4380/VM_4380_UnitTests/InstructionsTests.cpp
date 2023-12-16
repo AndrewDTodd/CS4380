@@ -980,8 +980,31 @@ TEST_F(VMInstructionsTesting, Validate_POP)
 }
 
 TEST_F(VMInstructionsTesting, Validate_PUSH)
-{
+{	
+	int32_t* buffer = static_cast<int32_t*>(_process->Push<int32_t>(-255));
 
+	int32_t initialStackSize = _process->m_usedMemory;
+	int32_t initialStackAllocNum = _process->m_numOfAllocations;
+
+	int32_t* prePUSHSP = static_cast<int32_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[19]));
+
+	_process->m_registers[0] = -1;
+	_process->operandOne = 0;
+
+	_isa.operator[](40)->Op(_process);
+
+	EXPECT_EQ(*prePUSHSP, -1);
+
+	int32_t postPUSHStackSize = _process->m_usedMemory;
+	int32_t postPUSHStackAllocNum = _process->m_numOfAllocations;
+
+	EXPECT_TRUE(postPUSHStackSize > initialStackSize);
+
+	EXPECT_EQ(postPUSHStackAllocNum, initialStackAllocNum + 1);
+
+	int32_t* postPUSHSP = static_cast<int32_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[19]));
+
+	EXPECT_TRUE(postPUSHSP < prePUSHSP);
 }
 //*******************************************************************************************************
 
@@ -1076,7 +1099,7 @@ TEST_F(VMInstructionsTesting, Validate_TRP)
 
 	ASSERT_EQ(capturedOutput.str(), "W");
 
-	std::cout.rdbuf(originalBuffer);
+	capturedOutput.str("");
 	//****************************************************
 
 	//Case TRP 4 *****************************************
@@ -1148,6 +1171,76 @@ TEST_F(VMInstructionsTesting, Validate_TRP)
 	std::cin.clear();
 	//****************************************************
 
+	//Case TRP 5 *****************************************
+	const char* testStr = "This is a test!";
+
+	uint8_t* stringPtr = static_cast<uint8_t*>(_process->_memoryManager->HeapAllocate(16, 1));
+	*stringPtr = 15;
+
+	std::memcpy(stringPtr + 1, testStr, 15);
+
+	_process->m_registers[3] = _process->_memoryManager->Physical_To_Virtual(stringPtr);
+
+	_process->operandOne = 5;
+
+	_isa.operator[](21)->Op(_process);
+
+	ASSERT_EQ(capturedOutput.str(), "This is a test!");
+
+	capturedOutput.str("");
+	//****************************************************
+
+	//Case TPR 6 *****************************************
+	size_t preTRPSixHeapSize = _process->_memoryManager->GetHeapUsedMem();
+	size_t preTRPSixHeapAllocNum = _process->_memoryManager->GetHeapNumAlloc();
+
+	testInput = "Test input string one";
+	testStream.str(testInput);
+	std::cin.rdbuf(testStream.rdbuf());
+
+	int32_t preTRPSixRThree = _process->m_registers[3];
+
+	_process->operandOne = 6;
+
+	_isa.operator[](21)->Op(_process);
+
+	ASSERT_NE(_process->m_registers[3], preTRPSixRThree);
+
+	const char* strInHeap = static_cast<const char*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[3]));
+
+	ASSERT_TRUE(std::strcmp(testInput.c_str(), strInHeap) == 0);
+
+	size_t postTRPSixHeapSize = _process->_memoryManager->GetHeapUsedMem();
+	size_t postTRPSixHeapAllocNum = _process->_memoryManager->GetHeapNumAlloc();
+
+	ASSERT_TRUE(postTRPSixHeapSize > preTRPSixHeapSize);
+
+	ASSERT_EQ(postTRPSixHeapAllocNum, preTRPSixHeapAllocNum + 1);
+
+	std::cin.clear();
+	//****************************************************
+
+	//Case TRP 7 *****************************************
+	size_t preTRPSevenHeapSize = _process->_memoryManager->GetHeapUsedMem();
+	size_t preTRPSevenHeapAllocNum = _process->_memoryManager->GetHeapNumAlloc();
+
+	int32_t preTRPSevenRThree = _process->m_registers[3];
+
+	_process->operandOne = 7;
+
+	_isa.operator[](21)->Op(_process);
+
+	ASSERT_NE(_process->m_registers[3], preTRPSevenRThree);
+
+	uint8_t* pascalStrInHeap = static_cast<uint8_t*>(_process->_memoryManager->Virtual_To_Physical(_process->m_registers[3]));
+
+	uint8_t pasStrLen = *pascalStrInHeap;
+
+	ASSERT_EQ(pasStrLen, 21);
+
+	ASSERT_TRUE(std::memcmp(strInHeap, pascalStrInHeap + 1, 21) == 0);
+	//****************************************************
+
 	//Case TRP 0 *****************************************
 	_process->operandOne = 0;
 
@@ -1162,5 +1255,6 @@ TEST_F(VMInstructionsTesting, Validate_TRP)
 	//****************************************************
 
 	std::cin.rdbuf(origCin);
+	std::cout.rdbuf(originalBuffer);
 }
 //*******************************************************************************************************

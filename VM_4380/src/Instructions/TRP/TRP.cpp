@@ -149,14 +149,14 @@ void TRP::Op(Process_4380* executingProcess)
 		str = static_cast<uint8_t*>(executingProcess->_memoryManager->Virtual_To_Physical(executingProcess->m_registers[3]));
 		length = *str;
 
-		for (uint8_t charNum = 1; charNum < length; charNum++)
+		for (uint8_t charNum = 1; charNum < length + 1; charNum++)
 		{
 			std::cout << str[charNum];
 		}
 		break;
 
 	case(6):
-		std::cin >> input;
+		std::getline(std::cin, input);
 
 		heapStrPtr = static_cast<uint8_t*>(executingProcess->_memoryManager->HeapAllocate(input.length() + 1, 1));
 
