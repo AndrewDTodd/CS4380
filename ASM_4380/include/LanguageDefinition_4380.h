@@ -43,6 +43,7 @@ private:
 	FREE_INS FREE;
 
 	//Jump
+	BAL_INS BAL;
 	BGT_INS BGT;
 	BLT_INS BLT;
 	BNZ_INS BNZ;
@@ -70,6 +71,11 @@ private:
 	LCK_INS LCK;
 	RUN_INS RUN;
 	ULK_INS ULK;
+
+	//Stack
+	PEEK_INS PEEK;
+	POP_INS POP;
+	PUSH_INS PUSH;
 
 	//TRP
 	TRP_INS TRP;

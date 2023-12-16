@@ -11,10 +11,11 @@ LanguageDefinition_4380::LanguageDefinition_4380() :
 		ADD, ADI, SUB, MUL, MULI, DIV, DIVI,
 		CMP, CMPI,
 		ALCI, ALLC, FREE,
-		JMP, JMR, BNZ, BGT, BLT, BRZ,
+		BAL, BGT, BLT, BNZ, BRZ, JMP, JMR,
 		AND, NOT, OR,
-		MOV, MOVI, LDA, STR, LDR, STB, LDB,
-		RUN, BLK, END, LCK, ULK,
+		LDA, LDB, LDR, MOVI, MOV, STB, STR,
+		BLK, END, LCK, RUN, ULK,
+		PEEK, POP, PUSH,
 		TRP);
 	SetRegisterMnemonics(
 		std::string("R0"), std::string("R1"), std::string("R2"), std::string("R3"), std::string("R4"), std::string("R5"),

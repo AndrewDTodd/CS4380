@@ -31,7 +31,7 @@ size_t LDB_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 
 		CheckRegisterIDWarning<int32_t, 19, 20, 21>(registerID, sizeof(int32_t) * 3);
 	}
-	//Register to Register verison
+	//Register to Register version
 	else
 	{
 		const int32_t opcode = 25;

@@ -21,7 +21,7 @@ size_t TRP_INS::Implementation(std::vector<uint8_t>& buffer, ASMFramework::Workp
 	if (trapNum == 99)
 		throw NotImplemented();
 	else if (trapNum < 0 || trapNum > 7 && trapNum != 99)
-		throw std::runtime_error("Value provided to .TRP instruciton - \"" + std::to_string(trapNum) + "\" - is invalid. Valid traps are 0 - 7");
+		throw std::runtime_error("Value provided to .TRP instruction - \"" + std::to_string(trapNum) + "\" - is invalid. Valid traps are 0 - 7");
 
 	SerializeToBuffer<int32_t>(buffer, opcode, trapNum, 0);
 

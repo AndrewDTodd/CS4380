@@ -50,6 +50,7 @@
 #include "Multi_Thread_INS/ULK_INS.h"
 
 //Stack
+#include "Stack_INS/PEEK_INS.h"
 #include "Stack_INS/POP_INS.h"
 #include "Stack_INS/PUSH_INS.h"
 
